@@ -1,0 +1,7 @@
+azureRegion = "West US 2"
+azureResourceGroup = "yuruna"
+azureResourceTagEnvironment = "yuruna"
+clusterDnsPrefix = "yuruna"
+clusterName = "yuruna"
+clusterVersion = "1.19.3"
+registryName = "yuruna"
