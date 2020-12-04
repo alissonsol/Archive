@@ -1,10 +1,22 @@
-terraform {
-  required_version = ">= 0.13"
+provider "azurerm" {
 
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "2.36.0"
-    }
+  features {}
+
+  # More information on the authentication methods supported by
+  # the AzureRM Provider can be found here:
+  # http://terraform.io/docs/providers/azurerm/index.html
+
+  # subscription_id = "..."
+  # client_id       = "..."
+  # client_secret   = "..."
+  # tenant_id       = "..."
+}
+
+resource "azurerm_resource_group" "default" {
+  name     = var.resourceGroup
+  location = var.clusterRegion
+
+  tags = {
+    environment = var.resourceTags
   }
 }

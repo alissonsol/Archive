@@ -1,7 +1,0 @@
-# Contexts for the deployment
----
-k8s:
-  namespace: "yuruna"
-context:
-- name: "yuruna"
-  services: "services-list"

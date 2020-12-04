@@ -1,41 +1,27 @@
-# Terraform Guidance
+# Creating cloud resources using Terraform
 
-## Azure resources
+Examples based on articles on how to [Manage Kubernetes with Terraform](https://learn.hashicorp.com/collections/terraform/kubernetes).
 
-This is based on the article [Provision an AKS Cluster (Azure)](https://learn.hashicorp.com/tutorials/terraform/aks). Assumes terraform is [downloaded](https://www.terraform.io/downloads.html) and installed. Check you have the latest version with `terraform version`.
+If making changes to the Terraform files, it is recommended to verify the plan with the command `terraform plan`.
 
-Configure the variables in `terraform.tfvars`.
+## Creating resources
 
-Then, execute script from the folder `automation`
+In the instructions below, `[cloud]` should be replaced by `aws`, `azure` or `gcp`, depending on your cloud provider. Folders are relative to the to Git root folder.
 
-```shell
-azure-deploy-resources.ps1
-```
+Configure deployment variables in the file `config/deployment.yml`.
 
-Attention: the registry name should be globally unique. Changing it requires changes to these files:
-
-- `terraform.tfvars`
-- `config/registry-host`
-- Yaml deployment files under `deployment` folder
-
-### Configure kubectl
-
-Use the following script to import the cluster credentials into `[user]/.kube/config`. The script will also create the `registry-credential` for each imported cluster.
+The first PowerShell script uses Terraform to create the a Docker registry, a Kubernetes cluster, and any other related resources (worker nodes, VPC, etc.). Execute the script below from the folder `automation`.
 
 ```shell
-azure-import-clusters.ps1
+deploy-resources.ps1 [cloud]
 ```
 
-Back to main [readme](../README.md)
+If there is a timeout while running this script then you can safely rerun it.
 
-### Cleaning up (if ever needed)
-
-If needed, resources can be deleted by executing commands below from folder `deployment/azure`.
+The second script imports Kubernetes cluster credentials into `[user]/.kube/config`. It also creates a `registry-credential` secret for each imported cluster (so it can [pull images from the a private registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)). Execute the script below from the folder `automation/[cloud]`.
 
 ```shell
-terraform destroy -auto-approve
+import-resources.ps1
 ```
-
-Don't forget to delete the cluster from `[user]/.kube/config`. That can be easily done using the [Visual Studio Code](https://code.visualstudio.com/) extension for [Kubernetes](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools).
 
 Back to main [readme](../README.md)

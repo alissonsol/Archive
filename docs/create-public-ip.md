@@ -1,21 +1,21 @@
 # Create Public IP
 
-Create public IP address and binds DNS entry to it
+Create public IP addresses and binds DNS entries
 
-## Azure
+## Creating the public-ip adddress
 
-- Execute script
+Execute the script below from the folder automation/[cloud].
 
 ```shell
-automation/azure-create-public-ip.ps1
+create-public-ip.ps1
 ```
 
-- From now on, this IP address will be the "STATIC_IP" used in commands
+- From now on, this IP address will be in the `config/workflows.yml` file and used in the follow-up commands.
 
 ## DNS binding
 
-- Go now to the domain registrar and create an A record pointing www.yuruna.com to the STATIC_IP
-- You may also want to create an A record pointing just yuruna.com to the STATIC_IP (host recordname `@`)
+- Configure the `frontend.site` field in the `config/workflows.yml` file.
+- Go now to the domain registrar and create an A record pointing the `frontend.site` to the `frontend.ipAddress` value.
 - It may take a while for the IP address to propagate. Check with a tool like <https://dns.google.com>
 
 Back to main [readme](../README.md)

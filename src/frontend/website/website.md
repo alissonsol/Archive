@@ -2,30 +2,6 @@
 
 Frontend website for user authentication and human-computer interface
 
-## Deploying to Kubernetes cluster
-
-- AKS cluster
-  - Make sure it is the current context
-  - Create namespace `kubectl create namespace yuruna`
-    - Set as default: `kubectl config set-context --current --namespace=yuruna`
-  - Run scripts to push image and create pull credential
-    - Set configuration executing `automation/set-dev-environment.ps1`
-    - Build containers locally executing `automation/src-build.ps1`
-    - Push containers to registry executing `automation/registry-push.ps1`
-    - Create secret to allow cluster to pull images from registry running `automation/azure-create-registry-credential.ps1`
-  - Deploy the website. Under folder `deployment`, enter `kubectl apply -f frontend/website`
-  - Port forward from Visual Studio Code or command line
-    - Get the pod id using `kubectl get pods --namespace=yuruna`
-    - Get the id for the pod and replace in the command `kubectl port-forward pods/website-[id] 8000:80 8001:443 -n yuruna`
-      - Remember to replace `website-[id]` with the real id from the previous command.
-      - The real command will be something like `kubectl port-forward pods/website-79f9dddc99-lvlkw 8000:80 8001:443 -n yuruna`
-  - Navigate to <http://localhost:8000>
-  - Stop the port forward.
-
-By now, you have created a cluster, built a container, and deployed it to that cluster. Celebrate a bit!
-
-Back to main [readme](../../../README.md) to create the ingress resources.
-
 ## Regenerating and modifying website project (if needed)
 
 - Created CSharp project "website" as per instructions from [Tutorial: Get started with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/getting-started/?view=aspnetcore-5.0)

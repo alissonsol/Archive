@@ -1,26 +1,34 @@
 # Set development environment variables (yuruna)
-# Configure files in ../config
+$git_root=git rev-parse --show-toplevel
 
-Push-Location $PSScriptRoot
+$modulePath = Join-Path -Path $git_root -ChildPath "automation/confirm-configuration"
+Import-Module -Name $modulePath
 
-if ($LASTEXITCODE -ne 0) {
-    Pop-Location
-    exit $env:ERRORLEVEL
+$targetConfiguration = 'localhost'
+$deployment = Confirm-Deployment
+$workloads = Confirm-Workloads
+
+# Set Docker registry environment variable (and authenticate, if needed)
+$registryLocation = $workloads.kustomization.registryLocation
+$registryUri = [System.UriBuilder]::new("https://$registryLocation")
+$registryHost = $registryUri.Host
+Write-Output "Registry host: $registryHost"
+
+# Set Terraform variables
+foreach ($configuration in $deployment.configuration) {
+    $configurationName = $configuration['name']
+    if ($configurationName -eq $targetConfiguration) { break; }
+}
+if ($configurationName -ne $targetConfiguration) { Write-Output "Configuration '$targetConfiguration' not found in deployment file"; Exit -1; }
+foreach ($key in $configuration.Keys) {
+    $value = $configuration[$key]
+    Set-Item -Path Env:TF_$key -Value $value
 }
 
-Write-Output "`nBack to define other environment settings"
-
-$registryHost = Get-Content ../config/registry-host -First 1
 $registryParts = $registryHost.Split(".")
 $registryName = $registryParts[0]
 $registryDomain = $registryParts[1]
-
-Write-Output "Registry host: $registryHost"
-Write-Output "Registry name: $registryName"
-Write-Output "Registry domain: $registryDomain"
-
-Set-Item -Path Env:DOCKER_REGISTRY -Value $registryHost
-
+Set-Item -Path Env:DOCKER_REGISTRY -Value $registryLocation
 if ($registryDomain -eq "azurecr") {
     az acr login -n $registryName
 }
@@ -28,5 +36,4 @@ if ($registryDomain -eq "azurecr") {
 Write-Output "`nDone. Showing environment below."
 Get-ChildItem env:
 
-Pop-Location
 Exit 0

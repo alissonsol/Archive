@@ -1,0 +1,28 @@
+# Deployment information
+---
+namespace: "yuruna"
+
+globalVars:
+  clusterDnsPrefix: "yuruna"
+  clusterName:      "yuruna"
+  frontendIpName:   "yuruna"
+  resourceGroup:    "yuruna"
+  resourceTags:     "yuruna"
+  registryName:     "yuruna"
+  nodeCount:        1
+
+configuration:
+# Localhost with Docker Desktop
+- name:             "localhost"
+  clusterName:      "docker-desktop"
+  registryName:     "localhost:5000"
+# regions: az account list-locations -o table
+- name:             "azure"
+  clusterRegion:    "westus2"
+  clusterVersion:   "1.19.3"
+  nodeType:         "Standard_D2_v2"
+# regions: https://cloud.google.com/about/locations
+- name:             "gcp"
+  clusterRegion:    "us-west2"
+  clusterVersion:   "1.19"
+  nodeType:         "n1-standard-1"

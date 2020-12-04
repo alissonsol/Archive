@@ -10,7 +10,7 @@
 - What is the ultimate question of life, the universe, and everything?
 - Why all artifacts need to be in same namespace?
 - Is there a way for the DNS binding to dynamically update?
-  - Need to investigate references
+  - Need to investigate
     - [ExternalDNS](https://github.com/kubernetes-sigs/external-dns)
     - [Configuring HTTPS with cert-manager and Google Cloud DNS](https://knative.dev/docs/serving/using-cert-manager-on-gcp/)
     - [Kubernetes w/ Let’s Encrypt & Cloud DNS](https://medium.com/google-cloud/kubernetes-w-lets-encrypt-cloud-dns-c888b2ff8c0e)

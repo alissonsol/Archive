@@ -1,4 +1,0 @@
-yuruna.azurecr.io
-# If testing locally, add this line to file %windir%\system32\etc\drivers\hosts (need to edit as Administrator)
-127.0.0.1 registry-local.localhost
-# Remember to remove that line when working with real registry, which should be set to

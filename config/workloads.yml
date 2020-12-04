@@ -1,0 +1,14 @@
+kustomization:
+  containerPrefix: yuruna
+  registryLocation: localhost:5000
+namespace: yuruna
+context:
+- name: yuruna
+  components: components.frontend
+  chart: frontend
+frontend:
+  ipName: yuruna
+  ipAddress: 127.0.0.1
+  site: localhost
+  certManagerIssuerEmail: certificates@yuruna.com
+  context: yuruna
