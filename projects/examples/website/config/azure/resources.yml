@@ -1,0 +1,24 @@
+# Resources information
+---
+globalVariables:
+  namespace: "yuruna"
+  clusterDnsPrefix: "yuruna"
+  clusterName:      "yuruna"
+  clusterRegion:    "westus2"
+  clusterVersion:   "1.20.0"
+  frontendIpName:   "localhost"
+  resourceGroup:    "yuruna"
+  resourceTags:     "yuruna"
+  nodeCount:        1
+  registryName:   "localhost:5000"
+
+resources:
+# regions: az account list-locations -o table
+- name:             "yuruna-aks"
+  template:         "azure-aks-cluster"
+  variables:
+    clusterRegion:  "westus2"
+    clusterVersion: "1.19.3"
+    nodeType:       "Standard_D2_v2"
+    registryName:   "yurunaazure"
+    frontendIpName: "yuruna"

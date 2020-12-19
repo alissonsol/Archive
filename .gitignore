@@ -44,6 +44,7 @@ project.lock.json
 
 # Visual Studio Code
 .vscode
+**/.vscode/*
 .vs
 
 # User-specific files
@@ -66,3 +67,6 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
+# Yuruna
+**/.yuruna/*

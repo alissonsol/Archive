@@ -1,6 +1,6 @@
 apiVersion: v2
 name: yuruna
-description: A cross-cloud Kubernetes-based application skeleton.
+description: Cross-cloud Kubernetes-based applications.
 
 type: application
 version: 0.1.0

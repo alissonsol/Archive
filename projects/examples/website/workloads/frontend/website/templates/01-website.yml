@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: website
-        image: {{ .Values.kustomization.registryLocation }}/{{ .Values.kustomization.containerPrefix }}/website:latest
+        image: {{ .Values.registryLocation }}/{{ .Values.containerPrefix }}/website:latest
         imagePullPolicy: Always 
         ports:
         - name: port80

@@ -1,8 +1,8 @@
 # yuruna
 
-A cross-cloud Kubernetes-based application skeleton.
+Cross-cloud Kubernetes-based applications.
 
-It is provided "as is" without guarantees. See [license](LICENSE.md). Always check for the [latest version](https://bit.ly/asol-yrn).
+It is provided "as is" without guarantees. See [license](LICENSE.md). Always check for the [latest version](https://bit.ly/asol-yrn) and read the [updates](docs/updates.md) file.
 
 ## Cloud-specific steps
 
@@ -13,21 +13,29 @@ These steps need be executed just once, unless you modify configurations. Steps 
    - There is an extra script to run if using Kubernetes locally (it starts a local container registry).
 3. [Authenticate](docs/authenticate.md) with your cloud provider
    - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
-4. Create cloud resources
-   - Instructions on using Terraform to create the [cloud resources](docs/terraform.md) (Kubernetes cluster, databases, etc.).
-   - Create [Public IP](docs/create-public-ip.md) addresses and bind DNS entries.
-   - From now on, scripts are just executing standard `helm` and `kubectl` commands, independently of the cloud being used!
 
 ## Step using the Kubernetes infrastructure
 
-1. Build and push container images to registry
-   - Follow the [build](docs/build.md) guide.
-2. Deploy infrastructure components
-   - Follow the instructions to deploy [infrastructure](docs/infrastructure.md) resources: certification issuer, ingress controller, etc.
-3. Deploy the services and configuration
-   - Follow [instructions](docs/deploy-workloads.md) to deploy lists of Kubernetes services to clusters in an easily configurable way.
-4. Done! On to the next goal!
-   - If not in use, remember to [clean up](docs/cleanup.md) the resources.
+- Create resources for a project
+
+```shell
+.\yuruna.ps1 resources ..\projects\examples\website localhost
+```
+
+- Build the components
+
+```shell
+.\yuruna.ps1 components ..\projects\examples\website localhost
+```
+
+- Deploy the  workloads
+
+```shell
+.\yuruna.ps1 components ..\projects\examples\website localhost
+```
+
+- Done! On to the next goal! Check the [syntax](docs/yuruna.md) documentation for more details.
+  - If not in use, remember to [clean up](docs/cleanup.md) the resources.
 
 ## Notes
 

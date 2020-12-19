@@ -5,7 +5,8 @@
 - Creation of multiple clusters passing different variables to Terraform.
 - Should be possible to move the entire "infrastructure" step to a Helm chart.
 - Better PowerShell scripts (likely eternal goal!).
-- Diagram: Pptx vs PDF
+- Graph from YML: Python [graphviz 0.15](https://pypi.org/project/graphviz/)
+- Visual Studio Code: [Your First Extension](https://code.visualstudio.com/api/get-started/your-first-extension)
 - Seek for TODO tag
 - Use verbs as per [Approved Verbs for PowerShell Commands](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.1)
 

@@ -1,0 +1,42 @@
+# Workloads information
+---
+globalVariables:
+  namespace:         "yuruna"
+  containerPrefix:   "yuruna"
+  registryLocation:  "localhost:5000"
+  registryName:      "localhost"
+  frontendIpName:    "localhost"
+  frontendIpAddress: "127.0.0.1"
+  site:              "localhost"
+  dockerUsername:    "dummy"
+  dockerPassword:    "dummy"
+  certManagerIssuerEmail: "certificates@yuruna.com"
+  websiteTlsSecret:  "website-tls-secret"
+
+workloads:
+- context: "docker-desktop"
+  deployments:
+  - kubectl: "create namespace ${env:namespace}"
+  - kubectl: "config set-context --current --namespace=${env:namespace}"
+  - kubectl: "delete secret registry-credential"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+  - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+  - helm: "repo update"
+  - helm: "uninstall nginx-ingress --namespace ${env:namespace}"
+  - helm: >
+      install nginx-ingress ingress-nginx/ingress-nginx
+      --namespace ${env:namespace}
+      --set controller.replicaCount=2
+      --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+      --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+      --set controller.service.loadBalancerIP="${env:frontendIpAddress}"
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:frontendIpName}"
+      --set controller.service.annotations."kubernetes\.io/ingress\.global-static-ip-name"="${env:frontendIpName}"
+  - kubectl: "apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
+  - shell: "mkcert -install"
+  - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" yuruna.com \"*.yuruna.com\" yuruna.test localhost 127.0.0.1 ::1"
+  - kubectl: "delete secret ${env:websiteTlsSecret}"
+  - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\""
+  - shell: "Start-Sleep -s 15"
+  - chart: "frontend/website"
+    variables:

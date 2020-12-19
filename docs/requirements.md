@@ -32,6 +32,7 @@ These instructions assume that you have a registered domain and know how to crea
 - Installed version of [Visual Studio Code](https://code.visualstudio.com/)
   - Installed [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) extension.
   - Installed extension for [Kubernetes](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools).
+- Installed [Graphviz](https://graphviz.org/download/) in the path.
 
 ## Development environment
 
@@ -54,15 +55,13 @@ These instructions assume that you have a registered domain and know how to crea
           - `brew install azure-cli`
           - `brew cask install google-cloud-sdk`
             - Pay attention to the messages asking to add configuration to the user profile! For PowerShell, added the `bash` lines to `[User]/.bash_profile`.
-  - Tools
+  - Required tools
     - Docker Desktop
       - `docker version`
         - `Engine: Version: 19.03.13`
       - `kubectl version`
         - `Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", ...}`
         - `Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", ...}`
-    - Visual Studio Code
-      - About: `1.51.1 (system setup)`
     - PowerShell 7 (x64)
       - `$PSVersionTable`
         - `PSVersion                      7.1.0`
@@ -85,5 +84,11 @@ These instructions assume that you have a registered domain and know how to crea
       - Google Cloud SDK
         - `gcloud --version`
           - `Google Cloud SDK 319.0.0, bq 2.0.62, core 2020.11.13, gsutil 4.55`
+    - Recommended tools
+      - Visual Studio Code
+        - About: `1.51.1 (system setup)`
+      - Graphviz
+        - `dot -V`
+          - `dot - graphviz version 2.44.1 (20200629.0800)`
 
 Back to main [readme](../README.md)

@@ -14,10 +14,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.frontend.site }}
-    secretName: website-kubernetes-tls
+    - {{ .Values.site }}
+    secretName: {{ .Values.websiteTlsSecret }}
   rules:
-  - host: {{ .Values.frontend.site }}
+  - host: {{ .Values.site }}
     http:
       paths:
       - pathType: Prefix

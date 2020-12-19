@@ -1,0 +1,13 @@
+# Components information
+---
+globalVariables:
+  containerPrefix:  "yuruna"
+  registryLocation: "localhost:5000"
+  registryName:     "localhost"
+  buildCommand: docker build --rm -f $dockerfile -t "${containerPrefix}/${project}:latest" "$buildPath"
+  tagCommand: docker tag "${containerPrefix}/${project}:latest" "${registryLocation}/${containerPrefix}/${project}:latest"
+  pushCommand: docker push "${registryLocation}/${containerPrefix}/${project}:latest"
+
+components:
+- project: "website"
+  buildPath: "frontend/website"
