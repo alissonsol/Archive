@@ -4,14 +4,14 @@ $yuruna_root = $PSScriptRoot
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
 Import-Module -Name $validationModulePath
 
-function Deploy-Resources {
+function Publish-ResourceList {
     param (
         $project_root,
         $config_root
     )
 
-    if (!(Confirm-Resources $project_root $config_root)) { return $false; }
-    Write-Debug "---- Deploying Resources"
+    if (!(Confirm-ResourceList $project_root $config_root)) { return $false; }
+    Write-Debug "---- Publishing Resources"
     # For each resource in resources.yml
     #   copy template to work folder under .yuruna
     #   apply variables from resources.yml
@@ -34,8 +34,9 @@ function Deploy-Resources {
             $templateFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate")
             if (-Not (Test-Path -Path $templateFolder)) { Write-Information "Resources template folder not found: $templateFolder`nUsed in file: $resourcesFile"; return $false; }
             # copy template to work folder under .yuruna
-            $workFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath ".yuruna/resources/$resourceTemplate")
+            $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/resources/$resourceTemplate"
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+            $workFolder = Resolve-Path -Path $workFolder
             Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -ErrorAction SilentlyContinue
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
@@ -64,8 +65,8 @@ function Deploy-Resources {
             Write-Debug "Terraform init: $result"
             $result = terraform plan -compact-warnings
             Write-Debug "Terraform plan: $result"
-            $result = terraform graph | dot -Tsvg > graph.svg
-            Write-Debug "Terraform graph: $result"
+            # $result = terraform graph | dot -Tsvg > graph.svg
+            # Write-Debug "Terraform graph: $result"
             Write-Information "Executing terraform apply from $workFolder"
             $result = terraform apply -auto-approve
             Write-Debug "Terraform apply: $result"

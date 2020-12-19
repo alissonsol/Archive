@@ -62,17 +62,21 @@ Import-Module -Name $resourcesModulePath
 Import-Module -Name $componentsModulePath
 Import-Module -Name $workloadsModulePath
 
-$InformationPreference = "Continue"
-
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
 $config_root = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
 
+$transcriptFileName = [System.IO.Path]::GetTempFileName()
+$null = Start-Transcript $transcriptFileName
+$DebugPreference = "Continue"
+$InformationPreference = "Continue"
+$VerbosePreference = "Continue"
+$result = $false
 switch -Exact ($operation)
 {
-    'validate' { Confirm-Configuration $project_root $config_root | out-null }
-    'resources' { Deploy-Resources $project_root $config_root | out-null }
-    'components' { Deploy-Components $project_root $config_root | out-null }
-    'workloads' { Deploy-Workloads $project_root $config_root | out-null }
+    'validate' { $result = Confirm-Configuration $project_root $config_root }
+    'resources' { $result = Publish-ResourceList $project_root $config_root }
+    'components' { $result = Publish-ComponentList $project_root $config_root }
+    'workloads' { $result = Publish-WorkloadList $project_root $config_root }
     Default {
         Write-Output "yuruna validate [project_root] [config_subfolder]`n    Validate configuration files.";
         Write-Output "yuruna resources [project_root] [config_subfolder]`n    Deploys resources using Terraform as helper.";
@@ -81,4 +85,5 @@ switch -Exact ($operation)
     }
 }
 
-Write-Output "Done!"
+$null = Stop-Transcript
+if (-Not $result) { Write-Output $(Get-Content -Path $transcriptFileName) }

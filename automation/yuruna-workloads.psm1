@@ -4,14 +4,14 @@ $yuruna_root = $PSScriptRoot
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
 Import-Module -Name $validationModulePath
 
-function Deploy-Workloads {
+function Publish-WorkloadList {
     param (
         $project_root,
         $config_root
     )
 
-    if (!(Confirm-Workloads $project_root $config_root)) { return $false; }
-    Write-Debug "---- Deploying Workloads"
+    if (!(Confirm-WorkloadList $project_root $config_root)) { return $false; }
+    Write-Debug "---- Publish Workloads"
     # For each workload in workloads.yml
     #   switch to context
     #     apply deployments: chart, kubectl, helm, or shell
@@ -61,8 +61,9 @@ function Deploy-Workloads {
                 $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName")
                 if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
                 #   copy chart to work folder under .yuruna
-                $workFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName/$chartName")
+                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName/$chartName"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+                $workFolder = Resolve-Path -Path $workFolder
                 Copy-Item "$chartFolder/*" -Destination $workFolder -Recurse -ErrorAction SilentlyContinue
 
                 # deploymentVars to values.yaml
@@ -96,9 +97,10 @@ function Deploy-Workloads {
                 if ($isHelm) { $value = $deployment['helm']; $expression = "helm $value"; }
                 if ($isShell) { $value = $deployment['shell']; $expression = "$value"}
 
-                $workFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName")
-                Set-Item -Path Env:workFolder -Value ${workFolder}
+                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+                $workFolder = Resolve-Path -Path $workFolder
+                Set-Item -Path Env:workFolder -Value ${workFolder}
                 Push-Location $workFolder
                 $expression = $ExecutionContext.InvokeCommand.ExpandString($expression)
                 Write-Debug "$expression"

@@ -62,7 +62,7 @@ kubectl create secret docker-registry registry-credential --docker-server=https:
 kubectl config use-context $originalContext
 
 # Persist new workloads information
-$workloads = Confirm-Workloads
+$workloads = Confirm-WorkloadList
 $workloads.kustomization."registryLocation" = $registryLocation
 $workloadsFile = Join-Path -Path $git_root -ChildPath "config/workloads.yml"
 $workloadsText = ConvertTo-Yaml $workloads

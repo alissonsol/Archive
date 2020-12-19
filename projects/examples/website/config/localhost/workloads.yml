@@ -37,6 +37,6 @@ workloads:
   - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" yuruna.com \"*.yuruna.com\" yuruna.test localhost 127.0.0.1 ::1"
   - kubectl: "delete secret ${env:websiteTlsSecret}"
   - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\""
-  - shell: "Start-Sleep -s 15"
+  - shell: "Start-Sleep -s 59"
   - chart: "frontend/website"
     variables:

@@ -4,7 +4,7 @@ $yuruna_root = $PSScriptRoot
 $modulePath = Join-Path -Path $yuruna_root -ChildPath "import-yaml"
 Import-Module -Name $modulePath
 
-function Confirm-Folders {
+function Confirm-FolderList {
     param (
         $project_root,
         $config_root
@@ -15,7 +15,7 @@ function Confirm-Folders {
     return $true;
 }
 
-function Confirm-GlobalVariables {
+function Confirm-GlobalVariableList {
     param (
         $yaml,
         $filePath
@@ -33,19 +33,19 @@ function Confirm-GlobalVariables {
     return $true;
 }
 
-function Confirm-Resources {
+function Confirm-ResourceList {
     param (
         $project_root,
         $config_root
     )
     Write-Debug "---- Validating Resources"
-    if (!(Confirm-Folders $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
 
     $resourcesFile = Join-Path -Path $config_root -ChildPath "resources.yml"
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
-    if (!(Confirm-GlobalVariables $yaml $resourcesFile)) { return $false; }
+    if (!(Confirm-GlobalVariableList $yaml $resourcesFile)) { return $false; }
 
     # Validate resources list
     if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
@@ -69,19 +69,19 @@ function Confirm-Resources {
     return $true;
 }
 
-function Confirm-Components {
+function Confirm-ComponentList {
     param (
         $project_root,
         $config_root
     )
     Write-Debug "---- Validating Components"
-    if (!(Confirm-Folders $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
 
     $componentsFile = Join-Path -Path $config_root -ChildPath "components.yml"
     if (-Not (Test-Path -Path $componentsFile)) { Write-Information "File not found: $componentsFile"; return $false; }
     $yaml = ConvertFrom-File $componentsFile
 
-    if (!(Confirm-GlobalVariables $yaml $componentsFile)) { return $false; }
+    if (!(Confirm-GlobalVariableList $yaml $componentsFile)) { return $false; }
 
     # Validate components list
     if ($null -eq $yaml.components) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
@@ -111,19 +111,19 @@ function Confirm-Components {
     return $true;
 }
 
-function Confirm-Workloads {
+function Confirm-WorkloadList {
     param (
         $project_root,
         $config_root
     )
     Write-Debug "---- Validating Workloads"
-    if (!(Confirm-Folders $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
 
     $workloadsFile = Join-Path -Path $config_root -ChildPath "workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }
     $yaml = ConvertFrom-File $workloadsFile
 
-    if (!(Confirm-GlobalVariables $yaml $workloadsFile)) { return $false; }
+    if (!(Confirm-GlobalVariableList $yaml $workloadsFile)) { return $false; }
 
     # Validate workloads list
     if ($null -eq $yaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
@@ -169,9 +169,9 @@ function Confirm-Configuration {
         $config_root
     )
 
-    if (!(Confirm-Resources $project_root $config_root)) { return $false; }
-    if (!(Confirm-Components $project_root $config_root)) { return $false; }
-    if (!(Confirm-Workloads $project_root $config_root)) { return $false; }
+    if (!(Confirm-ResourceList $project_root $config_root)) { return $false; }
+    if (!(Confirm-ComponentList $project_root $config_root)) { return $false; }
+    if (!(Confirm-WorkloadList $project_root $config_root)) { return $false; }
 
     return $true;
 }

@@ -4,14 +4,14 @@ $yuruna_root = $PSScriptRoot
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
 Import-Module -Name $validationModulePath
 
-function Deploy-Components {
+function Publish-ComponentList {
     param (
         $project_root,
         $config_root
     )
 
-    if (!(Confirm-Components $project_root $config_root)) { return $false; }
-    Write-Debug "---- Deploying Components"
+    if (!(Confirm-ComponentList $project_root $config_root)) { return $false; }
+    Write-Debug "---- Publishing Components"
     # For each component in components.yml
     #   execute build command in the folder
     #     command is parameter in components.yml

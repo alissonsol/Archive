@@ -5,7 +5,7 @@ function ConvertFrom-Content {
         $Content
     )
 
-    if (-Not (Get-Module -ListAvailable -Name powershell-yaml)) { Write-Output "Need to install powershell-yaml using:`nInstall-Module -Name powershell-yaml"; Exit -1 }
+    if (-Not (Get-Module -ListAvailable -Name powershell-yaml)) { Write-Information "Need to install powershell-yaml using:`nInstall-Module -Name powershell-yaml" -InformationAction Stop; Exit -1 }
 
     $lines = ''
     # Convert a string array to a string

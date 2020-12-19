@@ -4,7 +4,7 @@ $git_root=git rev-parse --show-toplevel
 $modulePath = Join-Path -Path $git_root -ChildPath "automation/confirm-configuration"
 Import-Module -Name $modulePath
 
-$workloads = Confirm-Workloads
+$workloads = Confirm-WorkloadList
 
 # Change below if different from defaults
 $frontendIpName = $workloads.frontend.ipName

@@ -4,37 +4,40 @@ Cross-cloud Kubernetes-based applications.
 
 It is provided "as is" without guarantees. See [license](LICENSE.md). Always check for the [latest version](https://bit.ly/asol-yrn) and read the [updates](docs/updates.md) file.
 
-## Cloud-specific steps
+## Requirements and cloud-specific steps
 
-These steps need be executed just once, unless you modify configurations. Steps 3 and 4 are not needed if using Docker Desktop in the `localhost`.
+These steps need be executed just once, unless you modify configurations.
 
-1. Search and replace 'yuruna' with your domain name across the entire project before starting
-2. Check [requirements](docs/requirements.md)
-   - There is an extra script to run if using Kubernetes locally (it starts a local container registry).
-3. [Authenticate](docs/authenticate.md) with your cloud provider
-   - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
+- Check [requirements](docs/requirements.md)
+  - There is an extra script to run if using Kubernetes locally (it starts a local container registry).
+- [Authenticate](docs/authenticate.md) with your cloud provider
+  - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
 
-## Step using the Kubernetes infrastructure
+## Using Yuruna to deploy Kubernetes-based applications to multiple clouds
 
-- Create resources for a project
+Include the `automation` folder in the path. Then deploy resources, build components, and install workloads. See project [examples](projects/examples/README.md) and check the [syntax](docs/yuruna.md) documentation for more details.
 
-```shell
-.\yuruna.ps1 resources ..\projects\examples\website localhost
-```
+Below are the end-to-end steps to deploy the `website` example to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
 
-- Build the components
+- Create resources: a Kubernetes cluster
 
 ```shell
-.\yuruna.ps1 components ..\projects\examples\website localhost
+./yuruna.ps1 resources ../projects/examples/website localhost
 ```
 
-- Deploy the  workloads
+- Build the components: a simple C# website application
 
 ```shell
-.\yuruna.ps1 workloads ..\projects\examples\website localhost
+./yuruna.ps1 components ../projects/examples/website localhost
 ```
 
-- Done! On to the next goal! Check the [syntax](docs/yuruna.md) documentation for more details.
+- Deploy the  workloads: deploy the website to the cluster, with certificates and NGINX ingress
+
+```shell
+./yuruna.ps1 workloads ../projects/examples/website localhost
+```
+
+- Done! On to the next goal!
   - If not in use, remember to [clean up](docs/cleanup.md) the resources.
 
 ## Notes
