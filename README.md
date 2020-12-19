@@ -31,7 +31,7 @@ These steps need be executed just once, unless you modify configurations. Steps 
 - Deploy the  workloads
 
 ```shell
-.\yuruna.ps1 components ..\projects\examples\website localhost
+.\yuruna.ps1 workloads ..\projects\examples\website localhost
 ```
 
 - Done! On to the next goal! Check the [syntax](docs/yuruna.md) documentation for more details.
