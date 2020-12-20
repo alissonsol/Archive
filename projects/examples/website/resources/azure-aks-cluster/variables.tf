@@ -33,3 +33,7 @@ variable "resourceGroup" {
 variable "resourceTags" {
   description = "Resource tags (dev, test, prod, etc.)"
 }
+
+variable "frontendIpName" {
+  description = "Frontend IP name"
+}

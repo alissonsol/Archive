@@ -163,6 +163,18 @@ function Confirm-WorkloadList {
     return $true;
 }
 
+
+function Clear-Configuration {
+    param (
+        $project_root
+    )
+
+    $executionFolder = Join-Path -Path $project_root -ChildPath ".yuruna"
+    Remove-Item -Path $executionFolder -Force -Recurse -ErrorAction "SilentlyContinue"
+
+    return $true;
+}
+
 function Confirm-Configuration {
     param (
         $project_root,

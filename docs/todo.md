@@ -2,8 +2,6 @@
 
 ## Global
 
-- Creation of multiple clusters passing different variables to Terraform.
-- Should be possible to move the entire "infrastructure" step to a Helm chart.
 - Better PowerShell scripts (likely eternal goal!).
 - Graph from YML: Python [graphviz 0.15](https://pypi.org/project/graphviz/)
 - Visual Studio Code: [Your First Extension](https://code.visualstudio.com/api/get-started/your-first-extension)

@@ -24,4 +24,9 @@ resource "azurerm_kubernetes_cluster" "default" {
   identity {
     type = "SystemAssigned"
   }
+
+  provisioner "local-exec" {
+    command = "az aks get-credentials --resource-group ${self.resource_group_name} --name ${self.name}"
+    interpreter = local.is_windows ? ["PowerShell", "-Command"] : []
+  }  
 }

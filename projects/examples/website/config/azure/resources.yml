@@ -3,7 +3,7 @@
 globalVariables:
   namespace: "yuruna"
   clusterDnsPrefix: "yuruna"
-  clusterName:      "yuruna"
+  clusterName:      "yuruna-aks"
   clusterRegion:    "westus2"
   clusterVersion:   "1.20.0"
   frontendIpName:   "localhost"
@@ -20,5 +20,5 @@ resources:
     clusterRegion:  "westus2"
     clusterVersion: "1.19.3"
     nodeType:       "Standard_D2_v2"
-    registryName:   "yurunaazure"
+    registryName:   "yuruna"
     frontendIpName: "yuruna"

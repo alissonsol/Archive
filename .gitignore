@@ -70,3 +70,4 @@ msbuild.wrn
 
 # Yuruna
 **/.yuruna/*
+**/resources.output.yml

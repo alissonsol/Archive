@@ -22,6 +22,9 @@ function Publish-ResourceList {
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
+    $resourcesOutputFile = Join-Path -Path $config_root -ChildPath "resources.output.yml"
+    New-Item -Path $resourcesOutputFile -ItemType File -Force
+
     # For each resource in resources.yml
     if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
     foreach ($resource in $yaml.resources) {
@@ -37,6 +40,7 @@ function Publish-ResourceList {
             $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/resources/$resourceTemplate"
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
             $workFolder = Resolve-Path -Path $workFolder
+            Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Verbose
             Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -ErrorAction SilentlyContinue
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
@@ -63,13 +67,15 @@ function Publish-ResourceList {
             Push-Location $workFolder
             $result = terraform init
             Write-Debug "Terraform init: $result"
-            $result = terraform plan -compact-warnings
-            Write-Debug "Terraform plan: $result"
+            # $result = terraform plan -compact-warnings
+            # Write-Debug "Terraform plan: $result"
             # $result = terraform graph | dot -Tsvg > graph.svg
             # Write-Debug "Terraform graph: $result"
             Write-Information "Executing terraform apply from $workFolder"
             $result = terraform apply -auto-approve
             Write-Debug "Terraform apply: $result"
+            $terraformOutput = "$(terraform output -json)" | ConvertFrom-Json
+            Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $terraformOutput)
             Pop-Location
         }
     }

@@ -2,8 +2,8 @@
 ---
 globalVariables:
   containerPrefix:  "yuruna"
-  registryLocation: "yurunaazure.azurecr.io"
-  registryName:     "yurunaazure"
+  registryLocation: "yuruna.azurecr.io"
+  registryName:     "yuruna"
   buildCommand: docker build --rm -f $dockerfile -t "${containerPrefix}/${project}:latest" "$buildPath"
   tagCommand: docker tag "${containerPrefix}/${project}:latest" "${registryLocation}/${containerPrefix}/${project}:latest"
   pushCommand: docker push "${registryLocation}/${containerPrefix}/${project}:latest"

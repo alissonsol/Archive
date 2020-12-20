@@ -44,5 +44,6 @@
 
 - PSScriptAnalyzer [code](https://github.com/PowerShell/PSScriptAnalyzer)
   - `Invoke-ScriptAnalyzer -Path .`
+- [Quickstart: Configure Terraform using Azure PowerShell](https://docs.microsoft.com/en-us/azure/developer/terraform/get-started-powershell)
 
 Back to main [readme](../README.md)

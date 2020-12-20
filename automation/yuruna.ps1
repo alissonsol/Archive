@@ -64,6 +64,8 @@ Import-Module -Name $workloadsModulePath
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
 $config_root = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
+$project_root = Resolve-Path -Path $project_root -ErrorAction "SilentlyContinue" 
+$config_root = Resolve-Path -Path $config_root -ErrorAction "SilentlyContinue"
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName
@@ -73,11 +75,13 @@ $VerbosePreference = "Continue"
 $result = $false
 switch -Exact ($operation)
 {
+    'clear' { $result = Clear-Configuration $project_root }
     'validate' { $result = Confirm-Configuration $project_root $config_root }
     'resources' { $result = Publish-ResourceList $project_root $config_root }
     'components' { $result = Publish-ComponentList $project_root $config_root }
     'workloads' { $result = Publish-WorkloadList $project_root $config_root }
     Default {
+        Write-Output "yuruna clear [project_root]`n    Clear intermediate execution files.";
         Write-Output "yuruna validate [project_root] [config_subfolder]`n    Validate configuration files.";
         Write-Output "yuruna resources [project_root] [config_subfolder]`n    Deploys resources using Terraform as helper.";
         Write-Output "yuruna components [project_root] [config_subfolder]`n    Build and push components to registry.";
