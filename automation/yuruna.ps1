@@ -64,7 +64,7 @@ Import-Module -Name $workloadsModulePath
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
 $config_root = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
-$project_root = Resolve-Path -Path $project_root -ErrorAction "SilentlyContinue" 
+$project_root = Resolve-Path -Path $project_root -ErrorAction "SilentlyContinue"
 $config_root = Resolve-Path -Path $config_root -ErrorAction "SilentlyContinue"
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()

@@ -1,16 +1,38 @@
-# Workloads information
+# Workloads information - azure
 ---
 globalVariables:
-  namespace:        "yuruna"
-  containerPrefix:  "yuruna"
-  registryName:     "yuruna.azurecr.io"
+  namespace:         "yuruna"
+  containerPrefix:   "yuruna"
+  registryLocation:  "yuruna.azurecr.io"
+  registryName:      "yuruna"
+  frontendIpName:    "yuruna"
+  frontendIpAddress: "127.0.0.1"
+  site:              "www.yuruna.com"
+  dockerUsername:    "dummy"
+  dockerPassword:    "dummy"
+  certManagerIssuerEmail: "certificates@yuruna.com"
+  websiteTlsSecret:  "website-tls-secret"
 
 workloads:
-- context: "yuruna"
+- context: "yuruna-aks"
   deployments:
+  - kubectl: "create namespace ${env:namespace}"
+  - kubectl: "config set-context --current --namespace=${env:namespace}"
+  - kubectl: "delete secret registry-credential"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=$(az acr credential show -n ${env:registryName} --query username) --docker-password=$(az acr credential show -n ${env:registryName} --query passwords[0].value)"
+  - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+  - helm: "repo update"
+  - helm: "uninstall nginx-ingress --namespace ${env:namespace}"
+  - helm: >
+      install nginx-ingress ingress-nginx/ingress-nginx
+      --namespace ${env:namespace}
+      --set controller.replicaCount=2
+      --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+      --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+      --set controller.service.loadBalancerIP="${env:frontendIpAddress}"
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:frontendIpName}"
+      --set controller.service.annotations."kubernetes\.io/ingress\.global-static-ip-name"="${env:frontendIpName}"
+  - kubectl: "apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
+  - shell: "Start-Sleep -s 59"
   - chart: "frontend/website"
     variables:
-      ipName:   "localhost"
-      ipAddres: "127.0.0.1"
-      site:     "localhost"
-      certManagerIssuerEmail: "certificates@yuruna.com"

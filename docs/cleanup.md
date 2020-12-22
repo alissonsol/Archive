@@ -4,21 +4,19 @@ These steps are intentionally not automated to make mistakes harder. **Follow th
 
 ## Cleaning up automatically
 
-If needed, resources can be deleted by executing the command below from the folder with the initial deployment files (`deployment/aws`, `deployment/azure`, etc.).
+If needed, resources can be deleted by executing the command below from the folder with the initial deployment files (`.yuruna/resources/$resourceTemplate`)
 
 ```shell
 terraform destroy -auto-approve -refresh=false
 ```
 
-This process will ask for the variable names. Enter anything (the values are not used, due to the `-refresh=false` parameter). It provides yet another opportunity to abort the process of destroying the resources.
-
-In some cases, that command doesn't find the resources to destroy (`0 destroyed`). It needs the originally created `.terraform` folder to still be available. In that case, instructions for cleaning manually are below.
+In some cases, that command doesn't find the resources to destroy (`0 destroyed`). It needs the created `.terraform` folder to be still available. If that was removed, you should follow the instructions below for manually cleaning resources.
 
 Don't forget to delete the cluster context from `[user]/.kube/config`. That can be easily done using the [Visual Studio Code](https://code.visualstudio.com/) extension for [Kubernetes](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools). It can also be done from the command line with [kubectl](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-delete-context-em-).
 
 ## Manually cleaning up AWS resources
 
-- From the [AWS Management Console](https://console.aws.amazon.com/eks/home#/clusters), delete the EKS clusters.
+- From the [AWS Management Console](https://console.aws.amazon.com/), delete clusters, registries, VPCs, IPs and other resources.
 
 ## Manually cleaning up Azure resources
 

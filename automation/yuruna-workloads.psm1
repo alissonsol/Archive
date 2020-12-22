@@ -15,17 +15,24 @@ function Publish-WorkloadList {
     # For each workload in workloads.yml
     #   switch to context
     #     apply deployments: chart, kubectl, helm, or shell
-    #       apply variables from workloads.yml
     #       copy chart to work folder under .yuruna
+    #       apply global variables, resources.output variables, workload variables
     #         execute helm install in work folder
     #       other expressions use ${env:vars}
     $workloadsFile = Join-Path -Path $config_root -ChildPath "workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }
-    $yaml = ConvertFrom-File $workloadsFile
+    $workloadsYaml = ConvertFrom-File $workloadsFile
+    if ($null -eq $workloadsYaml) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
+    if ($null -eq $workloadsYaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
+
+    $resourcesOutputFile = Join-Path -Path $config_root -ChildPath "resources.output.yml"
+    $resourcesOutputYaml = $null
+    if (Test-Path -Path $resourcesOutputFile) {
+        $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
+    }
 
     # For each workload in workloads.yml
-    if ($null -eq $yaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
-    foreach ($workload in $yaml.workloads) {
+    foreach ($workload in $workloadsYaml.workloads) {
         # context should exist
         $contextName = $workload['context']
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
@@ -42,18 +49,26 @@ function Publish-WorkloadList {
             $isHelm = !([string]::IsNullOrEmpty($deployment['helm']))
             $isShell = !([string]::IsNullOrEmpty($deployment['shell']))
             if (!($isChart -or $isKubectl -or $isHelm -or $isShell)) { Write-Information "context.deployment should be 'chart', 'kubectl', 'helm' or 'shell' in file: $workloadsFile"; return $false; }
+
             $deploymentVars = @{}
-            #   apply variables from workloads.yml
-            if (-Not ($null -eq  $yaml.globalVariables)) {
-                foreach ($key in $yaml.globalVariables.Keys) {
-                    $value = $yaml.globalVariables[$key]
+            #       apply global variables, resources.output variables, workload variables
+            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+                foreach ($key in $workloadsYaml.globalVariables.Keys) {
+                    $value = $workloadsYaml.globalVariables[$key]
                     $deploymentVars[$key] = $value
                 }
             }
-            foreach ($key in $deployment.variables.Keys) {
-                $value = $deployment.variables[$key]
-                if ([string]::IsNullOrEmpty($value)) { Write-Information "workload[$contextName]chart[$chartName][$key] variable cannot be null or empty in file: $workloadsFile"; return $false; }
-                $deploymentVars[$key] = $value
+            if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
+                foreach ($key in $resourcesOutputYaml.Keys) {
+                    $value = $resourcesOutputYaml[$key].value
+                    $deploymentVars[$key] = $value
+                }
+            }    
+            if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq  $deployment.variables.Keys))) {
+                foreach ($key in $deployment.variables.Keys) {
+                    $value = $deployment.variables[$key]
+                    $deploymentVars[$key] = $value
+                }
             }
             if ($isChart) {
                 $chartName = $deployment['chart']

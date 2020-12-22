@@ -1,4 +1,4 @@
-# Workloads information
+# Workloads information - localhost
 ---
 globalVariables:
   namespace:         "yuruna"

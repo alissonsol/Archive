@@ -9,7 +9,7 @@ It is provided "as is" without guarantees. See [license](LICENSE.md). Always che
 These steps need be executed just once, unless you modify configurations.
 
 - Check [requirements](docs/requirements.md)
-  - There is an extra script to run if using Kubernetes locally (it starts a local container registry).
+  - The PowerShell scripts do not verify that requirements are met. (TODO)
 - [Authenticate](docs/authenticate.md) with your cloud provider
   - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
 

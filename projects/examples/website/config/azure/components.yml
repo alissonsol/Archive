@@ -1,13 +1,14 @@
-# Components information
+# Components information - azure
 ---
 globalVariables:
   containerPrefix:  "yuruna"
-  registryLocation: "yuruna.azurecr.io"
+  registryLocation: "to-be-replaced"
   registryName:     "yuruna"
-  buildCommand: docker build --rm -f $dockerfile -t "${containerPrefix}/${project}:latest" "$buildPath"
-  tagCommand: docker tag "${containerPrefix}/${project}:latest" "${registryLocation}/${containerPrefix}/${project}:latest"
-  pushCommand: docker push "${registryLocation}/${containerPrefix}/${project}:latest"
+  buildCommand: docker build --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
+  tagCommand: docker tag "${env:containerPrefix}/${env:project}:latest" "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"
+  pushCommand: docker push "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"
 
 components:
 - project: "website"
   buildPath: "frontend/website"
+  variables:
