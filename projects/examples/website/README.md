@@ -41,7 +41,7 @@ As output, the following values will become available for later steps:
 
 - A Docker container image for a .NET C# website.
 - NGINX Ingress Controller, which will be installed using a [Helm chart](https://kubernetes.github.io/ingress-nginx/deploy/#using-helm).
-- [cert-manager](https://cert-manager.io/docs/), a certificate management controller. It will get a Let’s [Encrypt](https://letsencrypt.org/) certificate for the frontend website. Installed using a [Helm chart](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm).
+- [cert-manager](https://cert-manager.io/docs/), a certificate management controller. It will get a Let’s [Encrypt](https://letsencrypt.org/) certificate for the frontend website, unless it if configured as `localhost` (in that case, a [`mkcert`](https://github.com/FiloSottile/mkcert) certificate is used). Installed using a [Helm chart](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm).
 
 ## Workloads
 

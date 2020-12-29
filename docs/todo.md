@@ -2,10 +2,18 @@
 
 ## Global
 
+### P0, P1
+
 - Better PowerShell scripts (likely eternal goal!).
+- Implement `yuruna requirements` that tests for requirements.
+- Implement `yuruna clear` that clear resources (`Terraform destroy`).
+- Seek for TODO tag.
+
+### P2+
+
 - Graph from YML: Python [graphviz 0.15](https://pypi.org/project/graphviz/)
-- Visual Studio Code: [Your First Extension](https://code.visualstudio.com/api/get-started/your-first-extension)
-- Seek for TODO tag
+- Create Visual Studio Code extension
+  - Visual Studio Code: [Your First Extension](https://code.visualstudio.com/api/get-started/your-first-extension)
 - Use verbs as per [Approved Verbs for PowerShell Commands](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.1)
 
 ## AWS

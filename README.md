@@ -8,8 +8,8 @@ It is provided "as is" without guarantees. See [license](LICENSE.md). Always che
 
 These steps need be executed just once, unless you modify configurations.
 
-- Check [requirements](docs/requirements.md)
-  - The PowerShell scripts do not verify that requirements are met. (TODO)
+- Confirm [requirements](docs/requirements.md)
+  - The PowerShell scripts do not verify that requirements are met.
 - [Authenticate](docs/authenticate.md) with your cloud provider
   - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
 

@@ -1,6 +1,6 @@
 # yuruna examples
 
-## website
+## [website](website/README.md)
 
 A simple .NET C# website container deployed to a Kubernetes cluster.
 

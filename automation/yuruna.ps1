@@ -53,10 +53,14 @@ param (
 
 $yuruna_root = $PSScriptRoot
 Get-Module | Remove-Module
+$requirementsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-requirements"
+$clearModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-clear"
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
 $resourcesModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-resources"
 $componentsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-components"
 $workloadsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-workloads"
+Import-Module -Name $requirementsModulePath
+Import-Module -Name $clearModulePath
 Import-Module -Name $validationModulePath
 Import-Module -Name $resourcesModulePath
 Import-Module -Name $componentsModulePath
@@ -69,19 +73,21 @@ $config_root = Resolve-Path -Path $config_root -ErrorAction "SilentlyContinue"
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName
-$DebugPreference = "Continue"
-$InformationPreference = "Continue"
-$VerbosePreference = "Continue"
+$global:DebugPreference = "Continue"
+$global:InformationPreference = "Continue"
+$global:VerbosePreference = "SilentlyContinue"
 $result = $false
 switch -Exact ($operation)
 {
-    'clear' { $result = Clear-Configuration $project_root }
+    'requirements' { $result = Confirm-Requirements }
+    'clear' { $result = Clear-Configuration $project_root $config_root }
     'validate' { $result = Confirm-Configuration $project_root $config_root }
     'resources' { $result = Publish-ResourceList $project_root $config_root }
     'components' { $result = Publish-ComponentList $project_root $config_root }
     'workloads' { $result = Publish-WorkloadList $project_root $config_root }
     Default {
-        Write-Output "yuruna clear [project_root]`n    Clear intermediate execution files.";
+        Write-Output "yuruna requirements`n    Check if machine has all requirements.";
+        Write-Output "yuruna clear [project_root] [config_subfolder]`n    Clear resources for given configuration.";
         Write-Output "yuruna validate [project_root] [config_subfolder]`n    Validate configuration files.";
         Write-Output "yuruna resources [project_root] [config_subfolder]`n    Deploys resources using Terraform as helper.";
         Write-Output "yuruna components [project_root] [config_subfolder]`n    Build and push components to registry.";
@@ -90,4 +96,9 @@ switch -Exact ($operation)
 }
 
 $null = Stop-Transcript
-if (-Not $result) { Write-Output $(Get-Content -Path $transcriptFileName) }
+if (-Not $result) {
+    Write-Output $(Get-Content -Path $transcriptFileName)
+}
+else {
+    Write-Output "See transcript with command: Write-Output `$(Get-Content -Path $transcriptFileName)"
+}

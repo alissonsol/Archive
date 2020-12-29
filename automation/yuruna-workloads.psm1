@@ -63,7 +63,7 @@ function Publish-WorkloadList {
                     $value = $resourcesOutputYaml[$key].value
                     $deploymentVars[$key] = $value
                 }
-            }    
+            }
             if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq  $deployment.variables.Keys))) {
                 foreach ($key in $deployment.variables.Keys) {
                     $value = $deployment.variables[$key]
