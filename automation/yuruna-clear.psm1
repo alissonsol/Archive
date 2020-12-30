@@ -36,6 +36,7 @@ function Clear-Configuration {
             $result = terraform destroy -auto-approve -refresh=false
             Write-Debug "Terraform destroy: $result"
             Pop-Location
+            Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
         }
     }
 

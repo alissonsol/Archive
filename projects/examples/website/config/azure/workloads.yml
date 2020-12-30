@@ -3,8 +3,8 @@
 globalVariables:
   namespace:         "yuruna"
   containerPrefix:   "yuruna"
-  registryLocation:  "yuruna.azurecr.io"
-  registryName:      "yuruna"
+  registryLocation:  "to-be-replaced"
+  registryName:      ""
   frontendIpName:    "yuruna"
   frontendIpAddress: "127.0.0.1"
   site:              "www.yuruna.com"

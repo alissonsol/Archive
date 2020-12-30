@@ -3,7 +3,7 @@
 globalVariables:
   containerPrefix:  "yuruna"
   registryLocation: "to-be-replaced"
-  registryName:     "yuruna"
+  registryName:     ""
   buildCommand: docker build --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
   tagCommand: docker tag "${env:containerPrefix}/${env:project}:latest" "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"
   pushCommand: docker push "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"

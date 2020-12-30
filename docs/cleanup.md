@@ -1,8 +1,20 @@
 # Cleanup resources
 
-These steps are intentionally not automated to make mistakes harder. **Follow the instructions carefully**. Make sure you are in the correct folder.
+**These instructions will destroy resources**. Make sure you enter the correct parameters.
 
 ## Cleaning up automatically
+
+Execute the following command to clear the resources for a given configuration.
+
+```shell
+yuruna clear [project_root] [config_subfolder]
+```
+
+Example clearing the resources for the project `website` in the `Azure` cloud (assuming [authentication](authenticate.md) steps were followed).
+
+```shell
+./yuruna.ps1 clear ../projects/examples/website azure
+```
 
 If needed, resources can be deleted by executing the command below from the folder with the initial deployment files (`.yuruna/resources/$resourceTemplate`)
 
