@@ -132,9 +132,9 @@ function Confirm-WorkloadList {
         $contextName = $workload['context']
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
         $originalContext = kubectl config current-context
-        kubectl config use-context $contextName | out-null
+        kubectl config use-context $contextName | Out-Null
         $currentContext = kubectl config current-context
-        kubectl config use-context $originalContext | out-null
+        kubectl config use-context $originalContext | Out-Null
         if ($currentContext -ne $contextName) { Write-Information "K8S context not found: $contextName`nFile: $workloadsFile"; return $false; }
         # deployments shoudn't be null or empty
         foreach ($deployment in $workload.deployments) {

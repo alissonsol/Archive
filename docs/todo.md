@@ -6,7 +6,6 @@
 
 - Better PowerShell scripts (likely eternal goal!).
 - Implement `yuruna requirements` that tests for requirements.
-- Implement `yuruna clear` that clear resources (`Terraform destroy`).
 - Seek for TODO tag.
 
 ### P2+

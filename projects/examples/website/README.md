@@ -49,4 +49,10 @@ As output, the following values will become available for later steps:
 - NGINX controller will be deployed to the cluster redirecting ports to the website.
 - Cert-manager will be deployed to the cluster, getting a certificate for the frontend "site".
 
+## Cloud deployment instructions
+
+For Azure:
+- You need to edit the file under `projects/examples/config/azure/resources.yml` and set the `registryName` to a unique name. Azure requires a globally unique registry name. Ping `yourname.azurecr.io` and confirm that name is not already in use.
+- Afterwards, execute the same commands above, replacing `localhost` with `azure`.
+
 Back to main [readme](../../README.md)
