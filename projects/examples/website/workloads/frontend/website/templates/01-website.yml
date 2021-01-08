@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: website
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -11,7 +12,6 @@ spec:
     metadata:
       labels:
         app: website
-        version: v1
     spec:
       containers:
       - name: website
@@ -34,7 +34,7 @@ kind: Service
 metadata:
   name: website
   labels:
-    name: website
+    app: website
 spec:
   type: LoadBalancer
   ports:

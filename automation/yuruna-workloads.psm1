@@ -80,7 +80,8 @@ function Publish-WorkloadList {
                 $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName/$chartName"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
-                Copy-Item "$chartFolder/*" -Destination $workFolder -Recurse -ErrorAction SilentlyContinue
+                Write-Debug "Copying chart from: $chartFolder to $workFolder"
+                Copy-Item "$chartFolder/*" -Destination $workFolder -Recurse -Container -ErrorAction SilentlyContinue
 
                 # deploymentVars to values.yaml
                 $helmValuesFile = Join-Path -Path $workFolder -ChildPath "values.yaml"

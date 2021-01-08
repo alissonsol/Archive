@@ -1,7 +1,9 @@
+# reference: https://kubernetes.github.io/ingress-nginx/user-guide/basic-usage/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-to-website
+  namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod

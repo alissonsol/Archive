@@ -9,6 +9,7 @@
 ### Azure
 
 - [Azure Container Registry documentation](https://docs.microsoft.com/en-us/azure/container-registry/)
+- [Create an ingress controller with a static public IP address in Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/ingress-static-ip)
 - [Use a static public IP address and DNS label with the Azure Kubernetes Service (AKS) load balancer](https://docs.microsoft.com/en-us/azure/aks/static-ip)
 - [AKS with multiple nginx ingress controllers, Application Gateway and Key Vault certificates](https://blog.hjgraca.com/aks-with-multiple-nginx-ingress-controllers-application-gateway-and-key-vault-certificates)
 

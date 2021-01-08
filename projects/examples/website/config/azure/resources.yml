@@ -9,7 +9,8 @@ globalVariables:
   frontendIpName:   "localhost"
   resourceGroup:    "yuruna"
   resourceTags:     "yuruna"
-  nodeCount:        1
+  nodeCount:        3
+# TO-SET: registry name must be globally unique
   registryName:     ""
 
 resources:

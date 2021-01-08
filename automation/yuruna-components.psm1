@@ -98,8 +98,11 @@ function Publish-ComponentList {
         Write-Information "Tag: $executionCommand"
         Invoke-Expression $executionCommand
         # TODO: generic registry login approach
-        $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n ${env:registryName}")
-        Invoke-Expression $executionCommand | Out-Null
+        $registryLocation = $(Get-Content -Path Env:registryLocation)
+        if ($registryLocation -like '*azurecr.io*') {
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n ${env:registryLocation}")
+            Invoke-Expression $executionCommand | Out-Null
+        }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)
         Write-Information "Push: $executionCommand"
         Invoke-Expression $executionCommand

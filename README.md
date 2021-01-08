@@ -49,4 +49,4 @@ Below are the end-to-end steps to deploy the `website` example to `localhost` (a
 - Read more in the list of [references](docs/references.md).
 - Questions? Check the [FAQ](docs/faq.md) document.
 
-Copyright (c) 2020 by Alisson Sol
+Copyright (c) 2020-2021 by Alisson Sol

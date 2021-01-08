@@ -41,7 +41,7 @@ function Publish-ResourceList {
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
             $workFolder = Resolve-Path -Path $workFolder
             Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Verbose
-            Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -ErrorAction SilentlyContinue
+            Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -Container -ErrorAction SilentlyContinue
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
             New-Item -Path $terraformVarsFile -ItemType File -Force

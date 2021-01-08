@@ -4,6 +4,7 @@ globalVariables:
   namespace:         "yuruna"
   containerPrefix:   "yuruna"
   registryLocation:  "to-be-replaced"
+# TO-SET: registry name must be globally unique
   registryName:      ""
   frontendIpName:    "yuruna"
   frontendIpAddress: "127.0.0.1"
@@ -16,23 +17,45 @@ globalVariables:
 workloads:
 - context: "yuruna-aks"
   deployments:
-  - kubectl: "create namespace ${env:namespace}"
-  - kubectl: "config set-context --current --namespace=${env:namespace}"
-  - kubectl: "delete secret registry-credential"
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=$(az acr credential show -n ${env:registryName} --query username) --docker-password=$(az acr credential show -n ${env:registryName} --query passwords[0].value)"
+  # Uninstall previous workloads: idempotent
+  - kubectl: "delete namespace ${env:namespace} --v=1"
+  - kubectl: "delete namespace cert-manager --v=1"
+  - kubectl: "delete namespace ingress-basic --v=1"
+  - kubectl: "delete -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml --v=1"
+  - kubectl: "delete clusterrole nginx-ingress-ingress-nginx"
+  - kubectl: "delete clusterrolebinding nginx-ingress-ingress-nginx"
+  - shell: "Start-Sleep -s 9"
+  # Install dependencies
+  - kubectl: "create namespace ${env:namespace} --v=1"
+  - kubectl: "create namespace cert-manager --v=1"
+  - kubectl: "create namespace ingress-basic --v=1"
+  - kubectl: "label namespace cert-manager certmanager.k8s.io/disable-validation=true --v=1"
+  - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
   - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+  - helm: "repo add jetstack https://charts.jetstack.io"
   - helm: "repo update"
-  - helm: "uninstall nginx-ingress --namespace ${env:namespace}"
+  - shell: "Start-Sleep -s 9"
+  - helm: >
+      install cert-manager jetstack/cert-manager
+      --namespace cert-manager
+      --version v1.1.0
+      --set installCRDs=true
+      --set nodeSelector."beta\.kubernetes\.io/os"=linux
+      # --debug
+  - shell: "Start-Sleep -s 9"
   - helm: >
       install nginx-ingress ingress-nginx/ingress-nginx
-      --namespace ${env:namespace}
+      --namespace ingress-basic
       --set controller.replicaCount=2
       --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
       --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
       --set controller.service.loadBalancerIP="${env:frontendIpAddress}"
       --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:frontendIpName}"
-      --set controller.service.annotations."kubernetes\.io/ingress\.global-static-ip-name"="${env:frontendIpName}"
-  - kubectl: "apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
-  - shell: "Start-Sleep -s 59"
+      --set controller.admissionWebhooks.enabled=false
+      # --debug
+  # Wait for dependencies to be ready
+  - shell: "Start-Sleep -s 9"
+  # Install components
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=$(az acr credential show -n ${env:registryName} --query username) --docker-password=$(az acr credential show -n ${env:registryName} --query passwords[0].value) --v=1"
   - chart: "frontend/website"
     variables:

@@ -5,6 +5,14 @@
 ### P0, P1
 
 - Better PowerShell scripts (likely eternal goal!).
+- Cert-manager: workloads in Azure
+DEBUG: helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true
+ --set nodeSelector."beta\.kubernetes\.io/os"=linux --debug
+install.go:172: [debug] Original chart version: "v1.1.0"
+Error: read tcp dev-machine-IP:62410->130.211.96.40(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
+helm.go:81: [debug] read tcp dev-machine-IP:62410->130.211.96.40(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
+- NGINX: workloads in Azure: 2nd time+: Error: cannot re-use a name that is still in use
+- Rolling PowerShell environment in the workloads steps.
 - Implement `yuruna requirements` that tests for requirements.
 - Seek for TODO tag.
 
