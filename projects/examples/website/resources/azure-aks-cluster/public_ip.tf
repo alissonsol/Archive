@@ -13,7 +13,11 @@ data "azurerm_public_ip" "frontendIp" {
 
 # Reference: https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source
 data "external" "originalIp" {
-  program = ["powershell", "az network public-ip list -g ${azurerm_kubernetes_cluster.default.node_resource_group} --query \"{ip_address : [0].ipAddress}\" --output json"]
+  program = [
+    "pwsh",
+    "./public_ip.ps1",
+    azurerm_kubernetes_cluster.default.node_resource_group,
+  ]
 
   query = {
     dummy = data.azurerm_public_ip.frontendIp.ip_address   

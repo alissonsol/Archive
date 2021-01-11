@@ -5,6 +5,7 @@
 ### P0, P1
 
 - Better PowerShell scripts (likely eternal goal!).
+- Warn if .terraform already exists: may not create resources.
 - Cert-manager: workloads in Azure
 DEBUG: helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true
  --set nodeSelector."beta\.kubernetes\.io/os"=linux --debug

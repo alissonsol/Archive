@@ -47,4 +47,11 @@
   - `Invoke-ScriptAnalyzer -Path .`
 - [Quickstart: Configure Terraform using Azure PowerShell](https://docs.microsoft.com/en-us/azure/developer/terraform/get-started-powershell)
 
+### Ubuntu
+
+- How to Install Kubernetes (k8s) on [Ubuntu 20.04 LTS Server](https://www.linuxtechi.com/install-kubernetes-k8s-on-ubuntu-20-04/)
+- Google Cloud SDK [Installing a Snap package](https://cloud.google.com/sdk/docs/downloads-snap)
+- NGINX Ingress Controller [Bare-metal considerations](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/)
+- [Allow non-root process to bind to port 80 and 443?](https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443/892391#892391)
+
 Back to main [readme](../README.md)

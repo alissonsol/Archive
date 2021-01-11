@@ -96,7 +96,10 @@ function Publish-WorkloadList {
                 Push-Location $workFolder
                 $result = helm lint
                 Write-Debug "Helm link`n$result"
-                $installName = $chartName -replace '[^a-zA-Z]', ''
+                $installName = $deploymentVars['installName']
+                if ([string]::IsNullOrEmpty($installName)) {
+                    $installName = $chartName -replace '[^a-zA-Z]', ''
+                }
                 $result = helm uninstall $installName
                 Write-Debug "helm uninstall $installName`n$result"
                 $result = helm install $installName .

@@ -50,23 +50,6 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
     - Windows 10 Professional.
       - `ver`
         - `Microsoft Windows [Version 10.0.19042.685]`
-    - macOs - Big Sur
-      - `sw_vers`
-        - `ProductVersion: 11.0.1`
-        - `BuildVersion: 20B69`
-      - Installed tools with [Homebrew](https://brew.sh)
-        - `brew cask install docker`
-        - `brew cask install powershell`
-        - `brew install helm`
-        - `brew install terraform`
-        - `brew install mkcert`
-          - Run `mkcert -install`
-        - `brew install graphviz`
-        - Cloud-specific
-          - `brew install awscli`
-          - `brew install azure-cli`
-          - `brew cask install google-cloud-sdk`
-            - Pay attention to the messages asking to add configuration to the user profile! For PowerShell, added the `bash` lines to `[User]/.bash_profile`.
   - Required tools
     - Docker Desktop
       - `docker version`
@@ -102,5 +85,7 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
       - Graphviz
         - `dot -V`
           - `dot - graphviz version 2.44.1 (20200629.0800)`
+
+See some additional guidance on how machines were setup for the [macOS](./mac-os.md) and [Ubuntu](./ubuntu.md) tests (no guarantees!).
 
 Back to main [readme](../README.md)
