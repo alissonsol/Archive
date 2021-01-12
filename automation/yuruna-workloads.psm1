@@ -78,6 +78,7 @@ function Publish-WorkloadList {
                 if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
                 #   copy chart to work folder under .yuruna
                 $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName/$chartName"
+                Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
                 Write-Debug "Copying chart from: $chartFolder to $workFolder"

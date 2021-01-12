@@ -15,37 +15,20 @@ These steps need be executed just once, unless you modify configurations.
 
 ## Using Yuruna to deploy Kubernetes-based applications to multiple clouds
 
-Include the `automation` folder in the path. Then deploy resources, build components, and install workloads. See project [examples](projects/examples/README.md) and check the [syntax](docs/yuruna.md) documentation for more details.
+Include the `automation` folder in the path. Then deploy resources, build components, and install workloads.
 
-Below are the end-to-end steps to deploy the `website` example to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
+See project [examples](projects/examples/README.md) and check the [syntax](docs/yuruna.md) documentation for more details.
 
-- Create resources: a Kubernetes cluster
+While it fits, the project examples list is copied below:
 
-```shell
-./yuruna.ps1 resources ../projects/examples/website localhost
-```
-
-- Build the components: a simple C# website application
-
-```shell
-./yuruna.ps1 components ../projects/examples/website localhost
-```
-
-- Deploy the  workloads: deploy the website to the cluster, with certificates and NGINX ingress
-
-```shell
-./yuruna.ps1 workloads ../projects/examples/website localhost
-```
-
-- Done! On to the next goal!
-  - If not in use, remember to [clean up](docs/cleanup.md) the resources.
+- [website](projects/examples/website/README.md): A simple .NET C# website container deployed to a Kubernetes cluster.
 
 ## Notes
 
 - Creating cloud resources and not deleting them may result in a growing bill even if the clusters aren't used.
   - You should [clean up](docs/cleanup.md) if those won't be in use.
-- Instructions assume that only one cloud will be used at a time. See the [hacks](docs/hacks.md) document.
 - There are known improvements [to do](docs/todo.md) in this template project.
+- See the [hacks](docs/hacks.md) document for some workaround and shortcuts that may need to be understood.
 - Read more in the list of [references](docs/references.md).
 - Questions? Check the [FAQ](docs/faq.md) document.
 

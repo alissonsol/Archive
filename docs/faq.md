@@ -5,15 +5,6 @@
 - What is the answer to the ultimate question of life, the universe, and everything?
   - 42
 
-- Why is nothing shown during the `yuruna` execution?
-  - The output transcript goes to a temporary file. If you want to see the script output during execution, set the following PowerShell variables.
-
-```Shell
-$DebugPreference = "Continue"
-$InformationPreference = "Continue"
-$VerbosePreference = "Continue"
-```
-
 - All deployed successfully, but cannot connect to <https://localhost> in a Windows machine. Why?
 
   - Try to stop HTTP and related processes. Find which process is holding port 80 with `netstat -nao | find ":80"`. You need to stop the Web service (`net stop http`). That may be hard due to issues like [HTTP services can't be stopped when the Microsoft Web Deployment Service is installed](https://docs.microsoft.com/en-us/troubleshoot/iis/http-service-fail-stopped). Try to stop that service also (`net stop msdepsvc`), reboot, and try steps again.
@@ -27,7 +18,6 @@ $VerbosePreference = "Continue"
 ## Unanswered
 
 - What is the ultimate question of life, the universe, and everything?
-- Why all artifacts need to be in same namespace?
 - Is there a way for the DNS binding to dynamically update?
   - Need to investigate
     - [ExternalDNS](https://github.com/kubernetes-sigs/external-dns)

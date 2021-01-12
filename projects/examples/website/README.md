@@ -6,19 +6,19 @@ A simple .NET C# website container deployed to a Kubernetes cluster.
 
 Below are the end-to-end steps to deploy the `website` example to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
 
-- Create resources: a Kubernetes cluster
+- Create resources
 
 ```shell
 ./yuruna.ps1 resources ../projects/examples/website localhost
 ```
 
-- Build the components: a simple C# website application
+- Build the components
 
 ```shell
 ./yuruna.ps1 components ../projects/examples/website localhost
 ```
 
-- Deploy the  workloads: deploy the website to the cluster, with certificates and NGINX ingress
+- Deploy the  workloads
 
 ```shell
 ./yuruna.ps1 workloads ../projects/examples/website localhost

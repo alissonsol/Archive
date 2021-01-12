@@ -2,6 +2,7 @@
 
 ## Project updates
 
-- 2020/12/18: Now all commands are parameters for `yuruna` main PowerShell script. Only localhost working without further changes.
+- 2021/01/11: Deployment to Azure works!
+- 2020/12/18: All commands are parameters for `yuruna` main PowerShell script.
 
 Back to main [readme](../README.md)
