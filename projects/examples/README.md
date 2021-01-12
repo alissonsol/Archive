@@ -1,4 +1,4 @@
-# yuruna examples
+# Examples
 
 ## [website](website/README.md)
 

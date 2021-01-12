@@ -17,7 +17,7 @@ These steps need be executed just once, unless you modify configurations.
 
 Include the `automation` folder in the path. Then deploy resources, build components, and install workloads.
 
-See project [examples](projects/examples/README.md) and check the [syntax](docs/yuruna.md) documentation for more details.
+See project [examples](projects/examples/README.md) and check the [syntax](docs/syntax.md) documentation for more details.
 
 While it fits, the project examples list is copied below:
 

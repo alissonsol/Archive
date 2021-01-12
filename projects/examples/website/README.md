@@ -60,4 +60,4 @@ As output, the following values will become available for later steps:
     - Replace the values with those from the `resources.yml` and the `resources.output.yml` files.
   - Yet another option: add an entry to your `hosts` folder pointing `$site` to `$frontendIpAddress`. Don't forget to remove it!
 
-Back to main [readme](../../README.md)
+Back to main [readme](../../../README.md). Back to list of [examples](../README.md).
