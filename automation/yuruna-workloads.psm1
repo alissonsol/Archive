@@ -7,10 +7,10 @@ Import-Module -Name $validationModulePath
 function Publish-WorkloadList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
 
-    if (!(Confirm-WorkloadList $project_root $config_root)) { return $false; }
+    if (!(Confirm-WorkloadList $project_root $config_subfolder)) { return $false; }
     Write-Debug "---- Publish Workloads"
     # For each workload in workloads.yml
     #   switch to context
@@ -19,13 +19,13 @@ function Publish-WorkloadList {
     #       apply global variables, resources.output variables, workload variables
     #         execute helm install in work folder
     #       other expressions use ${env:vars}
-    $workloadsFile = Join-Path -Path $config_root -ChildPath "workloads.yml"
+    $workloadsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }
     $workloadsYaml = ConvertFrom-File $workloadsFile
     if ($null -eq $workloadsYaml) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
     if ($null -eq $workloadsYaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
 
-    $resourcesOutputFile = Join-Path -Path $config_root -ChildPath "resources.output.yml"
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
@@ -76,8 +76,12 @@ function Publish-WorkloadList {
                 if ([string]::IsNullOrEmpty($chartName)) { Write-Information "context.chart cannot be null or empty in file: $workloadsFile"; return $false; }
                 $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName")
                 if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
+                $installName = $deployment.variables['installName']
+                if ([string]::IsNullOrEmpty($installName)) {
+                    Write-Information "Chart[$chartName] missing variables['installName'] in file: $workloadsFile"; return $false;
+                }
                 #   copy chart to work folder under .yuruna
-                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName/$chartName"
+                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$installName"
                 Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
@@ -97,10 +101,6 @@ function Publish-WorkloadList {
                 Push-Location $workFolder
                 $result = helm lint
                 Write-Debug "Helm link`n$result"
-                $installName = $deploymentVars['installName']
-                if ([string]::IsNullOrEmpty($installName)) {
-                    $installName = $chartName -replace '[^a-zA-Z]', ''
-                }
                 $result = helm uninstall $installName
                 Write-Debug "helm uninstall $installName`n$result"
                 $result = helm install $installName .
@@ -118,7 +118,7 @@ function Publish-WorkloadList {
                 if ($isHelm) { $value = $deployment['helm']; $expression = "helm $value"; }
                 if ($isShell) { $value = $deployment['shell']; $expression = "$value"}
 
-                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/workloads/$contextName"
+                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
                 Set-Item -Path Env:workFolder -Value ${workFolder}

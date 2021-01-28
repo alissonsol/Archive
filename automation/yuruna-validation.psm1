@@ -7,8 +7,15 @@ Import-Module -Name $modulePath
 function Confirm-FolderList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
+    if ([string]::IsNullOrEmpty($project_root)) { Write-Information "Project path is null or empty"; return $false; }
+    if ([string]::IsNullOrEmpty($config_subfolder)) { Write-Information "Configuration subfolder is null or empty"; return $false; }
+
+    $config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
+    $config_root = Resolve-Path -Path $config_relative -ErrorAction "SilentlyContinue"
+    if ([string]::IsNullOrEmpty($config_root)) { Write-Information "Configuration subfolder not found: $config_relative"; return $false; }
+    
     if (-Not (Test-Path -Path $project_root)) { Write-Information "Project path not found: $project_root"; return $false; }
     if (-Not (Test-Path -Path $config_root)) { Write-Information "Config path not found: $config_root"; return $false; }
 
@@ -36,12 +43,12 @@ function Confirm-GlobalVariableList {
 function Confirm-ResourceList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
     Write-Debug "---- Validating Resources"
-    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_subfolder)) { return $false; }
 
-    $resourcesFile = Join-Path -Path $config_root -ChildPath "resources.yml"
+    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
@@ -72,12 +79,12 @@ function Confirm-ResourceList {
 function Confirm-ComponentList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
     Write-Debug "---- Validating Components"
-    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_subfolder)) { return $false; }
 
-    $componentsFile = Join-Path -Path $config_root -ChildPath "components.yml"
+    $componentsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/components.yml"
     if (-Not (Test-Path -Path $componentsFile)) { Write-Information "File not found: $componentsFile"; return $false; }
     $yaml = ConvertFrom-File $componentsFile
 
@@ -114,12 +121,12 @@ function Confirm-ComponentList {
 function Confirm-WorkloadList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
     Write-Debug "---- Validating Workloads"
-    if (!(Confirm-FolderList $project_root $config_root)) { return $false; }
+    if (!(Confirm-FolderList $project_root $config_subfolder)) { return $false; }
 
-    $workloadsFile = Join-Path -Path $config_root -ChildPath "workloads.yml"
+    $workloadsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }
     $yaml = ConvertFrom-File $workloadsFile
 
@@ -149,11 +156,13 @@ function Confirm-WorkloadList {
                 if ([string]::IsNullOrEmpty($chartName)) { Write-Information "context.chart cannot be null or empty in file: $workloadsFile"; return $false; }
                 $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName")
                 if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
-                foreach ($key in $chart.variables.Keys) {
-                    $value = $chart.variables[$key]
+                foreach ($key in $deployment.variables.Keys) {
+                    $value = $deployment.variables[$key]
                     if ([string]::IsNullOrEmpty($value)) { Write-Information "workload[$contextName]chart[$chartName][$key] variable cannot be null or empty in file: $workloadsFile"; return $false; }
                     Write-Debug "workload[$contextName]chart[$chartName][$key] = $value"
                 }
+                $installName = $deployment.variables['installName']
+                if ([string]::IsNullOrEmpty($installName)) { Write-Information "workload[$contextName]chart[$chartName]variables['installName'] cannot be null or empty in file: $workloadsFile"; return $false; }
             }
             # if ($isKubectl -or $isHelm -or $isShell)
             #   only possible to verify it is not null or empty, what has already been done!
@@ -166,12 +175,12 @@ function Confirm-WorkloadList {
 function Confirm-Configuration {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
 
-    if (!(Confirm-ResourceList $project_root $config_root)) { return $false; }
-    if (!(Confirm-ComponentList $project_root $config_root)) { return $false; }
-    if (!(Confirm-WorkloadList $project_root $config_root)) { return $false; }
+    if (!(Confirm-ResourceList $project_root $config_subfolder)) { return $false; }
+    if (!(Confirm-ComponentList $project_root $config_subfolder)) { return $false; }
+    if (!(Confirm-WorkloadList $project_root $config_subfolder)) { return $false; }
 
     return $true;
 }

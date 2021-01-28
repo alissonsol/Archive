@@ -7,10 +7,10 @@ Import-Module -Name $validationModulePath
 function Publish-ComponentList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
 
-    if (!(Confirm-ComponentList $project_root $config_root)) { return $false; }
+    if (!(Confirm-ComponentList $project_root $config_subfolder)) { return $false; }
     Write-Debug "---- Publishing Components"
     # For each component in components.yml
     #   apply global variables, resources.output variables, workload variables
@@ -18,13 +18,13 @@ function Publish-ComponentList {
     #     command is parameter in components.yml
     #   tag and push component to registry
 
-    $componentsFile = Join-Path -Path $config_root -ChildPath "components.yml"
+    $componentsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/components.yml"
     if (-Not (Test-Path -Path $componentsFile)) { Write-Information "File not found: $componentsFile"; return $false; }
     $componentsYaml = ConvertFrom-File $componentsFile
     if ($null -eq $componentsYaml) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
     if ($null -eq $componentsYaml.components) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
 
-    $resourcesOutputFile = Join-Path -Path $config_root -ChildPath "resources.output.yml"
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile

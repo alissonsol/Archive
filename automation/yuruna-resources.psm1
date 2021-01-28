@@ -7,10 +7,10 @@ Import-Module -Name $validationModulePath
 function Publish-ResourceList {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
 
-    if (!(Confirm-ResourceList $project_root $config_root)) { return $false; }
+    if (!(Confirm-ResourceList $project_root $config_subfolder)) { return $false; }
     Write-Debug "---- Publishing Resources"
     # For each resource in resources.yml
     #   copy template to work folder under .yuruna
@@ -18,11 +18,11 @@ function Publish-ResourceList {
     #   execute terraform apply from work folder
     #     creates local .terraform under work folder, which can be used later in terraform destroy
 
-    $resourcesFile = Join-Path -Path $config_root -ChildPath "resources.yml"
+    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"    
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
-    $resourcesOutputFile = Join-Path -Path $config_root -ChildPath "resources.output.yml"
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
     New-Item -Path $resourcesOutputFile -ItemType File -Force
 
     # For each resource in resources.yml
@@ -37,7 +37,7 @@ function Publish-ResourceList {
             $templateFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate")
             if (-Not (Test-Path -Path $templateFolder)) { Write-Information "Resources template folder not found: $templateFolder`nUsed in file: $resourcesFile"; return $false; }
             # copy template to work folder under .yuruna
-            $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/resources/$resourceTemplate"
+            $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
             $workFolder = Resolve-Path -Path $workFolder
             Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Verbose

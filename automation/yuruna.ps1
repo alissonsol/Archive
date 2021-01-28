@@ -67,9 +67,7 @@ Import-Module -Name $componentsModulePath
 Import-Module -Name $workloadsModulePath
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
-$config_root = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
 $project_root = Resolve-Path -Path $project_root -ErrorAction "SilentlyContinue"
-$config_root = Resolve-Path -Path $config_root -ErrorAction "SilentlyContinue"
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName
@@ -79,12 +77,12 @@ $global:VerbosePreference = "SilentlyContinue"
 $result = $false
 switch -Exact ($operation)
 {
-    'requirements' { $result = Confirm-Requirements }
-    'clear' { $result = Clear-Configuration $project_root $config_root }
-    'validate' { $result = Confirm-Configuration $project_root $config_root }
-    'resources' { $result = Publish-ResourceList $project_root $config_root }
-    'components' { $result = Publish-ComponentList $project_root $config_root }
-    'workloads' { $result = Publish-WorkloadList $project_root $config_root }
+    'requirements' { $result = Confirm-RequirementList }
+    'clear' { $result = Clear-Configuration $project_root $config_subfolder }
+    'validate' { $result = Confirm-Configuration $project_root $config_subfolder }
+    'resources' { $result = Publish-ResourceList $project_root $config_subfolder }
+    'components' { $result = Publish-ComponentList $project_root $config_subfolder }
+    'workloads' { $result = Publish-WorkloadList $project_root $config_subfolder }
     Default {
         Write-Output "yuruna requirements`n    Check if machine has all requirements.";
         Write-Output "yuruna clear [project_root] [config_subfolder]`n    Clear resources for given configuration.";

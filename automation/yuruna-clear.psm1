@@ -7,13 +7,13 @@ Import-Module -Name $modulePath
 function Clear-Configuration {
     param (
         $project_root,
-        $config_root
+        $config_subfolder
     )
 
-    if (!(Confirm-ResourceList $project_root $config_root)) { return $false; }
+    if (!(Confirm-ResourceList $project_root $config_subfolder)) { return $false; }
     Write-Debug "---- Destroying Resources"
 
-    $resourcesFile = Join-Path -Path $config_root -ChildPath "resources.yml"
+    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
@@ -27,7 +27,7 @@ function Clear-Configuration {
         # resource template can be empty: just naming already existing resource
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
             # go to work folder under .yuruna
-            $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/resources/$resourceTemplate"
+            $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
             $workFolder = Resolve-Path -Path $workFolder
 
             # execute terraform destroy from work folder
