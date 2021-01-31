@@ -1,0 +1,28 @@
+Requests Analysis
+
+1) Compile and upload files to blob storage
+   From now on, will assume samples have been uploaded to these URLs:
+   https://$clusterStorageAccountName.blob.core.windows.net/$clusterBinariesContainer/$mapperBinary
+   https://$clusterStorageAccountName.blob.core.windows.net/$clusterBinariesContainer/$reducerBinary
+
+2) Open Windows Azure PowerShell and set your Azure account.
+   - Installation of Windows Azure PowerShell
+     http://azure.microsoft.com/en-us/documentation/articles/install-configure-powershell/#Install
+   - Verify you are using the correct account using the cmdlet:
+     > Get-AzureAccount
+   - If needed, set the correct account
+     - Add an account using the cmdlet:
+       > Add-AzureAccount 
+	     Use get-help Add-AzureAccount for help
+     - At times, cached credentials may cause errors, and those may be resolved removing and adding again an account.
+       > Remove-AzureAcccount "[Your-AzureAccount-Alias]"
+       > Add-AzureAccount
+
+3) Customize variables in the config file and run ".ps1" script from Windows Azure PowerShell
+   - If needed, change values for variables at the top of the script
+   - Make sure the containers referenced in the script exist, mainly the input
+     The output and status containers may be created, assuming the account has permissions
+   - Run the script
+     It will indicate the location for the output
+	 Make sure running PowerShell scripts is enabled, as per this guidance:
+	 http://go.microsoft.com/fwlink/?LinkID=135170

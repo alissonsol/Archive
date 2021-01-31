@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestsMapper", "RequestsAnalysis\RequestsMapper\RequestsMapper.csproj", "{61BD0FF9-C375-4B40-887F-49A97D8DCFB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestsReducer", "RequestsAnalysis\RequestsReducer\RequestsReducer.csproj", "{E830897A-7C66-47F7-8504-D23AA88A31CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C64AEBA-6CDF-4EFA-A675-631C3ECB7578}"
+	ProjectSection(SolutionItems) = preProject
+		RequestsAnalysis\RequestsAnalysis.pptx = RequestsAnalysis\RequestsAnalysis.pptx
+		RequestsAnalysis\RequestsAnalysis.ps1 = RequestsAnalysis\RequestsAnalysis.ps1
+		RequestsAnalysis\RequestsAnalysis.ps1.config = RequestsAnalysis\RequestsAnalysis.ps1.config
+		RequestsAnalysis\RequestsAnalysis.txt = RequestsAnalysis\RequestsAnalysis.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFormat", "DataFormat", "{2DF93A9C-1D8E-467E-8052-277CE791C5A4}"
+	ProjectSection(SolutionItems) = preProject
+		RequestsAnalysis\DataFormat\DataFormat.cs = RequestsAnalysis\DataFormat\DataFormat.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61BD0FF9-C375-4B40-887F-49A97D8DCFB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61BD0FF9-C375-4B40-887F-49A97D8DCFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61BD0FF9-C375-4B40-887F-49A97D8DCFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61BD0FF9-C375-4B40-887F-49A97D8DCFB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E830897A-7C66-47F7-8504-D23AA88A31CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E830897A-7C66-47F7-8504-D23AA88A31CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E830897A-7C66-47F7-8504-D23AA88A31CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E830897A-7C66-47F7-8504-D23AA88A31CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
