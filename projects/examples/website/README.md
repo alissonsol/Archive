@@ -1,10 +1,28 @@
-# Website example
+# Website project
 
 A simple .NET C# website container deployed to a Kubernetes cluster.
 
+## Search and replace
+
+What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
+
+- yrn42website-prefix -> Common project prefix for containers. Example: abcd
+- yrn42website-namespace -> Kubernetes namespace for installing containers. Example: abcd
+- yrn42website-dns -> DNS prefix. Example: abcd
+- yrn42website-resource-group -> Name for group of resources (Azure). Example: abcd
+- yrn42website-tags -> Resource tags (Cloud, if template uses it). Example: abcd
+- yrn42website-domain -> Domain for web email, site, Example: abcd.com
+- yrn42website-ip-name -> Name for the public IP address. Example: abcd
+- yrn42website-cluster-name -> Name for the K8S cluster (or at least a common prefix). Example: abcd
+- yrn42website-sitename -> Name for site in the UX (This will be visible to end users). Example: Abcd
+
+Despite the several placeholders enabling reuse in different configuration, it is recommended to replace as many valuables as possible to become identical, easing future maintenance.
+
+Before deploying to the cloud environments, seek for `TO-SET` and set the required values. See section "Cloud deployment instructions".
+
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `website` example to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
+Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
 
 - Create resources
 

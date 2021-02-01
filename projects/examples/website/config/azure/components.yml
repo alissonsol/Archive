@@ -1,7 +1,7 @@
 # Components information - azure
 ---
 globalVariables:
-  containerPrefix:  "yuruna"
+  containerPrefix:  "yrn42website-prefix"
   registryLocation: "to-be-replaced"
 # TO-SET: registry name must be globally unique
   registryName:     ""

@@ -10,7 +10,7 @@ Execute the following command to clear the resources for a given configuration.
 yuruna clear [project_root] [config_subfolder]
 ```
 
-Example clearing the resources for the project `website` in the `Azure` cloud (assuming [authentication](authenticate.md) steps were followed).
+Clearing the resources for the project `website` in the `Azure` cloud (assuming [authentication](authenticate.md) steps were followed).
 
 ```shell
 ./yuruna.ps1 clear ../projects/examples/website azure

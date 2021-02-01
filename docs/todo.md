@@ -5,6 +5,7 @@
 ### P0, P1
 
 - Better PowerShell scripts (likely eternal goal!).
+  - Consider check behavior like that of the [GitHub actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions), appending to each command: `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }`
 - Warn if .terraform already exists: may not create resources.
 - Cert-manager: workloads in Azure
 DEBUG: helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true

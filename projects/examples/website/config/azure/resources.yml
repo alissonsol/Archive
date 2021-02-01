@@ -1,24 +1,21 @@
 # Resources information - azure
 ---
 globalVariables:
-  namespace: "yuruna"
-  clusterDnsPrefix: "yuruna"
-  clusterName:      "yuruna-aks"
-  clusterRegion:    "westus2"
-  clusterVersion:   "1.20.0"
-  frontendIpName:   "localhost"
-  resourceGroup:    "yuruna"
-  resourceTags:     "yuruna"
+  namespace: "yrn42website-namespace"
+  clusterDnsPrefix: "yrn42website-dns"
+  frontendIpName:   "yrn42website-ip-name"
+  resourceGroup:    "yrn42website-resource-group"
+  resourceTags:     "yrn42website-tags"
   nodeCount:        3
 # TO-SET: registry name must be globally unique
   registryName:     ""
 
 resources:
 # regions: az account list-locations -o table
-- name:             "yuruna-aks"
+- name:             "yrn42website-cluster-name-aks"
   template:         "azure-aks-cluster"
   variables:
     clusterRegion:  "westus2"
     clusterVersion: "1.19.3"
     nodeType:       "Standard_D2_v2"
-    frontendIpName: "yuruna"
+    clusterName:    "yrn42website-cluster-name-aks"

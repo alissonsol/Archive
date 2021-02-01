@@ -1,4 +1,4 @@
-# yuruna - frontend/website
+# frontend/website
 
 Frontend website for user authentication and human-computer interface
 
@@ -29,7 +29,7 @@ Frontend website for user authentication and human-computer interface
 ## Running the docker image locally
 
 - You may start debugging the Docker build in Visual Studio. This will run the container usually tagged as `website:dev`, with name `website`. Stopping the debugging may leave it running.
-- You can use the CMD script `frontend/website/docker-run-dev`, which will build an image tagged as `yuruna/website:latest` and then run it with name `yuruna-website`.
+- You can use the CMD script `frontend/website/docker-run-dev`, which will build an image tagged as `yrn42website-prefix/website:latest` and then run it with name `yrn42website-prefix-website`.
   - If coming directly to this step, check if the Docker file sharing is enable for the `C:\` drive (or whichever is needed). Information about sharing is in item above.
   - Check if the password in the command matches the one used when trusting the development certificates.
   - Open in browser: `https://localhost:8001/`
@@ -37,8 +37,8 @@ Frontend website for user authentication and human-computer interface
 - Local Kubernetes cluster 'docker-desktop'
   - Test if 'Running the docker image locally' works, as per instructions below.
   - If local Kubernetes cluster is enabled, loading can be locally tested
-    - `kubectl run --image="yuruna/website:latest" yuruna-website-test --port=80 --env="DOMAIN=www.yuruna.com" --expose=true --image-pull-policy=IfNotPresent`
+    - `kubectl run --image="yrn42website-prefix/website:latest" yrn42website-prefix-website-test --port=80 --env="DOMAIN=www.yrn42website-domain" --expose=true --image-pull-policy=IfNotPresent`
     - Check if container is running
-    - Stop the pod: `kubectl delete pod/yuruna-website-test`
+    - Stop the pod: `kubectl delete pod/yrn42website-prefix-website-test`
 
 Back to main [readme](../../../README.md)

@@ -1,7 +1,7 @@
 # Components information - localhost
 ---
 globalVariables:
-  containerPrefix:  "yuruna"
+  containerPrefix:  "yrn42website-prefix"
   registryLocation: "localhost:5000"
   registryName:     "localhost"
   buildCommand: docker build --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"

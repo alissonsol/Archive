@@ -1,21 +1,22 @@
 # Workloads information - azure
 ---
 globalVariables:
-  namespace:         "yuruna"
-  containerPrefix:   "yuruna"
+  namespace:         "yrn42website-namespace"
+  containerPrefix:   "yrn42website-prefix"
   registryLocation:  "to-be-replaced"
 # TO-SET: registry name must be globally unique
   registryName:      ""
-  frontendIpName:    "yuruna"
+  frontendIpName:    "yrn42website-ip-name"
   frontendIpAddress: "127.0.0.1"
-  site:              "www.yuruna.com"
+  site:              "www.yrn42website-domain"
   dockerUsername:    "dummy"
   dockerPassword:    "dummy"
-  certManagerIssuerEmail: "certificates@yuruna.com"
+  websiteDomain:     "yrn42website-domain"
   websiteTlsSecret:  "website-tls-secret"
+  certManagerIssuerEmail: "certificates@yrn42website-domain"
 
 workloads:
-- context: "yuruna-aks"
+- context: "yrn42website-cluster-name-aks"
   deployments:
   # Uninstall previous workloads: idempotent
   - kubectl: "delete namespace ${env:namespace} --v=1"
@@ -31,10 +32,11 @@ workloads:
   - kubectl: "create namespace ingress-basic --v=1"
   - kubectl: "label namespace cert-manager certmanager.k8s.io/disable-validation=true --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
   - helm: "repo add jetstack https://charts.jetstack.io"
   - helm: "repo update"
-  - shell: "Start-Sleep -s 9"
+  - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+  - helm: "repo update"
+  - shell: "Start-Sleep -s 19"
   - helm: >
       install cert-manager jetstack/cert-manager
       --namespace cert-manager
@@ -42,7 +44,7 @@ workloads:
       --set installCRDs=true
       --set nodeSelector."beta\.kubernetes\.io/os"=linux
       # --debug
-  - shell: "Start-Sleep -s 9"
+  - shell: "Start-Sleep -s 19"
   - helm: >
       install nginx-ingress ingress-nginx/ingress-nginx
       --namespace ingress-basic
@@ -59,4 +61,4 @@ workloads:
   - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=$(az acr credential show -n ${env:registryName} --query username) --docker-password=$(az acr credential show -n ${env:registryName} --query passwords[0].value) --v=1"
   - chart: "frontend/website"
     variables:
-      installName: "yuruna-website"
+      installName: "yrn42website-prefix-website"
