@@ -19,10 +19,6 @@ Include the `automation` folder in the path. Then deploy resources, build compon
 
 See project [examples](projects/examples/README.md) and check the [syntax](docs/syntax.md) documentation for more details.
 
-While it fits, the project examples list is copied below:
-
-- [website](projects/examples/website/README.md): A simple .NET C# website container deployed to a Kubernetes cluster.
-
 ## Notes
 
 - Creating cloud resources and not deleting them may result in a growing bill even if the clusters aren't used.

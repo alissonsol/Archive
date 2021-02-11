@@ -82,10 +82,26 @@ function Publish-ComponentList {
         }
 
         Push-Location $componentsPath
-        Invoke-Expression $buildCommand
+        # preProcessor
+        $preProcessor = $componentVars['preProcessor']
+        if ([string]::IsNullOrEmpty($preProcessor)) { $preProcessor = $componentsYaml.globalVariables['preProcessor'] }
+        if (-Not ([string]::IsNullOrEmpty($preProcessor))) {
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($preProcessor)
+            Write-Information "preProcessor: $executionCommand"
+            Invoke-Expression $executionCommand
+        }
+        # build
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($buildCommand)
         Write-Information "Build: $executionCommand"
         Invoke-Expression $executionCommand
+        # postProcessor
+        $postProcessor = $componentVars['postProcessor']
+        if ([string]::IsNullOrEmpty($postProcessor)) { $postProcessor = $componentsYaml.globalVariables['postProcessor'] }
+        if (-Not ([string]::IsNullOrEmpty($postProcessor))) {
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($postProcessor)
+            Write-Information "postProcessor: $executionCommand"
+            Invoke-Expression $executionCommand
+        }
         Pop-Location
         #   tag and push component to registry
         $tagCommand = $component['tagCommand']

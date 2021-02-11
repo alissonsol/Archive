@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tuning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tuning
+  template:
+    metadata:
+      labels:
+        app: tuning
+        version: v1
+    spec:
+      containers:
+      - name: tuning
+        image: {{ .Values.registryLocation }}/{{ .Values.containerPrefix }}/tuning:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - mountPath: /mnt/data
+            name: data-dir-volume
+        resources:
+            limits:
+              memory: "256Mi"
+              cpu: "100m"
+      imagePullSecrets:
+        - name: registry-credential
+      volumes:
+        - name: data-dir-volume
+          persistentVolumeClaim:
+            claimName: data-dir-pvc

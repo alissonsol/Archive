@@ -1,0 +1,21 @@
+# Resources information - localhost
+---
+globalVariables:
+  namespace: "yrn42onnxtraingpt2-namespace"
+  clusterDnsPrefix: "yrn42onnxtraingpt2-dns"
+  frontendIpName:   "localhost"
+  resourceGroup:    "yrn42onnxtraingpt2-resource-group"
+  resourceTags:     "yrn42onnxtraingpt2-tags"
+  nodeCount:        1
+  registryName:     "localhost:5000"
+
+resources:
+# Localhost with Docker Desktop
+# Nothing needs to be created: just provide cluster name
+- name:             "docker-desktop"
+  template:         ""
+  variables:
+# Terraform template will run local registry
+- name:             "localhost-registry"
+  template:         "localhost-registry"
+  variables:

@@ -3,7 +3,7 @@
 ## Answered
 
 - What is the answer to the ultimate question of life, the universe, and everything?
-  - 42
+  - `42`. That is why every example has the easy to find and replace prefixes starting with `yrn42`.
 
 - All deployed successfully, but cannot connect to <https://localhost> in a Windows machine. Why?
 
@@ -18,11 +18,5 @@
 ## Unanswered
 
 - What is the ultimate question of life, the universe, and everything?
-- Is there a way for the DNS binding to dynamically update?
-  - Need to investigate
-    - [ExternalDNS](https://github.com/kubernetes-sigs/external-dns)
-    - [Configuring HTTPS with cert-manager and Google Cloud DNS](https://knative.dev/docs/serving/using-cert-manager-on-gcp/)
-    - [Kubernetes w/ Let’s Encrypt & Cloud DNS](https://medium.com/google-cloud/kubernetes-w-lets-encrypt-cloud-dns-c888b2ff8c0e)
-    - [Use Let’s Encrypt, Cert-Manager and External-DNS to publish your Kubernetes apps to your website](https://medium.com/asl19-developers/use-lets-encrypt-cert-manager-and-external-dns-to-publish-your-kubernetes-apps-to-your-website-ff31e4e3badf)
 
 Back to main [readme](../README.md)

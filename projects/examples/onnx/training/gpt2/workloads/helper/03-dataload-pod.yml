@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dataload-pod
+  namespace: yrn42onnxtraingpt2-namespace
+spec:
+  volumes:
+    - name: data-dir-volume
+      persistentVolumeClaim:
+        claimName: data-dir-pvc
+  containers:
+    - name: dataload-container
+      image: localhost:5000/yrn42onnxtraingpt2-prefix/dataload:latest
+      imagePullPolicy: Always
+      volumeMounts:
+        - mountPath: "/mnt/storage"
+          name: data-dir-volume
+      resources:
+        limits:
+          memory: "1024Mi"
+          cpu: "1000m"

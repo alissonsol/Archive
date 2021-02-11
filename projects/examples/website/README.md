@@ -16,13 +16,13 @@ What to search and replace in order to reuse this project as the basis for a new
 - yrn42website-cluster-name -> Name for the K8S cluster (or at least a common prefix). Example: abcd
 - yrn42website-sitename -> Name for site in the UX (This will be visible to end users). Example: Abcd
 
-Despite the several placeholders enabling reuse in different configuration, it is recommended to replace as many valuables as possible to become identical, easing future maintenance.
+Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42website-domain` first and then use this regular expression to search and replace the others:  `(yrn42website)[A-Za-z0-9\-]*`
 
 Before deploying to the cloud environments, seek for `TO-SET` and set the required values. See section "Cloud deployment instructions".
 
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder.
+Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
 - Create resources
 

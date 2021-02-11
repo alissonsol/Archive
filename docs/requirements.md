@@ -9,6 +9,7 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
 - You obviously need [Git](https://git-scm.com/downloads)
   - `git config --global user.name "Your Name"`
   - `git config --global user.email "Your@email.address"`
+  - `git config --global core.autocrlf input`
 - Using a Hyper-V machine in Windows? Enable [nested virtualization](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
 - Installed [Docker Desktop](https://docs.docker.com/desktop/)
   - Enable [Kubernetes](https://docs.docker.com/get-started/orchestration/)
