@@ -9,6 +9,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/acme-challenge-type: http01
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/issue-temporary-certificate: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
     nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -18,10 +21,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.site }}
+    - {{ .Values.websiteHost }}
     secretName: {{ .Values.websiteTlsSecret }}
   rules:
-  - host: {{ .Values.site }}
+  - host: {{ .Values.websiteHost }}
     http:
       paths:
       - pathType: Prefix

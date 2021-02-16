@@ -2,11 +2,11 @@
 ---
 globalVariables:
   containerPrefix:  "yrn42website-prefix"
-  registryLocation: "localhost:5000"
-  registryName:     "localhost"
+  registryName:     "componentsRegistry"
+  # Notice that the 'registryName' variable is used to find the name of another variable, requiring the dual indirection
   buildCommand: docker build --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
-  tagCommand: docker tag "${env:containerPrefix}/${env:project}:latest" "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"
-  pushCommand: docker push "${env:registryLocation}/${env:containerPrefix}/${env:project}:latest"
+  tagCommand: docker tag "${env:containerPrefix}/${env:project}:latest" "$([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))/${env:containerPrefix}/${env:project}:latest"
+  pushCommand: docker push "$([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))/${env:containerPrefix}/${env:project}:latest"
 
 components:
 - project: "website"

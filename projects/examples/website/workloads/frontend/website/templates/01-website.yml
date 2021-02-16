@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
       - name: website
-        image: {{ .Values.registryLocation }}/{{ .Values.containerPrefix }}/website:latest
+        # Notice that the 'registryName' variable is used to find the name of another variable, requiring the dual indirection
+        image: {{ index .Values (printf "%s.registryLocation" .Values.registryName) }}/{{ .Values.containerPrefix }}/website:latest
         imagePullPolicy: Always 
         ports:
         - name: port80

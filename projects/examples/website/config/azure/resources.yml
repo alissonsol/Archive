@@ -1,21 +1,31 @@
 # Resources information - azure
 ---
 globalVariables:
-  namespace: "yrn42website-namespace"
+  namespace:        "yrn42website-ns"
   clusterDnsPrefix: "yrn42website-dns"
-  frontendIpName:   "yrn42website-ip-name"
-  resourceGroup:    "yrn42website-resource-group"
+  resourceGroup:    "yrn42website-rg"
   resourceTags:     "yrn42website-tags"
-  nodeCount:        3
-# TO-SET: registry name must be globally unique
-  registryName:     ""
+  nodeCount:        1
+  registryName:     "componentsRegistry"
 
+# Careful: if the template needs a veriable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
-# regions: az account list-locations -o table
-- name:             "yrn42website-cluster-name-aks"
-  template:         "azure-aks-cluster"
+# registry
+- name:             "componentsRegistry"
+  template:         "azure/registry"
   variables:
+    # TO-SET: registry name must be globally unique
+    uniqueName:     "yrn42registry"
+    registryRegion: "westus2"
+    # resource group gets _registry appended to it, so registry is isolated in its own resource group
+
+# cluster reference
+- name:             "yrn42website-context"
+  template:         "azure/aks-cluster"
+  variables:
+    clusterName:    "yrn42website-cluster"
+    destinationContext:  "yrn42website-context"
     clusterRegion:  "westus2"
-    clusterVersion: "1.19.3"
+    clusterVersion: "1.20.2"
     nodeType:       "Standard_D2_v2"
-    clusterName:    "yrn42website-cluster-name-aks"
+    nodeCount:      3

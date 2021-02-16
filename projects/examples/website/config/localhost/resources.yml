@@ -1,21 +1,24 @@
 # Resources information - localhost
 ---
 globalVariables:
-  namespace: "yrn42website-namespace"
+  namespace:        "yrn42website-ns"
   clusterDnsPrefix: "yrn42website-dns"
-  frontendIpName:   "localhost"
-  resourceGroup:    "yrn42website-resource-group"
+  resourceGroup:    "yrn42website-rg"
   resourceTags:     "yrn42website-tags"
   nodeCount:        1
-  registryName:     "localhost:5000"
+  registryName:     "componentsRegistry"
 
+# Careful: if the template needs a veriable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
-# Localhost with Docker Desktop
-# Nothing needs to be created: just provide cluster name
-- name:             "docker-desktop"
-  template:         ""
+# localhost registry container
+- name:             "componentsRegistry"
+  template:         "localhost/registry"
   variables:
-# Terraform template will run local registry
-- name:             "localhost-registry"
-  template:         "localhost-registry"
+  
+# localhost cluster reference
+- name:             "yrn42website-context"
+  template:         "localhost/context-copy"
   variables:
+    clusterName:    "yrn42website-cluster"
+    sourceContext:  "docker-desktop"
+    destinationContext:  "yrn42website-context"

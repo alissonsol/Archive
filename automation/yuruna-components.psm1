@@ -1,7 +1,7 @@
 # yuruna-components module
 
-$yuruna_root = $PSScriptRoot
-$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
 Import-Module -Name $validationModulePath
 
 function Publish-ComponentList {
@@ -24,7 +24,7 @@ function Publish-ComponentList {
     if ($null -eq $componentsYaml) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
     if ($null -eq $componentsYaml.components) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
 
-    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
@@ -48,9 +48,12 @@ function Publish-ComponentList {
             }
         }
         if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
-            foreach ($key in $resourcesOutputYaml.Keys) {
-                $value = $resourcesOutputYaml[$key].value
-                $componentVars[$key] = $value
+            foreach ($resource in $resourcesOutputYaml.Keys) {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$resource.$key"
+                    $value = $resourcesOutputYaml.$resource[$key].value
+                    $componentVars[$resourceKey] = $value
+                }
             }
         }
         if ((-Not ($null -eq $component.variables))  -and (-Not ($null -eq  $component.variables.Keys))) {
@@ -114,9 +117,9 @@ function Publish-ComponentList {
         Write-Information "Tag: $executionCommand"
         Invoke-Expression $executionCommand
         # TODO: generic registry login approach
-        $registryLocation = $(Get-Content -Path Env:registryLocation)
+        $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
         if ($registryLocation -like '*azurecr.io*') {
-            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n ${env:registryLocation}")
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation")
             Invoke-Expression $executionCommand | Out-Null
         }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)

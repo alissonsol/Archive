@@ -51,14 +51,15 @@ param (
     [string]$config_subfolder
 )
 
-$yuruna_root = $PSScriptRoot
-Get-Module | Remove-Module
-$requirementsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-requirements"
-$clearModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-clear"
-$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
-$resourcesModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-resources"
-$componentsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-components"
-$workloadsModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-workloads"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+Set-Item -Path Env:yuruna_root -Value ${yuruna_root}
+Get-Module | Remove-Module | Out-Null
+$requirementsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-requirements"
+$clearModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-clear"
+$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
+$resourcesModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-resources"
+$componentsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-components"
+$workloadsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-workloads"
 Import-Module -Name $requirementsModulePath
 Import-Module -Name $clearModulePath
 Import-Module -Name $validationModulePath

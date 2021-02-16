@@ -1,7 +1,7 @@
 # yuruna-resources module
 
-$yuruna_root = $PSScriptRoot
-$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
 Import-Module -Name $validationModulePath
 
 function Publish-ResourceList {
@@ -18,11 +18,11 @@ function Publish-ResourceList {
     #   execute terraform apply from work folder
     #     creates local .terraform under work folder, which can be used later in terraform destroy
 
-    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"    
+    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
-    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     New-Item -Path $resourcesOutputFile -ItemType File -Force
 
     # For each resource in resources.yml
@@ -34,8 +34,14 @@ function Publish-ResourceList {
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
         # resource template can be empty: just naming already existing resource
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
-            $templateFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate")
-            if (-Not (Test-Path -Path $templateFolder)) { Write-Information "Resources template folder not found: $templateFolder`nUsed in file: $resourcesFile"; return $false; }
+            $templateFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+            if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder))) {
+                $templateFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+                if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder)))  {
+                    Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
+                    return $false;
+                }
+            }
             # copy template to work folder under .yuruna
             $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
@@ -74,8 +80,14 @@ function Publish-ResourceList {
             Write-Information "Executing terraform apply from $workFolder"
             $result = terraform apply -auto-approve
             Write-Debug "Terraform apply: $result"
-            $terraformOutput = "$(terraform output -json)" | ConvertFrom-Json
-            Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $terraformOutput)
+            # resource.output file processing
+            $jsonOutput = "$(terraform output -json)"
+            if (![string]::IsNullOrEmpty($jsonOutput)) {
+                $terraformYaml = $jsonOutput | ConvertFrom-Json
+                $tuple = @{ }
+                $tuple."$resourceName" = $terraformYaml
+                Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $tuple)
+            }
             Pop-Location
         }
     }

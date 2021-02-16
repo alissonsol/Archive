@@ -1,0 +1,46 @@
+# Resources information - azure
+---
+globalVariables:
+  namespace:        "yrn42peerkeys"
+  clusterDnsPrefix: "yrn42peerkeys"
+  clusterName:      "yrn42peerkeys-aks"
+  clusterRegion:    "westus2"
+  clusterVersion:   "1.20.2"
+  nodeType:         "Standard_D2_v2"
+  resourceGroup:    "yrn42peerkeys"
+  resourceTags:     "yrn42peerkeys"
+  nodeCount:        3
+# TO-SET: registry name must be globally unique
+  registryName:     "componentsRegistry"
+
+resources:
+# Careful: if the template needs a veriable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
+- name:             "componentsRegistry"
+  template:         "azure/registry"
+  variables:
+    # TO-SET: registry name must be globally unique
+    uniqueName:     "yrn42peerkeys"
+    registryRegion: "westus2"
+    # resource group gets _registry appended to it, so registry is isolated in its own resource group
+
+# regions: az account list-locations -o table
+- name:             "yrn42peerkeys001"
+  template:         "azure/aks-cluster"
+  variables:
+    clusterName:    "yrn42peerkeys001"
+    resourceGroup:  "yrn42peerkeys001"
+    destinationContext:  "yrn42peerkeys001"
+
+- name:             "yrn42peerkeys002"
+  template:         "azure/aks-cluster"
+  variables:
+    clusterName:    "yrn42peerkeys002"
+    resourceGroup:  "yrn42peerkeys002"
+    destinationContext:  "yrn42peerkeys002"
+
+- name:             "yrn42peerkeys003"
+  template:         "azure/aks-cluster"
+  variables:
+    clusterName:    "yrn42peerkeys003"
+    resourceGroup:  "yrn42peerkeys003"
+    destinationContext:  "yrn42peerkeys003"

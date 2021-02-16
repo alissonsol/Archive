@@ -1,21 +1,18 @@
 # Workloads information - localhost
 ---
 globalVariables:
-  namespace:         "yrn42website-namespace"
+  namespace:         "yrn42website-ns"
   containerPrefix:   "yrn42website-prefix"
-  registryLocation:  "localhost:5000"
-  registryName:      "localhost"
-  frontendIpName:    "localhost"
-  frontendIpAddress: "127.0.0.1"
-  site:              "localhost"
+  registryName:      "componentsRegistry"
   dockerUsername:    "dummy"
   dockerPassword:    "dummy"
   websiteDomain:      "yrn42website-domain"
-  websiteTlsSecret:  "website-tls-secret"
+  websiteHost:        "localhost"
   certManagerIssuerEmail: "certificates@yrn42website-domain"
+  websiteTlsSecret:  "website-tls-secret"
 
 workloads:
-- context: "docker-desktop"
+- context: "yrn42website-context"
   deployments:
   # Uninstall previous workloads: idempotent
   - kubectl: "delete namespace ${env:namespace} --v=1"
@@ -54,14 +51,14 @@ workloads:
       --set controller.replicaCount=2
       --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
       --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-      --set controller.service.loadBalancerIP="${env:frontendIpAddress}"
-      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:frontendIpName}"
+      --set controller.service.loadBalancerIP="DUMMY"
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="DUMMY"
       --set controller.admissionWebhooks.enabled=false
       # --debug
   # Wait for dependencies to be ready
   - shell: "Start-Sleep -s 9"
   # Install components
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
   - chart: "frontend/website"
     variables:
-      installName: "yrn42website-prefix-website"
+      installName: "yrn42website-install-website"

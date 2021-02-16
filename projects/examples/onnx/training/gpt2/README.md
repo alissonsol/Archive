@@ -9,14 +9,14 @@ Based on example [Accelerate GPT2 fine-tuning with ONNX Runtime Training](https:
 What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
 
 - yrn42onnxtraingpt2-prefix -> Common project prefix for containers. Example: abcd
-- yrn42onnxtraingpt2-namespace -> Kubernetes namespace for installing containers. Example: abcd
+- yrn42onnxtraingpt2-ns -> Kubernetes namespace for installing containers. Example: abcd
 - yrn42onnxtraingpt2-dns -> DNS prefix. Example: abcd
-- yrn42onnxtraingpt2-resource-group -> Name for group of resources (Azure). Example: abcd
-- yrn42onnxtraingpt2-tags -> Resource tags (Cloud, if template uses it). Example: abcd
+- yrn42onnxtraingpt2-rg -> Name for group of resources (Azure). Example: abcd
+- yrn42onnxtraingpt2-tags -> Resource tags. Example: abcd
 - yrn42onnxtraingpt2-domain -> Domain for web email, site, Example: abcd.com
-- yrn42onnxtraingpt2-ip-name -> Name for the public IP address. Example: abcd
-- yrn42onnxtraingpt2-cluster-name -> Name for the K8S cluster (or at least a common prefix). Example: abcd
-- yrn42onnxtraingpt2-sitename -> Name for site in the UX (This will be visible to end users). Example: Abcd
+- yrn42onnxtraingpt2-host -> Host name. Example: www.abcd.com
+- yrn42onnxtraingpt2-cluster -> Name for the K8S cluster (or at least a common prefix). Example: abcd
+- yrn42onnxtraingpt2-uxname -> Name for site in the UX (This will be visible to end users). Example: Abcd
 
 Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42onnxtraingpt2-domain` first and then use this regular expression to search and replace the others:  `(yrn42onnxtraingpt2)[A-Za-z0-9\-]*`
 
@@ -65,11 +65,5 @@ As output, the following values will become available for later steps:
 
 - Container `dataload`: loads data into a persistent volume claim. Will be a [init container](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/).
 - Container `tuning`: executes the tuning phase.
-
-## Cloud deployment instructions
-
-- Edit the files under `projects/examples/config/azure/` and set the `registryName` to a unique name (search for `TO-SET`). Azure requires a globally unique registry name. Ping `yourname.azurecr.io` and confirm that name is not already in use. This should just be the name (like `yuruna`). Azure automatically adds the domain (`azurecr.io`). Set the same across all the files.
-  - The current value is intentionally left empty so that validation will point out the need to edit the files.
-- Afterwards, execute the same commands above, replacing `localhost` with `azure`.
 
 Back to main [readme](../../../../../README.md). Back to list of [examples](../../../README.md).

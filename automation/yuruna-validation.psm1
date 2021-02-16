@@ -1,7 +1,7 @@
 # yuruna-validation module
 
-$yuruna_root = $PSScriptRoot
-$modulePath = Join-Path -Path $yuruna_root -ChildPath "import-yaml"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+$modulePath = Join-Path -Path $yuruna_root -ChildPath "automation/import-yaml"
 Import-Module -Name $modulePath
 
 function Confirm-FolderList {
@@ -15,7 +15,7 @@ function Confirm-FolderList {
     $config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
     $config_root = Resolve-Path -Path $config_relative -ErrorAction "SilentlyContinue"
     if ([string]::IsNullOrEmpty($config_root)) { Write-Information "Configuration subfolder not found: $config_relative"; return $false; }
-    
+
     if (-Not (Test-Path -Path $project_root)) { Write-Information "Project path not found: $project_root"; return $false; }
     if (-Not (Test-Path -Path $config_root)) { Write-Information "Config path not found: $config_root"; return $false; }
 
@@ -61,8 +61,16 @@ function Confirm-ResourceList {
         $resourceTemplate = $resource['template']
         Write-Debug "resource: $resourceName - template: $resourceTemplate"
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
-        $templateFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate")
-        if (-Not (Test-Path -Path $templateFolder)) { Write-Information "Resources template folder not found: $templateFolder`nUsed in file: $resourcesFile"; return $false; }
+        $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+        if (($null -eq $templateProjectFolder) -or (-Not (Test-Path -Path $templateProjectFolder))) {
+            $templateGlobalFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+            if (($null -eq $templateGlobalFolder) -or (-Not (Test-Path -Path $templateGlobalFolder)))  {
+                Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
+                Write-Information "Not found local folder: $templateProjectFolder";
+                Write-Information "Not found global folder: $templateGlobalFolder";
+                return $false;
+            }
+        }
         # Variables
         if (-Not ($null -eq  $resource.variables)) {
             foreach ($key in $resource.variables.Keys) {
@@ -107,8 +115,6 @@ function Confirm-ComponentList {
         $pushCommand = $component['pushCommand']
         if ([string]::IsNullOrEmpty($pushCommand)) { $pushCommand = $yaml.globalVariables['pushCommand']; }
         if ([string]::IsNullOrEmpty($pushCommand)) { Write-Information "pushCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
-        $registryLocation = $yaml.globalVariables['registryLocation']
-        if ([string]::IsNullOrEmpty($registryLocation)) { Write-Information "globalVariables.registryLocation cannot be null or empty in file: $componentsFile"; return $false; }
 
         $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
         if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }

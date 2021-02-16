@@ -1,7 +1,7 @@
 # yuruna-clear module
 
-$yuruna_root = $PSScriptRoot
-$modulePath = Join-Path -Path $yuruna_root -ChildPath "import-yaml"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+$modulePath = Join-Path -Path $yuruna_root -ChildPath "automation/import-yaml"
 Import-Module -Name $modulePath
 
 function Clear-Configuration {
@@ -28,15 +28,18 @@ function Clear-Configuration {
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
             # go to work folder under .yuruna
             $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
-            $workFolder = Resolve-Path -Path $workFolder
-
-            # execute terraform destroy from work folder
-            Push-Location $workFolder
-            Write-Information "Executing terraform destroy from $workFolder"
-            $result = terraform destroy -auto-approve -refresh=false
-            Write-Debug "Terraform destroy: $result"
-            Pop-Location
-            Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
+            if (-Not ([string]::IsNullOrEmpty($workFolder))) {
+                $workFolder = Resolve-Path -Path $workFolder -ErrorAction "SilentlyContinue"
+                if (-Not ([string]::IsNullOrEmpty($workFolder))) {
+                    # execute terraform destroy from work folder
+                    Push-Location $workFolder
+                    Write-Information "Executing terraform destroy from $workFolder"
+                    $result = terraform destroy -auto-approve -refresh=false
+                    Write-Debug "Terraform destroy: $result"
+                    Pop-Location
+                    Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
+                }
+            }
         }
     }
 

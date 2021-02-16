@@ -1,5 +1,5 @@
 apiVersion: v2
-name: yrn42website-sitename
+name: yrn42website-uxname
 description: A simple .NET C# website container deployed to a Kubernetes cluster.
 
 type: application

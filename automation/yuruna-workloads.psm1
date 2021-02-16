@@ -1,7 +1,7 @@
 # yuruna-workloads module
 
-$yuruna_root = $PSScriptRoot
-$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "yuruna-validation"
+$yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
+$validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
 Import-Module -Name $validationModulePath
 
 function Publish-WorkloadList {
@@ -25,7 +25,7 @@ function Publish-WorkloadList {
     if ($null -eq $workloadsYaml) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
     if ($null -eq $workloadsYaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
 
-    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"    
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
@@ -52,7 +52,7 @@ function Publish-WorkloadList {
             if (!($isChart -or $isKubectl -or $isHelm -or $isShell)) { Write-Information "context.deployment should be 'chart', 'kubectl', 'helm' or 'shell' in file: $workloadsFile"; return $false; }
 
             $deploymentVars = @{}
-            #       apply global variables, resources.output variables, workload variables
+            #       apply global variables, resources.output variables, workload variables, deployment variables
             if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
                 foreach ($key in $workloadsYaml.globalVariables.Keys) {
                     $value = $workloadsYaml.globalVariables[$key]
@@ -60,8 +60,17 @@ function Publish-WorkloadList {
                 }
             }
             if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
-                foreach ($key in $resourcesOutputYaml.Keys) {
-                    $value = $resourcesOutputYaml[$key].value
+                foreach ($resource in $resourcesOutputYaml.Keys) {
+                    foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                        $resourceKey = "$resource.$key"
+                        $value = $resourcesOutputYaml.$resource[$key].value
+                        $deploymentVars[$resourceKey] = $value
+                    }
+                }
+            }
+            if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq  $workload.variables.Keys))) {
+                foreach ($key in $workload.variables.Keys) {
+                    $value = $workload.variables[$key]
                     $deploymentVars[$key] = $value
                 }
             }
@@ -96,7 +105,9 @@ function Publish-WorkloadList {
                     $line = "${key}: `"$value`""
                     Add-Content -Path $helmValuesFile -Value $line
                 }
-                #   execute helm install in work folder
+                $line = "contextName: `"$contextName`""
+                Add-Content -Path $helmValuesFile -Value $line
+            #   execute helm install in work folder
                 Write-Debug "`Helm execute from: $workFolder"
                 Push-Location $workFolder
                 $result = helm lint
@@ -113,6 +124,7 @@ function Publish-WorkloadList {
                     $value = $deploymentVars[$key]
                     Set-Item -Path Env:$key -Value ${value}
                 }
+                Set-Item -Path Env:contextName -Value ${contextName}
                 $expression = $null
                 if ($isKubectl) { $value = $deployment['kubectl']; $expression = "kubectl $value" }
                 if ($isHelm) { $value = $deployment['helm']; $expression = "helm $value"; }
