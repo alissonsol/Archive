@@ -48,7 +48,7 @@ namespace grava.Controllers
         [HttpDelete("{key}")]
         public string Delete(string key)
         {
-            System.Console.WriteLine(string.Format("grava.PDeleteut[{0}]", key));            
+            System.Console.WriteLine(string.Format("grava.Delete[{0}]", key));            
 
             return _dictionary.Delete(key);
         }

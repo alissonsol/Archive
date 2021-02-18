@@ -1,4 +1,4 @@
-# Yuruna: Cross-cloud Kubernetes-based applications
+# Yuruna: A developer toolset for cross-cloud Kubernetes-based applications.
 # Showing Write-Debug messages: $DebugPreference = "Continue"
 #  https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-debug
 # Showing Write-Information message: $InformationPreference = "Continue"
@@ -40,9 +40,6 @@
 
     .LINK
     Online version: http://bit.ly/asol-yrn
-
-    .LINK
-    yuruna.com
 #>
 
 param (

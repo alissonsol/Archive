@@ -107,7 +107,7 @@ function Publish-WorkloadList {
                 }
                 $line = "contextName: `"$contextName`""
                 Add-Content -Path $helmValuesFile -Value $line
-            #   execute helm install in work folder
+                # execute helm install in work folder
                 Write-Debug "`Helm execute from: $workFolder"
                 Push-Location $workFolder
                 $result = helm lint

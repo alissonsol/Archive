@@ -171,7 +171,7 @@ function Confirm-WorkloadList {
                 if ([string]::IsNullOrEmpty($installName)) { Write-Information "workload[$contextName]chart[$chartName]variables['installName'] cannot be null or empty in file: $workloadsFile"; return $false; }
             }
             # if ($isKubectl -or $isHelm -or $isShell)
-            #   only possible to verify it is not null or empty, what has already been done!
+            #   only possibility: verify it is not null or empty, what has already been done!
         }
     }
 
