@@ -5,8 +5,8 @@
 .COMPANYNAME None
 .COPYRIGHT (c) 2021 Alisson Sol et al.
 .TAGS yuruna-workloads
-.LICENSEURI https://www.yuruna.com
-.PROJECTURI https://www.yuruna.com
+.LICENSEURI http://www.yuruna.com
+.PROJECTURI http://www.yuruna.com
 .ICONURI
 .EXTERNALMODULEDEPENDENCIES powershell-yaml
 .REQUIREDSCRIPTS
