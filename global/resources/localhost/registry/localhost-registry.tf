@@ -12,11 +12,11 @@ data "external" "registryLocation" {
   program = [
     "pwsh",
     "./registry-location.ps1",
-    "dummy",
+    "placeholder",
   ]
 
   query = {
-    dummy = "dummy" 
+    placeholder = "placeholder" 
   }
 }
 

@@ -4,8 +4,8 @@ globalVariables:
   namespace:         "yrn42template-ns"
   containerPrefix:   "yrn42template-prefix"
   registryName:      "componentsRegistry"
-  dockerUsername:    "dummy"
-  dockerPassword:    "dummy"
+  dockerUsername:    "placeholder"
+  dockerPassword:    "placeholder"
   websiteDomain:     "yrn42template-domain"
 
 workloads:

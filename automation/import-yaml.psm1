@@ -1,5 +1,19 @@
-# yuruna import-yaml module
-# Module that converts from file or content to Yaml
+<#PSScriptInfo
+.VERSION 0.1
+.GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
+.AUTHOR Alisson Sol
+.COMPANYNAME None
+.COPYRIGHT (c) 2021 Alisson Sol et al.
+.TAGS import-yaml
+.LICENSEURI https://www.yuruna.com
+.PROJECTURI https://www.yuruna.com
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES powershell-yaml
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+.PRIVATEDATA
+#>
 
 function ConvertFrom-Content {
     param (

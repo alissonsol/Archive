@@ -3,11 +3,23 @@ data "external" "originalIp" {
   program = [
     "pwsh",
     "./localhost-ip.ps1",
-    "dummy",
+    "placeholder",
   ]
 
   query = {
-    dummy = "dummy" 
+    placeholder = "placeholder" 
+  }
+}
+
+data "external" "hostname" {
+  program = [
+    "pwsh",
+    "./localhost-name.ps1",
+    "placeholder",
+  ]
+
+  query = {
+    placeholder = "placeholder" 
   }
 }
 
@@ -17,4 +29,8 @@ output "frontendIp" {
 
 output "clusterIp" {
   value = data.external.originalIp.result.ip_address
+}
+
+output "hostname" {
+  value = data.external.hostname.result.hostname
 }

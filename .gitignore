@@ -71,3 +71,6 @@ msbuild.wrn
 # Yuruna
 **/.yuruna/*
 **/resources.output.yml
+**/*.certificate-authority
+**/*.client-certificate
+**/*.client-key

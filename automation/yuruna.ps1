@@ -1,18 +1,31 @@
-# Yuruna: A developer toolset for cross-cloud Kubernetes-based applications.
-# Showing Write-Debug messages: $DebugPreference = "Continue"
-#  https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-debug
-# Showing Write-Information message: $InformationPreference = "Continue"
-#   https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-information
+<#PSScriptInfo
+.VERSION 0.1
+.GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
+.AUTHOR Alisson Sol
+.COMPANYNAME None
+.COPYRIGHT (c) 2021 Alisson Sol et al.
+.TAGS
+.LICENSEURI https://www.yuruna.com
+.PROJECTURI https://www.yuruna.com
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES powershell-yaml
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+.PRIVATEDATA
+#>
+
+#requires -version 7
 
 <#
     .SYNOPSIS
-    Cross-cloud Kubernetes-based applications deployment.
+    A developer toolset for cross-cloud Kubernetes-based applications.
 
     .DESCRIPTION
-    Cross-cloud Kubernetes-based applications deployment.
+    A developer toolset for cross-cloud Kubernetes-based applications.
 
     .PARAMETER operation
-    Valid operations: resources, components and workloads.
+    Valid operations: resources, components, workloads, validate, requirements, clear.
 
     .PARAMETER project_root
     Base folder for the operations.
@@ -27,19 +40,19 @@
     Helper application output.
 
     .EXAMPLE
-    C:\PS> yuruna resources
+    C:\PS> ./yuruna.ps1 resources ../projects/examples/website localhost
     Deploys resources using Terraform as helper.
 
     .EXAMPLE
-    C:\PS> yuruna components
+    C:\PS> ./yuruna.ps1 resources ../projects/examples/website localhost
     Build and push components to registry.
 
     .EXAMPLE
-    C:\PS> yuruna workloads
+    C:\PS> ./yuruna.ps1 resources ../projects/examples/website localhost
     Deploy workloads using Helm as helper.
 
     .LINK
-    Online version: http://bit.ly/asol-yrn
+    Online version: http://www.yuruna.com
 #>
 
 param (

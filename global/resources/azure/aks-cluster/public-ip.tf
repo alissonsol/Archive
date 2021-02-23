@@ -20,7 +20,7 @@ data "external" "originalIp" {
   ]
 
   query = {
-    dummy = data.azurerm_public_ip.frontendIp.ip_address   
+    placeholder = data.azurerm_public_ip.frontendIp.ip_address   
   }
 }
 

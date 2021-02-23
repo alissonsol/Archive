@@ -4,8 +4,8 @@ globalVariables:
   namespace:         "yrn42website-ns"
   containerPrefix:   "yrn42website-prefix"
   registryName:      "componentsRegistry"
-  dockerUsername:    "dummy"
-  dockerPassword:    "dummy"
+  dockerUsername:    "placeholder"
+  dockerPassword:    "placeholder"
   websiteDomain:      "yrn42website-domain"
   websiteHost:        "localhost"
   certManagerIssuerEmail: "certificates@yrn42website-domain"
@@ -51,8 +51,8 @@ workloads:
       --set controller.replicaCount=2
       --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
       --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-      --set controller.service.loadBalancerIP="DUMMY"
-      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="DUMMY"
+      --set controller.service.loadBalancerIP="placeholder"
+      --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="placeholder"
       --set controller.admissionWebhooks.enabled=false
       # --debug
   # Wait for dependencies to be ready

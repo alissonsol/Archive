@@ -4,8 +4,8 @@ globalVariables:
   namespace:         "yrn42onnxtraingpt2-ns"
   containerPrefix:   "yrn42onnxtraingpt2-prefix"
   registryName:      "componentsRegistry"
-  dockerUsername:    "dummy"
-  dockerPassword:    "dummy"
+  dockerUsername:    "placeholder"
+  dockerPassword:    "placeholder"
 
 workloads:
 - context: "yrn42onnxtraingpt2-context"

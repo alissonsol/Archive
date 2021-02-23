@@ -5,8 +5,8 @@ globalVariables:
   resourceGroup:     "yrn42website-rg"
   containerPrefix:   "yrn42website-prefix"
   registryName:      "componentsRegistry"
-  dockerUsername:    "dummy"
-  dockerPassword:    "dummy"
+  dockerUsername:    "placeholder"
+  dockerPassword:    "placeholder"
   # TO-SET: set domain below, like yrn42.com
   # websiteDomain:     "yrn42website-domain"
   websiteDomain:     "yuruna.com"

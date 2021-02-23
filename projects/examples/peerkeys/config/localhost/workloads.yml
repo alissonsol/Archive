@@ -4,8 +4,8 @@ globalVariables:
   namespace:         "yrn42peerkeys"
   containerPrefix:   "yrn42peerkeys"
   registryName:      "componentsRegistry"
-  dockerUsername:    "dummy"
-  dockerPassword:    "dummy"
+  dockerUsername:    "placeholder"
+  dockerPassword:    "placeholder"
   websiteTlsSecret:  "website-tls-secret"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
 
