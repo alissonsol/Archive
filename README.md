@@ -32,4 +32,4 @@ See project [examples](projects/examples/README.md) and check the [syntax](docs/
 - Questions? Check the [FAQ](docs/faq.md) document.
 - Thanks to all users and [contributors](docs/contributors.md)
 
-Copyright (c) 2020-2021 by Alisson Sol
+Copyright (c) 2020-2021 by Alisson Sol et al.
