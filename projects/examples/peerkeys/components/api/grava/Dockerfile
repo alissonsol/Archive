@@ -4,7 +4,7 @@
 
 ARG DEV
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 ENV ASPNETCORE_ENVIRONMENT=${DEV:+Development}
 ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Release}
 RUN echo Building $ASPNETCORE_ENVIRONMENT version
@@ -15,7 +15,7 @@ WORKDIR /app
 ENV ASPNETCORE_URLS http://+:8088
 EXPOSE 8088
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["grava.csproj", "grava/"]
 RUN dotnet restore "grava/grava.csproj"

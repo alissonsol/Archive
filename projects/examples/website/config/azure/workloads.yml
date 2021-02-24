@@ -9,13 +9,13 @@ globalVariables:
   dockerPassword:    "placeholder"
   # TO-SET: set domain below, like yrn42.com
   # websiteDomain:     "yrn42website-domain"
-  websiteDomain:     "yuruna.com"
+  websiteDomain:     "yrn42.com"
   # TO-SET: set site address below, like www.yrn42.com
   # websiteHost:     "www.yrn42website-domain"
-  websiteHost:       "www.yuruna.com"
+  websiteHost:       "www.yrn42.com"
   # TO-SET: set email address below, like certificates@yrn42.com
   # certManagerIssuerEmail: "certificates@yrn42website-domain"
-  certManagerIssuerEmail: "certificates@yuruna.com"
+  certManagerIssuerEmail: "certificates@yrn2.com"
   websiteTlsSecret:  "website-tls-secret"
 
 workloads:

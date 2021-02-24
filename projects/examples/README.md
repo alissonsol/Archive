@@ -16,7 +16,7 @@ Automating some ONNX examples.
 
 ## Template
 
-= This is just the [folder structure](./template/) to create a new project.
+- This is just the [folder structure](./template/) to create a new project.
   - Copy and past folder structure to new folder.
   - Search and replace the template prefix (`yrn42template`) with the project name.
 

@@ -52,9 +52,10 @@ Terraform will be used to create the following resources:
 
 As output, the following values will become available for later steps:
 
-- ${registryName}.registryLocation
+- ${env:registryName}.registryLocation"
 - ${context.name}.clusterIp
 - ${context.name}.frontendIp
+- ${context.name}.hostname
 
 ## Components
 
@@ -72,7 +73,7 @@ As output, the following values will become available for later steps:
 
 ### DNS
 
-- Before executing `./yuruna.ps1 workloads` please confirm that the `yrn42website-domain` DNS entry (example: www.yuruna.com) already points to the `frontendIp`.
+- Before executing `./yuruna.ps1 workloads` please confirm that the `yrn42website-domain` DNS entry (example: www.yrn42.com) already points to the `frontendIp`.
   - Without that, the `cert-manager` cannot perform the [challenge process](https://letsencrypt.org/docs/challenge-types/#http-01-challenge) to get the TLS certificate.
   - After resource creation, you will get the Terraform output with the `frontendIp`. From the configuration interface for your DNS provider, point the `yrn42website-domain` to that IP address.
     - Another option to test is: `curl -v http://{frontendIp} -H 'Host: {yrn42website-domain}'`.
