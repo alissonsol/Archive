@@ -6,6 +6,12 @@ Instructions under development for the Apple M1 machines. Steps being documented
 
 ## Steps that may need manual interaction
 
+`[M1]` Because the steps to build code will need it, install xcode tools:
+
+```shell
+xcode-select --install
+```
+
 Steps that may need a password or other decisions before proceeding. First, install Brew (may need password and press to continue).
 
 ```shell
@@ -39,6 +45,9 @@ Install-Module -Name powershell-yaml
 If not installed yet, install and configure Git.
 
 ```shell
+brew uninstall git
+brew update
+brew reinstall pcre2 gettext
 brew install git
 git config --global user.name "Your Name"
 git config --global user.email "Your@email.address"
@@ -52,18 +61,13 @@ Tested with Preview 3.1.0 (60984). References:
 
 Start Docker from the `Applications` folder. Then, open the settings panel and [enable Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes).
 
-`[M1]` Because the steps to build code will need it, install xcode tools:
-
-```shell
-xcode-select --install
-```
-
 ## Steps without manual interaction
 
 These steps can then be executed to install Terraform, Helm and optionally Visual Studio Code and GraphViz (if you want to visualize Terraform plans).
 
 ```shell
-brew install --build-from-source terraform
+arch --arm64 brew install --build-from-source terraform
+brew upgrade terraform
 brew install helm
 brew install graphviz
 brew install --cask visual-studio-code

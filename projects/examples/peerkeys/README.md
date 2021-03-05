@@ -46,37 +46,43 @@ Below are the end-to-end steps to deploy the `peerkeys` project to `localhost` (
 
 Terraform will be used to create the following resources:
 
-- Project resources description.
+- Registry: {componentsRegistry}
+- Clusters: {yrn42peerkeys001}, {yrn42peerkeys002}, {yrn42peerkeys002}
 
 As output, the following values will become available for later steps:
 
-- Project resources output description.
+- ${env:registryName}.registryLocation
+- ${context.name}.clusterIp
+- ${context.name}.frontendIp
+- ${context.name}.hostname
 
 ## Components
 
-- Project components description.
+- A Docker container image for a .NET C# website.
+- A Docker container image for a key-value storage API.
 
 ## Workloads
 
-- Project workloads description.
+- The frontend/website will be deployed to each cluster.
+- The key-value storage API contianer will be deployed to each cluster.
+
+## Instructions
+
+- Follow the instructions to create resources, build components and deploy the workloads.
+- Connect to one of the frontends. Check your configuration for service endpoint and port (example: `http://localhost:9001`).
+  - Test by setting a key/value and retrieving different key-value pairs.
+  - Note: you may need to follow one of these instructions if being redirected to https
+    - [How to Stop Chrome from Automatically Redirecting to https](https://howchoo.com/chrome/stop-chrome-from-automatically-redirecting-https)
+    - [Safari keeps forcing HTTPS on localhost](https://stackoverflow.com/questions/46394682/safari-keeps-forcing-https-on-localhost)
+    - [Exclude localhost from Chrome/Chromium Browsers forced HTTPS redirection](https://medium.com/@hmheng/exclude-localhost-from-chrome-chromium-browsers-forced-https-redirection-642c8befa9b)
 
 ## Cloud deployment instructions
 
-### DNS
+These steps need be executed just once, unless you modify configurations.
 
-- Before executing `./yuruna.ps1 workloads` please confirm that the `yrn42peerkeys-domain` DNS entry (example: www.yrn42.com) already points to the `frontendIp`.
-  - Without that, the `cert-manager` cannot perform the [challenge process](https://letsencrypt.org/docs/challenge-types/#http-01-challenge) to get the TLS certificate.
-  - After resource creation, you will get the Terraform output with the `frontendIp`. From the configuration interface for your DNS provider, point the `yrn42peerkeys-domain` to that IP address.
-    - Another option to test is: `curl -v http://{frontendIp} -H 'Host: {yrn42peerkeys-domain}'`.
-    - Yet another option: add an entry to your `hosts` folder pointing `yrn42peerkeys-domain` to the resulting value for`frontendIp`. Don't forget to remove it!
-
-### Azure
-
-- Search for `TO-SET`
-  - Azure requires a globally unique registry name.
-    - Ping `yourname.azurecr.io` and confirm that name is not already in use.
-    - Set the value just to the unique host name, like `yrn42peerkeys` (not `yrn42peerkeys.azurecr.io`).
-  - The current value is intentionally left empty so that validation will point out the need to edit the files.
-- Afterwards, execute the same commands above, replacing `localhost` with `azure`.
+- Confirm [requirements](../../../docs/requirements.md)
+  - The PowerShell scripts do not verify that requirements are met.
+- [Authenticate](../../../docs/authenticate.md) with your cloud provider
+  - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
 
 Back to main [readme](../../../README.md). Back to list of [examples](../README.md).

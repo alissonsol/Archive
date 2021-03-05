@@ -52,7 +52,7 @@ Terraform will be used to create the following resources:
 
 As output, the following values will become available for later steps:
 
-- ${env:registryName}.registryLocation"
+- ${env:registryName}.registryLocation
 - ${context.name}.clusterIp
 - ${context.name}.frontendIp
 - ${context.name}.hostname
