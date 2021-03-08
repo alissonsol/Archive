@@ -14,7 +14,7 @@ function Publish-DecodedBase64Data {
     )
 
     $dataFile = Join-Path -Path $PSScriptRoot -ChildPath $filename
-    Remove-Item -Path $dataFile -Force -Recurse -ErrorAction "SilentlyContinue"
+    Remove-Item -Path $dataFile -Force -Recurse -ErrorAction SilentlyContinue
     $decodedData = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($dataBase64))
     Set-Content -Path $dataFile -Value $decodedData
 
@@ -33,7 +33,7 @@ Import-Module -Name $modulePath
 
 # Save originalContext and confirm sourceContext exists
 $originalContext = kubectl config current-context
-kubectl config use-context $sourceContext | Out-Null
+kubectl config use-context $sourceContext *>&1 | Write-Verbose
 $currentContext = kubectl config current-context
 if ($currentContext -ne $sourceContext) { Write-Information "K8S source context not found: $sourceContext`n"; return $false; }
 
@@ -64,4 +64,4 @@ $result = $(kubectl config set-context $destinationContext --cluster=$destinatio
 Write-Debug "**** Context: $result";
 
 # Back to originalContext
-kubectl config use-context $originalContext | Out-Null
+kubectl config use-context $originalContext *>&1 | Write-Verbose

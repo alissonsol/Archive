@@ -1,0 +1,23 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.installName }}
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+  - host: {{ .Values.frontendApp }}"."{{ index .Values (printf "%s.hostname" .Values.contextName) }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Values.frontendApp }}
+          servicePort: {{ .Values.frontendPort }}
+  - host: {{ .Values.backendApp }}"."{{ index .Values (printf "%s.hostname" .Values.contextName) }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Values.backendApp }}
+          servicePort: {{ .Values.backendPort }}

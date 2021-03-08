@@ -48,15 +48,26 @@ function Publish-WorkloadList {
 
     # For each workload in workloads.yml
     foreach ($workload in $workloadsYaml.workloads) {
-        # context should exist
+        # new work folder
         $contextName = $workload['context']
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
+        $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
+        if (-Not ([string]::IsNullOrEmpty($workFolder))) {
+            $workFolder = Resolve-Path -Path $workFolder -ErrorAction SilentlyContinue
+            if (-Not ([string]::IsNullOrEmpty($workFolder))) {
+                Remove-Item -Path $workFolder -Force -Recurse -ErrorAction SilentlyContinue
+            }
+        }
+        $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
+        New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction Si
+        #context should exist
         $originalContext = kubectl config current-context
-        kubectl config use-context $contextName | Out-Null
+        kubectl config use-context $contextName *>&1 | Write-Verbose
         $currentContext = kubectl config current-context
-        kubectl config use-context $originalContext | Out-Null
+        kubectl config use-context $originalContext *>&1 | Write-Verbose
         if ($currentContext -ne $contextName) { Write-Information "K8S context not found: $contextName`nFile: $workloadsFile"; return $false; }
-        kubectl config use-context $contextName | Out-Null
+        kubectl config use-context $contextName *>&1 | Write-Verbose
+        Write-Information "-- Workloads for context: $contextName"
         # deployments shoudn't be null or empty
         foreach ($deployment in $workload.deployments) {
             # apply deployments: chart, kubectl, helm, or shell
@@ -67,7 +78,7 @@ function Publish-WorkloadList {
             if (!($isChart -or $isKubectl -or $isHelm -or $isShell)) { Write-Information "context.deployment should be 'chart', 'kubectl', 'helm' or 'shell' in file: $workloadsFile"; return $false; }
 
             $deploymentVars = @{}
-            #       apply global variables, resources.output variables, workload variables, deployment variables
+            # apply global variables, resources.output variables, workload variables, deployment variables
             if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
                 foreach ($key in $workloadsYaml.globalVariables.Keys) {
                     $value = $workloadsYaml.globalVariables[$key]
@@ -104,9 +115,8 @@ function Publish-WorkloadList {
                 if ([string]::IsNullOrEmpty($installName)) {
                     Write-Information "Chart[$chartName] missing variables['installName'] in file: $workloadsFile"; return $false;
                 }
-                #   copy chart to work folder under .yuruna
-                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$installName"
-                Remove-Item -Path $workFolder -Force -Recurse -ErrorAction "SilentlyContinue"
+                # copy chart to work folder under .yuruna
+                $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName/$installName"
                 New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
                 Write-Debug "Copying chart from: $chartFolder to $workFolder"
@@ -125,11 +135,11 @@ function Publish-WorkloadList {
                 # execute helm install in work folder
                 Write-Debug "`Helm execute from: $workFolder"
                 Push-Location $workFolder
-                $result = helm lint
-                Write-Debug "Helm link`n$result"
-                $result = helm uninstall $installName
-                Write-Debug "helm uninstall $installName`n$result"
-                $result = helm install $installName .
+                $result = $(helm lint *>&1 | Write-Verbose)
+                Write-Debug "Helm lint`n$result"
+                $result = $(helm uninstall $installName *>&1 | Write-Verbose)
+                Write-Debug "Helm uninstall $installName`n$result"
+                $result = $(helm install $installName . *>&1 | Write-Verbose)
                 Write-Debug "Helm install $installName`n$result"
                 Pop-Location
             }
@@ -146,18 +156,23 @@ function Publish-WorkloadList {
                 if ($isShell) { $value = $deployment['shell']; $expression = "$value"}
 
                 $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
-                New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
                 Set-Item -Path Env:workFolder -Value ${workFolder}
                 Push-Location $workFolder
                 $expression = $ExecutionContext.InvokeCommand.ExpandString($expression)
                 Write-Debug "$expression"
-                $result = Invoke-Expression $expression
+                # Shell could be used to Write-Information back to user
+                if ($isShell) {
+                    $result = Invoke-Expression $expression *>&1 | Write-Information
+                }
+                else {
+                    $result = Invoke-Expression $expression *>&1 | Write-Verbose
+                }
                 Write-Debug "$result"
                 Pop-Location
             }
         }
-        kubectl config use-context $originalContext | Out-Null
+        kubectl config use-context $originalContext *>&1 | Write-Verbose
     }
 
     return $true;

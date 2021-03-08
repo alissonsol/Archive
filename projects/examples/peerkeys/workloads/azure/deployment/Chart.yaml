@@ -1,6 +1,6 @@
 apiVersion: v2
-name: yrn42peerkeys-website
-description: yrn42peerkeys website.
+name: yrn42peerkeys deployment
+description: Helm for yrn42peerkeys
 
 type: application
 version: 0.1.0

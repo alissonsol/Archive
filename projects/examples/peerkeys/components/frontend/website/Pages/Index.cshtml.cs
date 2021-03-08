@@ -15,6 +15,7 @@ namespace website.Pages
 
         public KeyValue UserInput { get; set; }
         public string UserAction { get; set; }
+        public string BackendUrl { get { return _dictionary.BackendUrl.ToString(); } }
 
         public IndexModel(ILogger<IndexModel> logger)
         {

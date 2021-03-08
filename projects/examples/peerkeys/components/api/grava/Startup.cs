@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace grava
 {
@@ -30,6 +31,14 @@ namespace grava
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // https://www.billbogaiv.com/posts/net-core-hosted-on-subdirectories-in-nginx
+            string pathBase = Environment.GetEnvironmentVariable("pathBase");
+            if (!string.IsNullOrEmpty(pathBase))
+            {
+                app.UsePathBase(pathBase);
+            }
+            Console.WriteLine(string.Format("pathBase: {0}\n", pathBase));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

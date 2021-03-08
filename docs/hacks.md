@@ -25,4 +25,19 @@ kubectl config rename-context old-name new-name
   - Notice this sentence from [Syncing Secrets Across Namespaces](https://cert-manager.io/docs/faq/kubed/): "Wildcard certificates are not supported with HTTP01 validation and require DNS01"
     - See documentation on [Challenge Types](https://letsencrypt.org/docs/challenge-types/)
 
+## Hack to debug issues from container
+
+The containers have minimal software install. Even to ping you have to install it.
+
+```shell
+apt-get update
+apt-get install -y iputils-ping
+```
+
+## Docker and Kubernetes issues
+
+Usually, the Docker functionality to `Reset to factory defaults` is the best path to a solution.
+
+Afterwards, remove the `~/.kube` folder and enable Kubernetes again (this loses at least some configuration, and possibly data).
+
 Back to main [readme](../README.md)

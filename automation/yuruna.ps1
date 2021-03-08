@@ -33,6 +33,9 @@
     .PARAMETER config_subfolder
     Configuration subfolder.
 
+    .PARAMETER debug_mode
+    Set to $true to see debug messages.
+
     .INPUTS
     Template files.
 
@@ -58,12 +61,22 @@
 param (
     [string]$operation,
     [string]$project_root,
-    [string]$config_subfolder
+    [string]$config_subfolder,
+    [bool]$debug_mode=$false
 )
+
+$global:DebugPreference = "Continue"
+$global:InformationPreference = "Continue"
+$global:VerbosePreference = "Continue"
+if ($false -eq $debug_mode) {
+    $global:DebugPreference = "SilentlyContinue"
+    $global:InformationPreference = "Continue"
+    $global:VerbosePreference = "SilentlyContinue"
+}
 
 $yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
 Set-Item -Path Env:yuruna_root -Value ${yuruna_root}
-Get-Module | Remove-Module | Out-Null
+Get-Module | Remove-Module *>&1 | Write-Verbose
 $requirementsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-requirements"
 $clearModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-clear"
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
@@ -78,13 +91,11 @@ Import-Module -Name $componentsModulePath
 Import-Module -Name $workloadsModulePath
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
-$project_root = Resolve-Path -Path $project_root -ErrorAction "SilentlyContinue"
+$project_root = Resolve-Path -Path $project_root -ErrorAction SilentlyContinue
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName
-$global:DebugPreference = "Continue"
-$global:InformationPreference = "Continue"
-$global:VerbosePreference = "SilentlyContinue"
+
 $result = $false
 switch -Exact ($operation)
 {
@@ -106,8 +117,9 @@ switch -Exact ($operation)
 
 $null = Stop-Transcript
 if (-Not $result) {
+    Write-Output $result
     Write-Output $(Get-Content -Path $transcriptFileName)
 }
 else {
-    Write-Output "See transcript with command: Write-Output `$(Get-Content -Path $transcriptFileName)"
+    Write-Debug "`n-- See transcript with command: Write-Output `$(Get-Content -Path $transcriptFileName)"
 }

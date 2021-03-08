@@ -19,7 +19,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "gravaEndpoint": "http://localhost:8088/api/KeyValue",
+        "backendUrl": "http://localhost:8088/api/KeyValue",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",

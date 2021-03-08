@@ -28,7 +28,7 @@ function Confirm-FolderList {
     if ([string]::IsNullOrEmpty($config_subfolder)) { Write-Information "Configuration subfolder is null or empty"; return $false; }
 
     $config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
-    $config_root = Resolve-Path -Path $config_relative -ErrorAction "SilentlyContinue"
+    $config_root = Resolve-Path -Path $config_relative -ErrorAction SilentlyContinue
     if ([string]::IsNullOrEmpty($config_root)) { Write-Information "Configuration subfolder not found: $config_relative"; return $false; }
 
     if (-Not (Test-Path -Path $project_root)) { Write-Information "Project path not found: $project_root"; return $false; }
@@ -76,9 +76,9 @@ function Confirm-ResourceList {
         $resourceTemplate = $resource['template']
         Write-Debug "resource: $resourceName - template: $resourceTemplate"
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
-        $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+        $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
         if (($null -eq $templateProjectFolder) -or (-Not (Test-Path -Path $templateProjectFolder))) {
-            $templateGlobalFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+            $templateGlobalFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction SilentlyContinue
             if (($null -eq $templateGlobalFolder) -or (-Not (Test-Path -Path $templateGlobalFolder)))  {
                 Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
                 Write-Information "Not found local folder: $templateProjectFolder";
@@ -160,10 +160,10 @@ function Confirm-WorkloadList {
         $contextName = $workload['context']
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
         $originalContext = kubectl config current-context
-        kubectl config use-context $contextName | Out-Null
+        kubectl config use-context $contextName *>&1 | Write-Verbose
         $currentContext = kubectl config current-context
-        kubectl config use-context $originalContext | Out-Null
-        if ($currentContext -ne $contextName) { Write-Information "K8S context not found: $contextName`nFile: $workloadsFile"; return $false; }
+        kubectl config use-context $originalContext *>&1 | Write-Verbose
+        if ($currentContext -ne $contextName) { Write-Debug "K8S context not found: $contextName`nFile: $workloadsFile"; }
         # deployments shoudn't be null or empty
         foreach ($deployment in $workload.deployments) {
             # valid deployments are chart, kubectl, helm and shell
@@ -186,7 +186,7 @@ function Confirm-WorkloadList {
                 if ([string]::IsNullOrEmpty($installName)) { Write-Information "workload[$contextName]chart[$chartName]variables['installName'] cannot be null or empty in file: $workloadsFile"; return $false; }
             }
             # if ($isKubectl -or $isHelm -or $isShell)
-            #   only possibility: verify it is not null or empty, what has already been done!
+            # only possibility: verify it is not null or empty, what has already been done!
         }
     }
 

@@ -25,6 +25,12 @@ resource "azurerm_kubernetes_cluster" "default" {
     type = "SystemAssigned"
   }
 
+  addon_profile {
+    http_application_routing {
+      enabled = true
+    }
+  }  
+
   # Azure-specific: imports the cluster context to local .kube/config
   provisioner "local-exec" {
     command = "./cluster-import.ps1"

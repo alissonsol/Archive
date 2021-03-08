@@ -78,13 +78,13 @@ function Publish-ComponentList {
         }
         $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
         if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
-        #   execute build command in the folder
-        #     command is parameter in components.yml
+        # execute build command in the folder
+        # command is parameter in components.yml
         $buildCommand = $component['buildCommand']
         if ([string]::IsNullOrEmpty($buildCommand)) { $buildCommand = $componentsYaml.globalVariables['buildCommand'] }
         if ([string]::IsNullOrEmpty($buildCommand)) { Write-Information "buildCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
 
-        Write-Information "-- Building project: $project in Folder: $buildFolder"
+        Write-Information "-- Component: $project from $buildFolder"
         $dockerfile = Join-Path -Path $buildFolder -ChildPath "Dockerfile"
         if (-Not (Test-Path -Path $dockerfile)) { $dockerfile = Join-Path -Path $buildFolder -ChildPath "dockerfile"; }
         if (-Not (Test-Path -Path $dockerfile)) { Write-Information "Missing dockerfile in folder: $buildFolder"; return $false; }
@@ -109,7 +109,7 @@ function Publish-ComponentList {
         }
         # build
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($buildCommand)
-        Write-Information "Build: $executionCommand"
+        Write-Debug "Build: $executionCommand"
         Invoke-Expression $executionCommand
         # postProcessor
         $postProcessor = $componentVars['postProcessor']
@@ -120,7 +120,7 @@ function Publish-ComponentList {
             Invoke-Expression $executionCommand
         }
         Pop-Location
-        #   tag and push component to registry
+        # tag and push component to registry
         $tagCommand = $component['tagCommand']
         if ([string]::IsNullOrEmpty($tagCommand)) { $tagCommand = $componentsYaml.globalVariables['tagCommand']; }
         if ([string]::IsNullOrEmpty($tagCommand)) { Write-Information "tagCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
@@ -128,16 +128,16 @@ function Publish-ComponentList {
         if ([string]::IsNullOrEmpty($pushCommand)) { $pushCommand = $componentsYaml.globalVariables['pushCommand']; }
         if ([string]::IsNullOrEmpty($pushCommand)) { Write-Information "pushCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($tagCommand)
-        Write-Information "Tag: $executionCommand"
+        Write-Debug "Tag: $executionCommand"
         Invoke-Expression $executionCommand
         # TODO: generic registry login approach
         $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
         if ($registryLocation -like '*azurecr.io*') {
-            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation")
-            Invoke-Expression $executionCommand | Out-Null
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation 2>&1")
+            Invoke-Expression $executionCommand *>&1 | Write-Verbose
         }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)
-        Write-Information "Push: $executionCommand"
+        Write-Debug "Push: $executionCommand"
         Invoke-Expression $executionCommand
     }
 

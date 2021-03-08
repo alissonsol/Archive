@@ -12,7 +12,9 @@ Steps that may need a password or other decisions before proceeding. First, inst
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Now, install mkcert and then install the root certificates. May need to enter password twice when running `mkcert -install`.
+NOTE: When updating the installed versions, use `reinstall` instead of `install` in the commands below.
+
+Install mkcert and then install the root certificates. May need to enter password twice when running `mkcert -install`.
 
 ```shell
 brew install mkcert

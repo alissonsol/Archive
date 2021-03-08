@@ -8,64 +8,63 @@ globalVariables:
   dockerPassword:    "placeholder"
   websiteTlsSecret:  "website-tls-secret"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
+  ingressClass:       "addon-http-application-routing"
 
 workloads:
+
 - context: "yrn42peerkeys001"
   variables:
     namespace: "yrn42peerkeys001"
-    backendPort: "9201"
-    frontendPort: "9001"
+    frontendApp: "yrn42peerkeys001-site"
+    frontendPathBase: ""
+    backendApp: "yrn42peerkeys001-grava"
+    backendPathBase: ""
   deployments:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  # Install components
   - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
-  - chart: "api/grava"
+  - chart: "azure/deployment"
     variables:
-      installName: "grava001"
-      selectorLabel: "grava001"
-  - chart: "frontend/website"
-    variables:
-      installName: "yrn42peerkeys001"
-      selectorLabel: "yrn42peerkeys001"
+      installName: "yrn42peerkeys001-deployment"
+  - kubectl: "expose deployment/${env:frontendApp}"
+  - kubectl: "expose deployment/${env:backendApp}"
+  - shell: "Write-Information \">> Enpoint: http://${env:frontendApp}.$([Environment]::GetEnvironmentVariable(\"${env:contextName}.hostname\"))${env:frontendPathBase}\""
 
 - context: "yrn42peerkeys002"
   variables:
     namespace: "yrn42peerkeys002"
-    backendPort: "9202"
-    frontendPort: "9002"    
+    frontendApp: "yrn42peerkeys002-site"
+    frontendPathBase: ""
+    backendApp: "yrn42peerkeys002-grava"
+    backendPathBase: ""
   deployments:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  # Install components
   - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
-  - chart: "api/grava"
+  - chart: "azure/deployment"
     variables:
-      installName: "grava002"
-      selectorLabel: "grava002"
-  - chart: "frontend/website"
-    variables:
-      installName: "yrn42peerkeys002"
-      selectorLabel: "yrn42peerkeys002"
+      installName: "yrn42peerkeys002-deployment"
+  - kubectl: "expose deployment/${env:frontendApp}"
+  - kubectl: "expose deployment/${env:backendApp}"
+  - shell: "Write-Information \">> Enpoint: http://${env:frontendApp}.$([Environment]::GetEnvironmentVariable(\"${env:contextName}.hostname\"))${env:frontendPathBase}\""
 
 - context: "yrn42peerkeys003"
   variables:
     namespace: "yrn42peerkeys003"
-    backendPort: "9203"
-    frontendPort: "9003"    
+    frontendApp: "yrn42peerkeys003-site"
+    frontendPathBase: ""
+    backendApp: "yrn42peerkeys003-grava"
+    backendPathBase: ""
   deployments:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  # Install components
   - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
-  - chart: "api/grava"
+  - chart: "azure/deployment"
     variables:
-      installName: "grava003"
-      selectorLabel: "grava003"
-  - chart: "frontend/website"
-    variables:
-      installName: "yrn42peerkeys003"
-      selectorLabel: "yrn42peerkeys003"
+      installName: "yrn42peerkeys003-deployment"
+  - kubectl: "expose deployment/${env:frontendApp}"
+  - kubectl: "expose deployment/${env:backendApp}"
+  - shell: "Write-Information \">> Enpoint: http://${env:frontendApp}.$([Environment]::GetEnvironmentVariable(\"${env:contextName}.hostname\"))${env:frontendPathBase}\""

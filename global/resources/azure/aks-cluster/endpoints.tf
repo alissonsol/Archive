@@ -24,10 +24,27 @@ data "external" "originalIp" {
   }
 }
 
+data "external" "hostname" {
+  program = [
+    "pwsh",
+    "./public-fqdn.ps1",
+    azurerm_kubernetes_cluster.default.resource_group_name,
+    azurerm_kubernetes_cluster.default.name,
+  ]
+
+  query = {
+    placeholder = data.azurerm_public_ip.frontendIp.ip_address   
+  }
+}
+
 output "frontendIp" {
   value = data.azurerm_public_ip.frontendIp.ip_address
 }
 
 output "clusterIp" {
   value = data.external.originalIp.result.ip_address
+}
+
+output "hostname" {
+  value = data.external.hostname.result.hostname
 }

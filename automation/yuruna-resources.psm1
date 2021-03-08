@@ -45,23 +45,23 @@ function Publish-ResourceList {
     foreach ($resource in $yaml.resources) {
         $resourceName = $resource['name']
         $resourceTemplate = $resource['template']
-        Write-Debug "resource: $resourceName - template: $resourceTemplate"
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
         # resource template can be empty: just naming already existing resource
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
-            $templateFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+            $templateFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
             if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder))) {
-                $templateFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction "SilentlyContinue"
+                $templateFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction SilentlyContinue
                 if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder)))  {
                     Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
                     return $false;
                 }
             }
+            Write-Information "-- Resource: $resourceName from template $templateFolder"
             # copy template to work folder under .yuruna
             $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
             New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
             $workFolder = Resolve-Path -Path $workFolder
-            Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Verbose
+            Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Force -ErrorAction SilentlyContinue
             Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -Container -ErrorAction SilentlyContinue
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
@@ -92,7 +92,7 @@ function Publish-ResourceList {
             # Write-Debug "Terraform plan: $result"
             # $result = terraform graph | dot -Tsvg > graph.svg
             # Write-Debug "Terraform graph: $result"
-            Write-Information "Executing terraform apply from $workFolder"
+            Write-Debug "Executing terraform apply from $workFolder"
             $result = terraform apply -auto-approve
             Write-Debug "Terraform apply: $result"
             # resource.output file processing

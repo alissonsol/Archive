@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.installName }}
+  name: {{ .Values.frontendApp }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.selectorLabel }}
+      app: {{ .Values.frontendApp }}
   template:
     metadata:
       labels:
-        app: {{ .Values.selectorLabel }}
+        app: {{ .Values.frontendApp }}
     spec:
       containers:
       - name: website
@@ -25,23 +25,9 @@ spec:
             memory: "128Mi"
             cpu: "100m"
         env:
-          - name: "gravaEndpoint"
-            value: {{ "http://" }}{{ index .Values (printf "%s.frontendIp" .Values.contextName) }}:{{ .Values.backendPort }}/api/KeyValue
+          - name: "backendUrl"
+            value: {{ (printf "http://" ) }}{{ index .Values (printf "%s.hostname" .Values.contextName) }}/{{ .Values.backendPathBase }}/api/KeyValue
+          - name: "pathBase"
+            value: {{ (printf "/%s" .Values.frontendPathBase) }}
       imagePullSecrets:
         - name: registry-credential
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Values.installName }}
-  namespace: {{ .Values.namespace }}
-  labels:
-    app: {{ .Values.selectorLabel }}
-spec:
-  type: LoadBalancer
-  ports:
-    - name: port80
-      port: {{ .Values.frontendPort }}
-      targetPort: 80
-  selector:
-    app: {{ .Values.selectorLabel }}
