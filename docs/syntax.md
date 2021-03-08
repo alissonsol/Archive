@@ -12,6 +12,10 @@ The main PowerShell script named `yuruna` accepts the following parameters:
 - `yuruna workloads [project_root] [config_subfolder]`: Deploy workloads using Helm as helper.
 - `yuruna clear [project_root] [config_subfolder]`: Clear resources for given configuration (`terraform destroy` executed in the configured work folder).
 
+You can also execute commands in "debug mode" setting the `debug_mode` parameter to true. For example:
+
+- `yuruna validate [project_root] [config_subfolder] -debug_mode $true`
+
 Coming soon
 
 - `yuruna requirements`: Check if machine has all requirements.

@@ -1,6 +1,6 @@
 # Project contributors
 
-Appreciate all the help from everyone developing and contributing to Yuruna. The always incomplete list of contributors:
+Appreciate all the help from everyone developing, testing, and contributing to Yuruna. The always incomplete list of contributors:
 
 - [Alisson Sol](https://github.com/alissonsol)
 - [Jingyan Wang](https://github.com/jingyanwangms)

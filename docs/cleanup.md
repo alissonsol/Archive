@@ -33,8 +33,7 @@ Don't forget to delete the cluster context from `[user]/.kube/config`. That can 
 ## Manually cleaning up Azure resources
 
 - From the [Azure Portal](https://portal.azure.com), delete the "Azure Resource Groups" that have been created. Deleting the resource groups will delete all associated resources.
-  - There will be a global resource containing the registry, containers and any other direclty created resources.
-  - For each Kubernetes cluster, there will be a corresponding AKS node resource group (see [AKS faq](https://docs.microsoft.com/en-us/azure/aks/faq)). Those are named with the suffix "_nodes".
+  - There will be a global resource for registry and clusters. For each Kubernetes cluster, there will be a corresponding AKS node resource group (see [AKS faq](https://docs.microsoft.com/en-us/azure/aks/faq)). Those are named with the suffix "_nodes".
 
 ## Manually cleaning up GCP resources
 

@@ -5,7 +5,7 @@
 ### P0, P1
 
 - Seek for TODO tag.
-  - peerkeys: ClusterIP for exposed services not the frontendIp or clusterIp
+  - peerkeys: etcd replication
   - onnx: final step for workloads (helper)
 - Implement `yuruna requirements` that tests for requirements.
 - Tags in resources
@@ -15,12 +15,13 @@
 - Better PowerShell scripts (likely eternal goal!).
   - Consider check behavior like that of the [GitHub actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions), appending to each command: `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }`
 - Warn if .terraform already exists: may not create resources.
+- Check if terraform requires variable and not provide it if not needed (avoids warnings).
 - Rolling PowerShell environment in the workloads steps (or document this: create single .ps1 file and execute it instead!)
 - Finish testing and publish the resources for AWS and GCP
 
 ### P2
 
-- For resources created using terraform `local-exec`: destry when doing `terraform destroy`
+- For resources created using terraform `local-exec`: destroy when doing `terraform destroy`
 - Create Visual Studio Code extension to start projects, run commands, etc.
   - Visual Studio Code: [Your First Extension](https://code.visualstudio.com/api/get-started/your-first-extension)
 - Graph from YML: Python [graphviz 0.15](https://pypi.org/project/graphviz/)

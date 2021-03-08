@@ -1,6 +1,6 @@
 # Requirements
 
-These instructions assume that you have a registered domain and know how to create/edit DNS records in your registrar.
+Some examples assume that you have a registered domain and know how to create/edit DNS records in your registrar.
 
 Ahead of installing certificates in the localhost, it is recommended to run `mkcert -install` once to create the local certificate authority. That may demand elevation.
 

@@ -13,7 +13,7 @@ These steps need be executed just once, unless you modify configurations.
 - [Authenticate](docs/authenticate.md) with your cloud provider
   - Instructions from now on assume execution from a PowerShell prompt connected to the cloud account.
   - Depending on your cloud, login mechanism and activity, the authentication may timeout and need to be repeated.
-  - *Windows Warning*: Example using Linux-based containers may not work if scripts have the wrong line termination.
+  - *Windows Warning*: Examples using Linux-based containers may not work if scripts have the wrong line termination when building locally.
     - The recommendation is to set `git config --global core.autocrlf input` before `git clone`.
 
 ## Using Yuruna to deploy Kubernetes-based applications to multiple clouds
