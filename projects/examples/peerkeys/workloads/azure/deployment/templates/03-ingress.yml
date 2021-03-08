@@ -8,10 +8,11 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-  - http:
+  - host: {{ (printf "%s." .Values.frontendApp) }}{{ index .Values (printf "%s.hostname" .Values.contextName) }}
+    http:
       paths:
       - pathType: Prefix
-        path: {{ .Values.frontendPathBase }}.*
+        path: /
         backend:
           service:
             name: {{ .Values.frontendApp }}
@@ -26,10 +27,11 @@ metadata:
     kubernetes.io/ingress.class: addon-http-application-routing
 spec:
   rules:
-  - http:
+  - host: {{ (printf "%s." .Values.backendApp) }}{{ index .Values (printf "%s.hostname" .Values.contextName) }}
+    http:
       paths:
       - pathType: Prefix
-        path: {{ .Values.backendPathBase }}.*
+        path: /
         backend:
           service:
             name: {{ .Values.backendApp }}
