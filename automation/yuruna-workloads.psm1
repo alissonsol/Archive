@@ -46,10 +46,29 @@ function Publish-WorkloadList {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
     }
 
+    # Debug info
+    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+        foreach ($key in $workloadsYaml.globalVariables.Keys) {
+            $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
+            Write-Debug "globalVariables[$key] = $value"
+        }
+    }
+
+    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
+        foreach ($resource in $resourcesOutputYaml.Keys) {
+            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                $resourceKey = "$resource.$key"
+                $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                Write-Debug "resourcesOutput[$resourceKey] = $value"
+            }
+        }
+    }
+
     # For each workload in workloads.yml
     foreach ($workload in $workloadsYaml.workloads) {
         # new work folder
         $contextName = $workload['context']
+        Write-Information "-- Workloads for context: $contextName"
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
         $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
         if (-Not ([string]::IsNullOrEmpty($workFolder))) {
@@ -58,6 +77,15 @@ function Publish-WorkloadList {
                 Remove-Item -Path $workFolder -Force -Recurse -ErrorAction SilentlyContinue
             }
         }
+        Set-Item -Path Env:contextName -Value ${contextName}
+
+        if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq  $workload.variables.Keys))) {
+            foreach ($key in $workload.variables.Keys) {
+                $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
+                Write-Debug "workloadVariables[$key] = $value"
+            }
+        }
+
         $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
         New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction Si
         #context should exist
@@ -67,7 +95,7 @@ function Publish-WorkloadList {
         kubectl config use-context $originalContext *>&1 | Write-Verbose
         if ($currentContext -ne $contextName) { Write-Information "K8S context not found: $contextName`nFile: $workloadsFile"; return $false; }
         kubectl config use-context $contextName *>&1 | Write-Verbose
-        Write-Information "-- Workloads for context: $contextName"
+
         # deployments shoudn't be null or empty
         foreach ($deployment in $workload.deployments) {
             # apply deployments: chart, kubectl, helm, or shell
@@ -79,33 +107,43 @@ function Publish-WorkloadList {
 
             $deploymentVars = @{}
             # apply global variables, resources.output variables, workload variables, deployment variables
+            # previous loops just presented values for debugging
             if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
                 foreach ($key in $workloadsYaml.globalVariables.Keys) {
-                    $value = $workloadsYaml.globalVariables[$key]
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
                     $deploymentVars[$key] = $value
+                    Set-Item -Path Env:$key -Value ${value}
                 }
             }
+
             if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
                 foreach ($resource in $resourcesOutputYaml.Keys) {
                     foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                         $resourceKey = "$resource.$key"
-                        $value = $resourcesOutputYaml.$resource[$key].value
+                        $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                         $deploymentVars[$resourceKey] = $value
+                        Set-Item -Path Env:$resourceKey -Value ${value}
                     }
                 }
             }
+
             if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq  $workload.variables.Keys))) {
                 foreach ($key in $workload.variables.Keys) {
-                    $value = $workload.variables[$key]
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
                     $deploymentVars[$key] = $value
+                    Set-Item -Path Env:$resourceKey -Value ${value}
                 }
             }
+
             if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq  $deployment.variables.Keys))) {
                 foreach ($key in $deployment.variables.Keys) {
-                    $value = $deployment.variables[$key]
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($deployment.variables[$key])
                     $deploymentVars[$key] = $value
+                    Set-Item -Path Env:$resourceKey -Value ${value}
+                    Write-Debug "deploymentVariables[$key] = $value"
                 }
             }
+
             if ($isChart) {
                 $chartName = $deployment['chart']
                 if ([string]::IsNullOrEmpty($chartName)) { Write-Information "context.chart cannot be null or empty in file: $workloadsFile"; return $false; }

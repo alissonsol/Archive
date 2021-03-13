@@ -96,6 +96,6 @@ Peerkeys exemplifies frontend, backend, and K8S "composing". The example automat
 
 In a localhost, running all the components in the same cluster creates a collision for the ingress rules. That is solved by using a different "pathBase" for each instance. That results in a problem to enable the services to all operate from the same code, as explained in the blog post [.NET Core hosted on subdirectories in Nginx](https://www.billbogaiv.com/posts/net-core-hosted-on-subdirectories-in-nginx). The solution described there is used, and a single ingress controller maps paths to each internal container via the rules deployed to each namespace.
 
-<img src="peerkeys-localhost.png" alt="peerkeys in the cloud" width="640"/>
+<img src="peerkeys-localhost.png" alt="peerkeys in the localhost" width="640"/>
 
 Back to main [readme](../../../README.md). Back to list of [examples](../README.md).

@@ -36,6 +36,9 @@
     .PARAMETER debug_mode
     Set to $true to see debug messages.
 
+    .PARAMETER verbose_mode
+    Set to $true to see verbose messages.
+
     .INPUTS
     Template files.
 
@@ -62,16 +65,19 @@ param (
     [string]$operation,
     [string]$project_root,
     [string]$config_subfolder,
-    [bool]$debug_mode=$false
+    [bool]$debug_mode=$false,
+    [bool]$verbose_mode=$false
 )
 
-$global:DebugPreference = "Continue"
 $global:InformationPreference = "Continue"
-$global:VerbosePreference = "Continue"
-if ($false -eq $debug_mode) {
-    $global:DebugPreference = "SilentlyContinue"
-    $global:InformationPreference = "Continue"
-    $global:VerbosePreference = "SilentlyContinue"
+
+$global:DebugPreference = "SilentlyContinue"
+$global:VerbosePreference = "SilentlyContinue"
+if ($true -eq $debug_mode) {
+    $global:DebugPreference = "Continue"
+}
+if ($true -eq $verbose_mode) {
+    $global:VerbosePreference = "Continue"
 }
 
 $yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")

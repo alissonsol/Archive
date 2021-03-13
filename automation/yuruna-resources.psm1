@@ -40,6 +40,14 @@ function Publish-ResourceList {
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     New-Item -Path $resourcesOutputFile -ItemType File -Force
 
+    # Debug info: Notice how there is not string expansion for the components script
+    if (-Not ($null -eq  $yaml.globalVariables)) {
+        foreach ($key in $yaml.globalVariables.Keys) {
+            $value = $yaml.globalVariables[$key]
+            Write-Debug "globalVariables[$key] = $value"
+        }
+    }
+
     # For each resource in resources.yml
     if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
     foreach ($resource in $yaml.resources) {
@@ -77,10 +85,11 @@ function Publish-ResourceList {
                 foreach ($key in $resource.variables.Keys) {
                     $value = $resource.variables[$key]
                     $terraformVars[$key] = $value
+                    Write-Debug "resourceVariables[$key] = $value"
                 }
             }
             foreach ($key in $terraformVars.Keys) {
-                $value = $terraformVars[$key]
+                $value = $ExecutionContext.InvokeCommand.ExpandString($terraformVars[$key])
                 $line = "$key = `"$value`""
                 Add-Content -Path $terraformVarsFile -Value $line
             }

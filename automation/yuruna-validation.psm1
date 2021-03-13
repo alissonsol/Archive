@@ -47,7 +47,6 @@ function Confirm-GlobalVariableList {
     if (-Not ($null -eq  $yaml.globalVariables)) {
         foreach ($key in $yaml.globalVariables.Keys) {
             $value = $yaml.globalVariables[$key]
-            Write-Debug "globalVariables[$key] = $value"
             if ([string]::IsNullOrEmpty($value)) { Write-Information "globalVariables.$key cannot be null or empty in file: $filePath"; return $false; }
         }
     }
@@ -74,7 +73,6 @@ function Confirm-ResourceList {
     foreach ($resource in $yaml.resources) {
         $resourceName = $resource['name']
         $resourceTemplate = $resource['template']
-        Write-Debug "resource: $resourceName - template: $resourceTemplate"
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
         $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
         if (($null -eq $templateProjectFolder) -or (-Not (Test-Path -Path $templateProjectFolder))) {
@@ -90,7 +88,6 @@ function Confirm-ResourceList {
         if (-Not ($null -eq  $resource.variables)) {
             foreach ($key in $resource.variables.Keys) {
                 $value = $resource.variables[$key]
-                Write-Debug "resource[$resourceName][$key] = $value"
                 if ([string]::IsNullOrEmpty($value)) { Write-Information "resource[$resourceName][$key] cannot be null or empty in file: $resourcesFile"; return $false; }
             }
         }
@@ -133,7 +130,6 @@ function Confirm-ComponentList {
 
         $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
         if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
-        Write-Debug "Project: $project in Folder: $buildPath`n$buildCommand"
     }
 
     return $true;
@@ -180,7 +176,6 @@ function Confirm-WorkloadList {
                 foreach ($key in $deployment.variables.Keys) {
                     $value = $deployment.variables[$key]
                     if ([string]::IsNullOrEmpty($value)) { Write-Information "workload[$contextName]chart[$chartName][$key] variable cannot be null or empty in file: $workloadsFile"; return $false; }
-                    Write-Debug "workload[$contextName]chart[$chartName][$key] = $value"
                 }
                 $installName = $deployment.variables['installName']
                 if ([string]::IsNullOrEmpty($installName)) { Write-Information "workload[$contextName]chart[$chartName]variables['installName'] cannot be null or empty in file: $workloadsFile"; return $false; }

@@ -44,6 +44,24 @@ function Publish-ComponentList {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
     }
 
+    # Debug info
+    if (-Not ($null -eq $componentsYaml.globalVariables)) {
+        foreach ($key in $componentsYaml.globalVariables.Keys) {
+            $value = $ExecutionContext.InvokeCommand.ExpandString($componentsYaml.globalVariables[$key])
+            Write-Debug "globalVariables[$key] = $value"
+        }
+    }
+
+    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
+        foreach ($resource in $resourcesOutputYaml.Keys) {
+            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                $resourceKey = "$resource.$key"
+                $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                Write-Debug "resourcesOutput[$resourceKey] = $value"
+            }
+        }
+    }
+
     $componentsPath = Join-Path -Path $project_root -ChildPath "components/"
     # For each component in components.yml
     foreach ($component in $componentsYaml.components) {
@@ -57,7 +75,7 @@ function Publish-ComponentList {
         # apply global variables, resources.output variables, workload variables
         if (-Not ($null -eq $componentsYaml.globalVariables)) {
             foreach ($key in $componentsYaml.globalVariables.Keys) {
-                $value = $componentsYaml.globalVariables[$key]
+                $value = $ExecutionContext.InvokeCommand.ExpandString($componentsYaml.globalVariables[$key])
                 $componentVars[$key] = $value
             }
         }
@@ -65,15 +83,16 @@ function Publish-ComponentList {
             foreach ($resource in $resourcesOutputYaml.Keys) {
                 foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                     $resourceKey = "$resource.$key"
-                    $value = $resourcesOutputYaml.$resource[$key].value
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                     $componentVars[$resourceKey] = $value
                 }
             }
         }
         if ((-Not ($null -eq $component.variables))  -and (-Not ($null -eq  $component.variables.Keys))) {
             foreach ($key in $component.variables.Keys) {
-                $value = $component.variables[$key]
+                $value = $ExecutionContext.InvokeCommand.ExpandString($component.variables[$key])
                 $componentVars[$key] = $value
+                Write-Debug "componentVariables[$key] = $value"
             }
         }
         $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
