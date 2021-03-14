@@ -4,11 +4,12 @@ globalVariables:
   namespace:         "yrn42peerkeys"
   containerPrefix:   "yrn42peerkeys"
   registryName:      "componentsRegistry"
-  dockerUsername:    "placeholder"
-  dockerPassword:    "placeholder"
   websiteTlsSecret:  "website-tls-secret"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
   ingressClass:       "addon-http-application-routing"
+  _registryLocation: "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
+  dockerUsername: "$(az acr credential show -n ${env:_registryLocation} --query username)"
+  dockerPassword: "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
 
 workloads:
 
@@ -23,7 +24,7 @@ workloads:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
   - chart: "azure/deployment"
     variables:
       installName: "yrn42peerkeys001-deployment"
@@ -42,7 +43,7 @@ workloads:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
   - chart: "azure/deployment"
     variables:
       installName: "yrn42peerkeys002-deployment"
@@ -61,7 +62,7 @@ workloads:
   - kubectl: "delete namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query username) --docker-password=$(az acr credential show -n $([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --query passwords[0].value) --v=1"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
   - chart: "azure/deployment"
     variables:
       installName: "yrn42peerkeys003-deployment"

@@ -47,13 +47,6 @@ function Publish-WorkloadList {
     }
 
     # Debug info
-    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
-        foreach ($key in $workloadsYaml.globalVariables.Keys) {
-            $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
-            Write-Debug "globalVariables[$key] = $value"
-        }
-    }
-
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
             foreach ($key in $resourcesOutputYaml.$resource.Keys) {
@@ -61,6 +54,13 @@ function Publish-WorkloadList {
                 $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                 Write-Debug "resourcesOutput[$resourceKey] = $value"
             }
+        }
+    }
+
+    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+        foreach ($key in $workloadsYaml.globalVariables.Keys) {
+            $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
+            Write-Debug "globalVariables[$key] = $value"
         }
     }
 
@@ -108,14 +108,6 @@ function Publish-WorkloadList {
             $deploymentVars = @{}
             # apply global variables, resources.output variables, workload variables, deployment variables
             # previous loops just presented values for debugging
-            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
-                foreach ($key in $workloadsYaml.globalVariables.Keys) {
-                    $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
-                    $deploymentVars[$key] = $value
-                    Set-Item -Path Env:$key -Value ${value}
-                }
-            }
-
             if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
                 foreach ($resource in $resourcesOutputYaml.Keys) {
                     foreach ($key in $resourcesOutputYaml.$resource.Keys) {
@@ -127,11 +119,19 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq  $workload.variables.Keys))) {
+            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+                foreach ($key in $workloadsYaml.globalVariables.Keys) {
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
+                    $deploymentVars[$key] = $value
+                    Set-Item -Path Env:$key -Value ${value}
+                }
+            }
+
+            if ((-Not ($null -eq $workload.variables)) -and (-Not ($null -eq  $workload.variables.Keys))) {
                 foreach ($key in $workload.variables.Keys) {
                     $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
                     $deploymentVars[$key] = $value
-                    Set-Item -Path Env:$resourceKey -Value ${value}
+                    Set-Item -Path Env:$key -Value ${value}
                 }
             }
 
@@ -166,6 +166,9 @@ function Publish-WorkloadList {
                 foreach ($key in $deploymentVars.Keys) {
                     $value = $deploymentVars[$key]
                     $line = "${key}: `"$value`""
+                    if (($value.ToString().StartsWith("`"")) -and ($value.ToString().EndsWith("`""))) {
+                        $line = "${key}: $value"
+                    }
                     Add-Content -Path $helmValuesFile -Value $line
                 }
                 $line = "contextName: `"$contextName`""

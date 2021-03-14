@@ -23,7 +23,7 @@ resources:
 - name:             "yrn42website-context"
   template:         "azure/aks-cluster"
   variables:
-    clusterName:    "yrn42website-cluster"
+    clusterName:    "yrn42website-aks"
     destinationContext:  "yrn42website-context"
     clusterRegion:  "westus2"
     clusterVersion: "1.20.2"

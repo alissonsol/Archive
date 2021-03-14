@@ -45,20 +45,20 @@ function Publish-ComponentList {
     }
 
     # Debug info
-    if (-Not ($null -eq $componentsYaml.globalVariables)) {
-        foreach ($key in $componentsYaml.globalVariables.Keys) {
-            $value = $ExecutionContext.InvokeCommand.ExpandString($componentsYaml.globalVariables[$key])
-            Write-Debug "globalVariables[$key] = $value"
-        }
-    }
-
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
             foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                 $resourceKey = "$resource.$key"
-                $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                $value = $resourcesOutputYaml.$resource[$key].value
                 Write-Debug "resourcesOutput[$resourceKey] = $value"
             }
+        }
+    }
+
+    if (-Not ($null -eq $componentsYaml.globalVariables)) {
+        foreach ($key in $componentsYaml.globalVariables.Keys) {
+            $value = $componentsYaml.globalVariables[$key]
+            Write-Debug "globalVariables[$key] = $value"
         }
     }
 
@@ -70,40 +70,40 @@ function Publish-ComponentList {
         if ([string]::IsNullOrEmpty($project)) { Write-Information "component.project cannot be null or empty in file: $componentsFile"; return $false; }
         $buildPath = $component['buildPath']
         if ([string]::IsNullOrEmpty($buildPath)) { Write-Information "component.buildPath cannot be null or empty in file: $componentsFile"; return $false; }
+        $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
+        if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
+        Write-Information "-- Component: $project from $buildFolder"
 
         $componentVars = @{}
         # apply global variables, resources.output variables, workload variables
-        if (-Not ($null -eq $componentsYaml.globalVariables)) {
-            foreach ($key in $componentsYaml.globalVariables.Keys) {
-                $value = $ExecutionContext.InvokeCommand.ExpandString($componentsYaml.globalVariables[$key])
-                $componentVars[$key] = $value
-            }
-        }
         if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
             foreach ($resource in $resourcesOutputYaml.Keys) {
                 foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                     $resourceKey = "$resource.$key"
-                    $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                    $value = $resourcesOutputYaml.$resource[$key].value
                     $componentVars[$resourceKey] = $value
                 }
             }
         }
+        if (-Not ($null -eq $componentsYaml.globalVariables)) {
+            foreach ($key in $componentsYaml.globalVariables.Keys) {
+                $value = $componentsYaml.globalVariables[$key]
+                $componentVars[$key] = $value
+            }
+        }
         if ((-Not ($null -eq $component.variables))  -and (-Not ($null -eq  $component.variables.Keys))) {
             foreach ($key in $component.variables.Keys) {
-                $value = $ExecutionContext.InvokeCommand.ExpandString($component.variables[$key])
+                $value = $component.variables[$key]
                 $componentVars[$key] = $value
                 Write-Debug "componentVariables[$key] = $value"
             }
         }
-        $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
-        if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
         # execute build command in the folder
         # command is parameter in components.yml
         $buildCommand = $component['buildCommand']
         if ([string]::IsNullOrEmpty($buildCommand)) { $buildCommand = $componentsYaml.globalVariables['buildCommand'] }
         if ([string]::IsNullOrEmpty($buildCommand)) { Write-Information "buildCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
 
-        Write-Information "-- Component: $project from $buildFolder"
         $dockerfile = Join-Path -Path $buildFolder -ChildPath "Dockerfile"
         if (-Not (Test-Path -Path $dockerfile)) { $dockerfile = Join-Path -Path $buildFolder -ChildPath "dockerfile"; }
         if (-Not (Test-Path -Path $dockerfile)) { Write-Information "Missing dockerfile in folder: $buildFolder"; return $false; }
@@ -152,7 +152,7 @@ function Publish-ComponentList {
         # TODO: generic registry login approach
         $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
         if ($registryLocation -like '*azurecr.io*') {
-            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation 2>&1")
+            $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation *>&1")
             Invoke-Expression $executionCommand *>&1 | Write-Verbose
         }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)

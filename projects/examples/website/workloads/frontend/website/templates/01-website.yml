@@ -38,13 +38,13 @@ metadata:
   labels:
     app: website
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: port80
-      port: 8000
+      port: 80
       targetPort: 80
     - name: port443
-      port: 8001
+      port: 443
       targetPort: 443
   selector:
     app: website

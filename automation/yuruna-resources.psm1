@@ -96,14 +96,14 @@ function Publish-ResourceList {
             # execute terraform apply from work folder
             Push-Location $workFolder
             $result = terraform init
-            Write-Debug "Terraform init: $result"
+            Write-Verbose "Terraform init: $result"
             # $result = terraform plan -compact-warnings
             # Write-Debug "Terraform plan: $result"
             # $result = terraform graph | dot -Tsvg > graph.svg
             # Write-Debug "Terraform graph: $result"
             Write-Debug "Executing terraform apply from $workFolder"
             $result = terraform apply -auto-approve
-            Write-Debug "Terraform apply: $result"
+            Write-Verbose "Terraform apply: $result"
             # resource.output file processing
             $jsonOutput = "$(terraform output -json)"
             if (![string]::IsNullOrEmpty($jsonOutput)) {
