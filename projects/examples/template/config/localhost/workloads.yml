@@ -7,13 +7,15 @@ globalVariables:
   dockerUsername:    "placeholder"
   dockerPassword:    "placeholder"
   websiteDomain:     "yrn42template-domain"
+  _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
 
 workloads:
 - context: "yrn42template-context"
+  variables:
+    _param: "example"
   deployments:
   # Uninstall previous workloads: idempotent
   - kubectl: "delete namespace ${env:namespace} --v=1"
-  - shell: "Start-Sleep -s 9"
   # Install dependencies
   - kubectl: "create namespace ${env:namespace} --v=1"
   - helm: "repo update"
@@ -21,10 +23,9 @@ workloads:
   - shell: "mkcert -install"
   - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1"
   - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
-  # Wait for dependencies to be ready
-  - shell: "Start-Sleep -s 9"
   # Install components
-  - kubectl: "create secret docker-registry registry-credential --docker-server=http://$([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+  - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
   - chart: "yrn42template"
     variables:
       installName: "yrn42template-install"
+  - shell: $(Join-Path -Path $project_root -ChildPath "workloads/yrn42template/echoParams.ps1 ${env:_param}")

@@ -47,20 +47,22 @@ function Publish-WorkloadList {
     }
 
     # Debug info
-    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
+    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
             foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                 $resourceKey = "$resource.$key"
                 $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                 Write-Debug "resourcesOutput[$resourceKey] = $value"
+                Set-Item -Path Env:$resourceKey -Value ${value}
             }
         }
     }
 
-    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
         foreach ($key in $workloadsYaml.globalVariables.Keys) {
             $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
             Write-Debug "globalVariables[$key] = $value"
+            Set-Item -Path Env:$key -Value ${value}
         }
     }
 
@@ -79,10 +81,11 @@ function Publish-WorkloadList {
         }
         Set-Item -Path Env:contextName -Value ${contextName}
 
-        if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq  $workload.variables.Keys))) {
+        if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq $workload.variables.Keys))) {
             foreach ($key in $workload.variables.Keys) {
                 $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
                 Write-Debug "workloadVariables[$key] = $value"
+                Set-Item -Path Env:$key -Value ${value}
             }
         }
 
@@ -119,7 +122,7 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq  $workloadsYaml.globalVariables.Keys))) {
+            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
                 foreach ($key in $workloadsYaml.globalVariables.Keys) {
                     $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
                     $deploymentVars[$key] = $value
@@ -127,7 +130,7 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $workload.variables)) -and (-Not ($null -eq  $workload.variables.Keys))) {
+            if ((-Not ($null -eq $workload.variables)) -and (-Not ($null -eq $workload.variables.Keys))) {
                 foreach ($key in $workload.variables.Keys) {
                     $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
                     $deploymentVars[$key] = $value
@@ -135,11 +138,12 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq  $deployment.variables.Keys))) {
+            if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq $deployment.variables.Keys))) {
                 foreach ($key in $deployment.variables.Keys) {
-                    $value = $ExecutionContext.InvokeCommand.ExpandString($deployment.variables[$key])
+                    $rawValue = $deployment.variables[$key]
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($rawValue)
                     $deploymentVars[$key] = $value
-                    Set-Item -Path Env:$resourceKey -Value ${value}
+                    Set-Item -Path Env:$key -Value ${value}
                     Write-Debug "deploymentVariables[$key] = $value"
                 }
             }
@@ -149,7 +153,7 @@ function Publish-WorkloadList {
                 if ([string]::IsNullOrEmpty($chartName)) { Write-Information "context.chart cannot be null or empty in file: $workloadsFile"; return $false; }
                 $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName")
                 if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
-                $installName = $deployment.variables['installName']
+                $installName = $ExecutionContext.InvokeCommand.ExpandString($deployment.variables['installName'])
                 if ([string]::IsNullOrEmpty($installName)) {
                     Write-Information "Chart[$chartName] missing variables['installName'] in file: $workloadsFile"; return $false;
                 }

@@ -26,7 +26,7 @@ function ConvertFrom-Content {
     # Convert a string array to a string
     foreach ($line in $Content) { $lines = $lines + "`n" + $line }
     # Deserialize a string to the PowerShell object
-    $yaml = ConvertFrom-YAML $lines
+    $yaml = ConvertFrom-YAML -Ordered $lines
 
     # Return the object
     return $yaml

@@ -77,7 +77,7 @@ function Confirm-ResourceList {
         $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
         if (($null -eq $templateProjectFolder) -or (-Not (Test-Path -Path $templateProjectFolder))) {
             $templateGlobalFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction SilentlyContinue
-            if (($null -eq $templateGlobalFolder) -or (-Not (Test-Path -Path $templateGlobalFolder)))  {
+            if (($null -eq $templateGlobalFolder) -or (-Not (Test-Path -Path $templateGlobalFolder))) {
                 Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
                 Write-Information "Not found local folder: $templateProjectFolder";
                 Write-Information "Not found global folder: $templateGlobalFolder";
@@ -128,8 +128,8 @@ function Confirm-ComponentList {
         if ([string]::IsNullOrEmpty($pushCommand)) { $pushCommand = $yaml.globalVariables['pushCommand']; }
         if ([string]::IsNullOrEmpty($pushCommand)) { Write-Information "pushCommand cannot be null or empty in file (both globalVariables and component level): $componentsFile"; return $false; }
 
-        $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath")
-        if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
+        $buildFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "components/$buildPath") -ErrorAction SilentlyContinue
+        if (($null -eq $buildFolder) -or (-Not (Test-Path -Path $buildFolder))) { Write-Information "Components folder not found: $buildPath`nUsed in file: $componentsFile"; return $false; }
     }
 
     return $true;
@@ -171,8 +171,8 @@ function Confirm-WorkloadList {
             if ($isChart) {
                 $chartName = $deployment['chart'];
                 if ([string]::IsNullOrEmpty($chartName)) { Write-Information "context.chart cannot be null or empty in file: $workloadsFile"; return $false; }
-                $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName")
-                if (-Not (Test-Path -Path $chartFolder)) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
+                $chartFolder = Resolve-Path -Path (Join-Path -Path $project_root -ChildPath "workloads/$chartName") -ErrorAction SilentlyContinue
+                if (($null -eq $chartFolder) -or (-Not (Test-Path -Path $chartFolder))) { Write-Information "workload[$contextName]chart[$chartName] folder not found: $chartFolder"; return $false; }
                 foreach ($key in $deployment.variables.Keys) {
                     $value = $deployment.variables[$key]
                     if ([string]::IsNullOrEmpty($value)) { Write-Information "workload[$contextName]chart[$chartName][$key] variable cannot be null or empty in file: $workloadsFile"; return $false; }

@@ -34,6 +34,10 @@ apt-get update
 apt-get install -y iputils-ping
 ```
 
+Then, if you want to build a project outside, you may need to use `dotnet restore`, then `dotnet build` and `dotnet run`. For the restore step to work, you may need to have [`nuget`](https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools) installed and in the path. Then, in what is really the reason for the information to be here in the "hacks" page: at times you first have to execute `nuget restore [name].proj` ahead of `dotnet restore [name].proj`.
+
+See also [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/master/docs/examples/grpc) for debugging instructions.
+
 ## Docker and Kubernetes issues
 
 Usually, the Docker functionality to `Reset to factory defaults` is the best path to a solution.
