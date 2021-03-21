@@ -169,6 +169,8 @@ function Publish-WorkloadList {
                 New-Item -Path $helmValuesFile -ItemType File -Force
                 foreach ($key in $deploymentVars.Keys) {
                     $value = $deploymentVars[$key]
+                    # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
+                    $value =  $value -replace '\\', ''
                     $line = "${key}: `"$value`""
                     if (($value.ToString().StartsWith("`"")) -and ($value.ToString().EndsWith("`""))) {
                         $line = "${key}: $value"
