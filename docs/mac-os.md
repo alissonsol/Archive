@@ -1,8 +1,8 @@
-# macOS
+# `yuruna` macOS instructions
 
 Shortcut through the many guides to install [requirements](./requirements.md) in the macOS.
 
-Tested with Big Sur: `sw_vers`: `ProductVersion: 11.2`: `BuildVersion: 20D64`. Test with Intel processor only. These steps won't work for the Apple M1 hardware (see [macOS M1](mac-os-m1.md) instructions under development).
+Tested with Big Sur: `sw_vers`: `ProductVersion: 11.2`: `BuildVersion: 20D64`. Test with Intel processor below. See [macOS M1](mac-os-m1.md) instructions under development.
 
 ## Steps that may need manual interaction
 

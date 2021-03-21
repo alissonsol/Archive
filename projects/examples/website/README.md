@@ -1,4 +1,4 @@
-# Website project
+# `yuruna` website example
 
 A simple .NET C# website container deployed to a Kubernetes cluster.
 
@@ -6,15 +6,15 @@ A simple .NET C# website container deployed to a Kubernetes cluster.
 
 What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
 
-- yrn42website-prefix -> Common project prefix for containers. Example: abcd
-- yrn42website-ns -> Kubernetes namespace for installing containers. Example: abcd
-- yrn42website-dns -> DNS prefix. Example: abcd
-- yrn42website-rg -> Name for group of resources (Azure). Example: abcd
-- yrn42website-tags -> Resource tags. Example: abcd
-- yrn42website-domain -> Domain for web email, site. Example: abcd.com
-- yrn42website-host -> Host name. Example: www.abcd.com
-- yrn42website-cluster -> Name for the K8S cluster (or at least a common prefix). Example: abcd
-- yrn42website-uxname -> Name for site in the UX (This will be visible to end users). Example: Abcd
+- yrn42website-prefix -> Common project prefix for containers. Example: yrn42
+- yrn42website-ns -> Kubernetes namespace for installing containers. Example: yrn42
+- yrn42website-dns -> DNS prefix. Example: yrn42
+- yrn42website-rg -> Name for group of resources (Azure). Example: yrn42
+- yrn42website-tags -> Resource tags. Example: yrn42
+- yrn42website-domain -> Domain for web email, site. Example: yrn42.com
+- yrn42website-host -> Host name. Example: www.yrn42.com
+- yrn42website-cluster -> Name for the K8S cluster (or at least a common prefix). Example: yrn42
+- yrn42website-uxname -> Name for site in the UX (This will be visible to end users). Example: yrn42
 
 Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42website-domain` first and then use this regular expression to search and replace the others:  `(yrn42website)[A-Za-z0-9\-]*`
 

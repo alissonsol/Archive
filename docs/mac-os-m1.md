@@ -1,8 +1,8 @@
-# macOS M1 instructions
+# `yuruna` macOS M1 instructions
 
 Shortcut to the many guides to install [requirements](./requirements.md) in the macOS.
 
-Instructions under development for the Apple M1 machines. Steps being documented, as well as what doesn't work yet.
+Instructions under development for the Apple M1 machines. Steps under development.
 
 ## Steps that may need manual interaction
 

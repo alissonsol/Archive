@@ -1,4 +1,4 @@
-# Ubuntu
+# `yuruna` Ubuntu instructions
 
 Installing the [requirements](./requirements.md) for Ubuntu still demands several manual steps. Moreover, some of the instructions are outdated. Below are the steps taken to get the requirements working in a Ubuntu machine (v20.04).
 

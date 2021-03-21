@@ -1,4 +1,4 @@
-# Yuruna helper: copy context
+# yuruna helper: copy context
 # This code is hacky, and creates temporary file with keys in the .yuruna folder
 # Why?
 # Because it was indeed simple to "copy the context".

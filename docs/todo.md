@@ -1,14 +1,13 @@
-# TO DO
+# `yuruna` TO DO list
 
 ## Global
 
 ### P0, P1
 
 - Seek for TODO tag.
-  - peerkeys: etcd replication
   - onnx: final step for workloads (helper)
 - Implement `yuruna requirements` that tests for requirements.
-- Tags in resources
+- Tags in resources created by the scripts.
 
 ### P1
 
@@ -16,7 +15,9 @@
   - Consider check behavior like that of the [GitHub actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions), appending to each command: `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }`
 - Warn if .terraform already exists: may not create resources.
 - Check if terraform requires variable and not provide it if not needed (avoids warnings).
-- Rolling PowerShell environment in the workloads steps (or document this: create single .ps1 file and execute it instead!)
+- Documentation
+  - How to start new project from the "template".
+  - Hw to use a single PowerShell script for the several commands in a repeated block.
 - Finish testing and publish the resources for AWS and GCP
 
 ### P2

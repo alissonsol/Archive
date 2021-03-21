@@ -68,7 +68,7 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 
-# Yuruna
+# yuruna
 **/.yuruna/*
 **/resources.output.yml
 **/*.certificate-authority

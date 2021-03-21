@@ -1,4 +1,4 @@
-# Hacks
+# `yuruna` hacks
 
 Some notes and hacks learned during the development process.
 
@@ -12,7 +12,7 @@ It is common for cloud providers to demand a unique registry name and correspond
 
 ## Hack to workaround Kubernetes context collision
 
-You can keep contexts simultaneous pointing to the clusters in different clouds by using the [config rename-context](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-rename-context-em-) option for `kubectl`.
+You can keep contexts simultaneously pointing to the clusters in different clouds by using the [config rename-context](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-rename-context-em-) option for `kubectl`.
 
 ```shell
 kubectl config rename-context old-name new-name
