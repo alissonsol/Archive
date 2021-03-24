@@ -10,7 +10,6 @@ globalVariables:
   resourceGroup:    "yrn42peerkeys"
   resourceTags:     "yrn42peerkeys"
   nodeCount:        3
-# TO-SET: registry name must be globally unique
   registryName:     "componentsRegistry"
 
 resources:

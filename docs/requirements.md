@@ -13,8 +13,8 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
 - Using a Hyper-V machine in Windows? Enable [nested virtualization](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
 - Installed [Docker Desktop](https://docs.docker.com/desktop/)
   - Enable [Kubernetes](https://docs.docker.com/get-started/orchestration/)
-- Installed [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
-  - Learn about [execution policies](https:/go.microsoft.com/fwlink/?LinkID=135170)
+- Installed [PowerShell Core](https://github.com/powershell/powershell), the cross-platform automation and configuration tool/framework, version 7+.
+  - For Windows: learn about [execution policies](https:/go.microsoft.com/fwlink/?LinkID=135170)
     - From PowerShell as Administrator, run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`
   - While in the Administrator PowerShell window, install the module "powershell-yaml"
     - Execute: `Install-Module -Name powershell-yaml`

@@ -26,7 +26,7 @@ spec:
             cpu: "100m"
         env:
           - name: "backendUrl"
-            value: {{ (printf "http://" ) }}{{ index .Values (printf "%s.hostname" .Values.contextName) }}/{{ .Values.backendPathBase }}/api/KeyValue
+            value: {{ (printf "http://" ) }}{{ .Values._endpointHost }}/{{ .Values.backendPathBase }}/api/KeyValue
           - name: "pathBase"
             value: {{ (printf "/%s" .Values.frontendPathBase) }}
       imagePullSecrets:

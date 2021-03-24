@@ -10,42 +10,37 @@ namespace grava.Models
         public RslDictionary() : base() { }
         public RslDictionary(int capacity) : base(capacity) { }
 
-        public TValue Set(TKey key, TValue value)
+        // Replace base methods
+        new public bool ContainsKey(TKey key)
         {
-            if (ContainsKey(key))
-            {
-                this[key] = value;
-            }
-            else
-            {
-                Add(key, value);
-            }
-
-            return value;
+            return base.ContainsKey(key);
         }
 
-        public TValue Get(TKey key)
+        new public void Add(TKey key, TValue value)
         {
-            if (ContainsKey(key))
-            {
-                return this[key];
-            }
-
-            return default;
+            base.Add(key, value);
         }
 
-        public TValue Delete(TKey key)
+        new public bool Remove(TKey key)
         {
-            TValue value = default;
+            return base.Remove(key);
+        }
 
-            if (ContainsKey(key))
+        new public System.Collections.Generic.Dictionary<TKey, TValue>.KeyCollection Keys
+        {
+            get { return base.Keys; }
+        }
+
+        new public TValue this[TKey key]
+        {
+            get
             {
-                value = this[key];
+                return base[key];
             }
-
-            Remove(key);
-
-            return value;
+            set
+            {
+                base[key] = value;
+            }
         }
     }
 }

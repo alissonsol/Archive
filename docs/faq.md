@@ -1,4 +1,4 @@
-# `yuruna`: Frequently Asked Questions
+# `yuruna` Frequently Asked Questions
 
 ## Answered
 

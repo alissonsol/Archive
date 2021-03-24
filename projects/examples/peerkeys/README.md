@@ -88,6 +88,8 @@ After authentication, deploy to Azure using the following sequence. Make sure th
 ./yuruna.ps1 workloads ../projects/examples/peerkeys azure
 ```
 
+NOTE: You need to open ports for Internet traffic for the etcd service using the Azure Portal. Automation coming soon...
+
 ## Notes
 
 Peerkeys exemplifies frontend, backend, and K8S "composing". The example automates the steps to deploy components and expose services, as explained in the MSDN article [Up and Running with Azure Kubernetes Services](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/december/containers-up-and-running-with-azure-kubernetes-services). In a cloud deployment, each cluster gets the ingress, which will expose the frontend site and the backend API from different endpoints, mapping to the internal services (via HTTP, port 80).

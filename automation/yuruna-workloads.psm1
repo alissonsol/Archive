@@ -69,7 +69,7 @@ function Publish-WorkloadList {
     # For each workload in workloads.yml
     foreach ($workload in $workloadsYaml.workloads) {
         # new work folder
-        $contextName = $workload['context']
+        $contextName = $ExecutionContext.InvokeCommand.ExpandString($workload['context'])
         Write-Information "-- Workloads for context: $contextName"
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
         $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"

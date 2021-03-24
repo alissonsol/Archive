@@ -1,6 +1,6 @@
 apiVersion: v2
-name: yrn42peerkeys deployment
-description: Helm for yrn42peerkeys
+name: cloudtalk deployment
+description: Helm for cloudtalk
 
 type: application
 version: 0.1.0

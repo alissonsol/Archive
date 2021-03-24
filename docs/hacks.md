@@ -44,4 +44,8 @@ Usually, the Docker functionality to `Reset to factory defaults` is the best pat
 
 Afterwards, remove the `~/.kube` folder and enable Kubernetes again (this loses at least some configuration, and possibly data).
 
+## Azure deletes static IP when deleting an ingress using it
+
+This is an unexpected Azure behavior, confirmed by this post: [How to make Azure not delete Public IP when deleting service / ingress-controller?](https://www.javaer101.com/en/article/75709569.html). Following the workaround also has its side-effects. Makes is better to `clear`, and then rebuild everything (`resources`, `components`, and `workloads`).
+
 Back to main [readme](../README.md)

@@ -96,6 +96,33 @@ function Confirm-ResourceList {
     return $true;
 }
 
+function Confirm-ResourceOutputList {
+    param (
+        $project_root,
+        $config_subfolder
+    )
+
+    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
+    # If is valid for the resources output not to exist yet
+    if (-Not (Test-Path -Path $resourcesOutputFile)) { Write-Verbose "Resources output file not found: $resourcesOutputFile"; return $true; }
+    $yaml = ConvertFrom-File $resourcesOutputFile
+
+    # Validate resources output list
+    if ($null -eq $yaml) { Write-Information "resources output cannot be null or empty in file: $resourcesOutputFile"; return $false; }
+    Write-Verbose "---- Validating Resources Output"
+    foreach ($key in $yaml.Keys) {
+        $context = $key
+        foreach ($output in $yaml[$context].Keys) {
+            $variableName = $output
+            $variableValue = $yaml[$context][$variableName].Value
+            Write-Verbose "resourceOutput[$context][$variableName] = $variableValue"
+            if ([string]::IsNullOrEmpty($variableValue)) { Write-Information "resourceOutput[$context][$variableName] have null or empty value in: $resourcesOutputFile"; return $false; }
+        }
+    }
+
+    return $true;
+}
+
 function Confirm-ComponentList {
     param (
         $project_root,
@@ -103,6 +130,7 @@ function Confirm-ComponentList {
     )
     Write-Debug "---- Validating Components"
     if (!(Confirm-FolderList $project_root $config_subfolder)) { return $false; }
+    if (!(Confirm-ResourceOutputList $project_root $config_subfolder)) { return $false; }
 
     $componentsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/components.yml"
     if (-Not (Test-Path -Path $componentsFile)) { Write-Information "File not found: $componentsFile"; return $false; }
@@ -142,6 +170,7 @@ function Confirm-WorkloadList {
     )
     Write-Debug "---- Validating Workloads"
     if (!(Confirm-FolderList $project_root $config_subfolder)) { return $false; }
+    if (!(Confirm-ResourceOutputList $project_root $config_subfolder)) { return $false; }
 
     $workloadsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }

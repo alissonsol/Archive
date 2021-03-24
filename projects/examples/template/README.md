@@ -76,7 +76,6 @@ As output, the following values will become available for later steps:
   - Azure requires a globally unique registry name.
     - Ping `yourname.azurecr.io` and confirm that name is not already in use.
     - Set the value just to the unique host name, like `yrn42template` (not `yrn42template.azurecr.io`).
-  - The current value is intentionally left empty so that validation will point out the need to edit the files.
 - Afterwards, execute the same commands above, replacing `localhost` with `azure`.
 
 Back to main [readme](../../../README.md). Back to list of [examples](../README.md).

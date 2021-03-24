@@ -40,7 +40,11 @@ namespace website.Pages
         public void OnPostGet(KeyValue kv)
         {
             UserInput.Key = kv.Key;
-            UserInput.Value = _dictionary.Get(kv.Key);
+            UserInput.Value = string.Empty;
+            if (!string.IsNullOrEmpty(UserInput.Key)) // Avoid getting the Keys making a call with the empty/null key
+            {
+                UserInput.Value = _dictionary.Get(kv.Key);
+            }
 
             UserAction = string.Format("Get for [{0},{1}] ", kv.Key, kv.Value);
         }
@@ -60,11 +64,6 @@ namespace website.Pages
 
             StringBuilder sb = new StringBuilder();
             sb.Append(string.Format("Keys for [{0},{1}]<br />", kv.Key, kv.Value));
-            // TODO: override for ".Keys"
-            // foreach(string k in _dictionary.Keys)
-            // {
-            //     sb.Append(string.Format("[{0}] = {1}<br />", k, _dictionary[k]));
-            // }
             sb.Append(_dictionary.GetKeys());
             UserAction = sb.ToString();
         }

@@ -4,6 +4,7 @@ resource "azurerm_public_ip" "frontendIp" {
   location            = azurerm_kubernetes_cluster.default.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  domain_name_label   = var.clusterName
 }
 
 data "azurerm_public_ip" "frontendIp" {
@@ -24,19 +25,6 @@ data "external" "originalIp" {
   }
 }
 
-data "external" "hostname" {
-  program = [
-    "pwsh",
-    "./public-fqdn.ps1",
-    azurerm_kubernetes_cluster.default.resource_group_name,
-    azurerm_kubernetes_cluster.default.name,
-  ]
-
-  query = {
-    placeholder = data.azurerm_public_ip.frontendIp.ip_address   
-  }
-}
-
 output "frontendIp" {
   value = data.azurerm_public_ip.frontendIp.ip_address
 }
@@ -46,5 +34,5 @@ output "clusterIp" {
 }
 
 output "hostname" {
-  value = data.external.hostname.result.hostname
+  value = data.azurerm_public_ip.frontendIp.fqdn
 }

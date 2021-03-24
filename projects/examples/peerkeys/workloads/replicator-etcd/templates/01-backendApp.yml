@@ -27,5 +27,9 @@ spec:
         env:
           - name: "pathBase"
             value: {{ (printf "/%s" .Values.backendPathBase) }}
+          - name: "etcdServer"
+            value: {{ (printf "http://" ) }}{{ index .Values (printf "%s.hostname" .Values.contextName) }}:{{ .Values.replicatedStatePortClient }}
+          - name: "etcdPassword"
+            value: {{ .Values.etcdPassword }}
       imagePullSecrets:
         - name: registry-credential
