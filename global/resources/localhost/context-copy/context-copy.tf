@@ -1,7 +1,7 @@
 resource "null_resource" "context" {
   provisioner "local-exec" {
     command = "./context-copy.ps1"
-    interpreter = local.is_windows ? ["PowerShell", "-Command"] : ["pwsh", "-Command"]
+    interpreter = ["pwsh", "-Command"]
 
     environment = {
       SOURCE_CONTEXT = var.sourceContext
