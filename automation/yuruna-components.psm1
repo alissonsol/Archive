@@ -106,6 +106,7 @@ function Publish-ComponentList {
 
         $dockerfile = Join-Path -Path $buildFolder -ChildPath "Dockerfile"
         if (-Not (Test-Path -Path $dockerfile)) { $dockerfile = Join-Path -Path $buildFolder -ChildPath "dockerfile"; }
+        if (-Not (Test-Path -Path $dockerfile)) { $dockerfile = Join-Path -Path $buildFolder -ChildPath "$project-dockerfile"; }
         if (-Not (Test-Path -Path $dockerfile)) { Write-Information "Missing dockerfile in folder: $buildFolder"; return $false; }
 
         $componentVars['project'] = $project

@@ -7,6 +7,7 @@
 - Seek for TODO tag.
   - onnx: final step for workloads (helper)
 - Implement `yuruna requirements` that tests for requirements.
+- Before "cloud-based" scripts execute, validate session
 - Tags in resources created by the scripts.
 
 ### P1

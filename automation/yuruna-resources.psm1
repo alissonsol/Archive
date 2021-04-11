@@ -92,6 +92,8 @@ function Publish-ResourceList {
                 $value = $ExecutionContext.InvokeCommand.ExpandString($terraformVars[$key])
                 $line = "$key = `"$value`""
                 Add-Content -Path $terraformVarsFile -Value $line
+                Set-Item -Path Env:$key -Value ${value}
+                Write-Verbose "$line"
             }
             # execute terraform apply from work folder
             Push-Location $workFolder

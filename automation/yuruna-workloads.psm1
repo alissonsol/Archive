@@ -45,6 +45,13 @@ function Publish-WorkloadList {
     if (Test-Path -Path $resourcesOutputFile) {
         $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
     }
+    else {
+        # Allow deployment of workloads in phases, reusing upper resource output
+        $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/../resources.output.yml"
+        if (Test-Path -Path $resourcesOutputFile) {
+            $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
+        }
+    }
 
     # Debug info
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq $resourcesOutputYaml.Keys))) {
@@ -186,7 +193,7 @@ function Publish-WorkloadList {
                 Write-Debug "Helm lint`n$result"
                 $result = $(helm uninstall $installName *>&1 | Write-Verbose)
                 Write-Debug "Helm uninstall $installName`n$result"
-                $result = $(helm install $installName . *>&1 | Write-Verbose)
+                $result = $(helm install $installName . --debug *>&1 | Write-Verbose)
                 Write-Debug "Helm install $installName`n$result"
                 Pop-Location
             }

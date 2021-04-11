@@ -100,6 +100,10 @@ if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
 $project_root = Resolve-Path -Path $project_root -ErrorAction SilentlyContinue
 Set-Item -Path Env:project_root -Value ${project_root}
 
+$config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
+$config_root = Resolve-Path -Path $config_relative -ErrorAction SilentlyContinue
+Set-Item -Path Env:config_root -Value ${config_root}
+
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName
 
