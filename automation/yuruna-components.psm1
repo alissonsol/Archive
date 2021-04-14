@@ -74,7 +74,9 @@ function Publish-ComponentList {
         if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
         Write-Information "-- Component: $project from $buildFolder"
 
-        $componentVars = @{}
+
+        # Notice how there is not string expansion for the components script
+        $componentVars = [ordered]@{}
         # apply global variables, resources.output variables, workload variables
         if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
             foreach ($resource in $resourcesOutputYaml.Keys) {
@@ -82,6 +84,7 @@ function Publish-ComponentList {
                     $resourceKey = "$resource.$key"
                     $value = $resourcesOutputYaml.$resource[$key].value
                     $componentVars[$resourceKey] = $value
+                    Set-Item -Path Env:$resourceKey -Value ${value}
                 }
             }
         }
@@ -89,6 +92,7 @@ function Publish-ComponentList {
             foreach ($key in $componentsYaml.globalVariables.Keys) {
                 $value = $componentsYaml.globalVariables[$key]
                 $componentVars[$key] = $value
+                Set-Item -Path Env:$key -Value ${value}
             }
         }
         if ((-Not ($null -eq $component.variables))  -and (-Not ($null -eq  $component.variables.Keys))) {
@@ -96,6 +100,7 @@ function Publish-ComponentList {
                 $value = $component.variables[$key]
                 $componentVars[$key] = $value
                 Write-Debug "componentVariables[$key] = $value"
+                Set-Item -Path Env:$key -Value ${value}
             }
         }
         # execute build command in the folder
@@ -114,6 +119,7 @@ function Publish-ComponentList {
         $componentVars['dockerfile'] = $dockerfile
         foreach ($key in $componentVars.Keys) {
             $value = $componentVars[$key]
+            if ([string]::IsNullOrEmpty($value)) { Write-Debug "WARNING: empty value for $key" }
             Set-Item -Path Env:$key -Value ${value}
             Write-Debug "$project[Env:$key] is $(Get-Content -Path Env:$key)"
         }

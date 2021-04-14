@@ -74,7 +74,7 @@ function Publish-ResourceList {
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
             New-Item -Path $terraformVarsFile -ItemType File -Force
-            $terraformVars = @{}
+            $terraformVars = [ordered]@{}
             if (-Not ($null -eq  $yaml.globalVariables)) {
                 foreach ($key in $yaml.globalVariables.Keys) {
                     $value = $yaml.globalVariables[$key]
@@ -90,6 +90,7 @@ function Publish-ResourceList {
             }
             foreach ($key in $terraformVars.Keys) {
                 $value = $ExecutionContext.InvokeCommand.ExpandString($terraformVars[$key])
+                if ([string]::IsNullOrEmpty($value)) { Write-Debug "WARNING: empty value for $key" }
                 $line = "$key = `"$value`""
                 Add-Content -Path $terraformVarsFile -Value $line
                 Set-Item -Path Env:$key -Value ${value}

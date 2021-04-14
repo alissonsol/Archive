@@ -115,7 +115,7 @@ function Publish-WorkloadList {
             $isShell = !([string]::IsNullOrEmpty($deployment['shell']))
             if (!($isChart -or $isKubectl -or $isHelm -or $isShell)) { Write-Information "context.deployment should be 'chart', 'kubectl', 'helm' or 'shell' in file: $workloadsFile"; return $false; }
 
-            $deploymentVars = @{}
+            $deploymentVars = [ordered]@{}
             # apply global variables, resources.output variables, workload variables, deployment variables
             # previous loops just presented values for debugging
             if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
@@ -129,7 +129,7 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
+            if ((-Not ($null -eq $workloadsYaml.globalVariables)) -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
                 foreach ($key in $workloadsYaml.globalVariables.Keys) {
                     $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
                     $deploymentVars[$key] = $value
@@ -145,10 +145,11 @@ function Publish-WorkloadList {
                 }
             }
 
-            if ((-Not ($null -eq $deployment.variables))  -and (-Not ($null -eq $deployment.variables.Keys))) {
+            if ((-Not ($null -eq $deployment.variables)) -and (-Not ($null -eq $deployment.variables.Keys))) {
                 foreach ($key in $deployment.variables.Keys) {
                     $rawValue = $deployment.variables[$key]
                     $value = $ExecutionContext.InvokeCommand.ExpandString($rawValue)
+                    if ([string]::IsNullOrEmpty($value)) { Write-Debug "WARNING: empty value for $key" }
                     $deploymentVars[$key] = $value
                     Set-Item -Path Env:$key -Value ${value}
                     Write-Debug "deploymentVariables[$key] = $value"
