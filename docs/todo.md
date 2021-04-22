@@ -9,12 +9,12 @@
 - Implement `yuruna requirements` that tests for requirements.
 - Before "cloud-based" scripts execute, validate session
 - Tags in resources created by the scripts.
+- Validation: repeated resource names and other duplications like context names
 
 ### P1
 
 - Better PowerShell scripts (likely eternal goal!).
   - Consider check behavior like that of the [GitHub actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions), appending to each command: `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }`
-- Warn if .terraform already exists: may not create resources.
 - Check if terraform requires variable and not provide it if not needed (avoids warnings).
 - Documentation
   - How to start new project from the "template".
@@ -55,6 +55,7 @@
 ## Azure
 
 - Global improvements
+- Website sample project ingress fix
 
 ## GCP
 

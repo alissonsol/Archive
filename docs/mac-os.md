@@ -2,7 +2,15 @@
 
 Shortcut through the many guides to install [requirements](./requirements.md) in the macOS.
 
-Tested with Big Sur: `sw_vers`: `ProductVersion: 11.2`: `BuildVersion: 20D64`. Test with Intel processor below. See [macOS M1](mac-os-m1.md) instructions under development.
+Tested with Big Sur: `sw_vers`: `ProductVersion: 11.2.3`: `BuildVersion: 20D91`. Test with Intel processor below. See [macOS M1](mac-os-m1.md) instructions under development.
+
+## Upgrading the environment
+
+If you previously performed the steps to install the requirements, get the latest versions with the command.
+
+```shell
+brew upgrade
+```
 
 ## Steps that may need manual interaction
 

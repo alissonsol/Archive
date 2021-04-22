@@ -13,8 +13,9 @@ These steps need be executed just once, unless you modify configurations.
 - [Authenticate](docs/authenticate.md) with your cloud provider
   - Instructions assume execution from a PowerShell prompt connected to the cloud account.
   - Depending on your cloud, login mechanism and activity, the authentication may timeout and need to be repeated.
-- *Windows Warning*: Examples using Linux-based containers may not work if scripts have the wrong line termination when building locally.
-  - The recommendation is to set `git config --global core.autocrlf input` before `git clone`.
+- *Windows Warnings*
+  - Examples using Linux-based containers may not work if scripts have the wrong line termination when building locally. The recommendation is to set `git config --global core.autocrlf input` before `git clone`.
+  - When deploying examples to the local host, check the  [FAQ](docs/faq.md) about having other processes already using port 80.
 
 ## Using `yuruna` to deploy Kubernetes-based applications
 
@@ -26,20 +27,20 @@ yuruna.ps1 components [project_root] [config_subfolder]
 yuruna.ps1 workloads  [project_root] [config_subfolder]
 ```
 
-Deploying the [peerkeys](projects/examples/peerkeys/README.md) example to the localhost.
+Deploying the [peerkeys](projects/examples/peerkeys/README.md) example to the localhost. Running commands from the automation folder.
 
 ```shell
-yuruna.ps1 resources  projects/examples/peerkeys localhost
-yuruna.ps1 components projects/examples/peerkeys localhost
-yuruna.ps1 workloads  projects/examples/peerkeys localhost
+./yuruna.ps1 resources  ../projects/examples/peerkeys localhost
+./yuruna.ps1 components ../projects/examples/peerkeys localhost
+./yuruna.ps1 workloads  ../projects/examples/peerkeys localhost
 ```
 
 Deploying the [website](projects/examples/website/README.md) example to Azure, showing debug and verbose messages.
 
 ```shell
-yuruna.ps1 resources  projects/examples/website azure -debug_mode $true -verbose_mode $true
-yuruna.ps1 components projects/examples/website azure -debug_mode $true -verbose_mode $true
-yuruna.ps1 workloads  projects/examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 resources  ../projects/examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 components ../projects/examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 workloads  ../projects/examples/website azure -debug_mode $true -verbose_mode $true
 ```
 
 See project [examples](projects/examples/README.md) and check the [syntax](docs/syntax.md) documentation for more details.

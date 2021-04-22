@@ -11,12 +11,3 @@ provider "azurerm" {
   # client_secret   = "..."
   # tenant_id       = "..."
 }
-
-resource "azurerm_resource_group" "default" {
-  name     = format("%s_registry", var.resourceGroup) 
-  location = var.registryRegion
-
-  tags = {
-    environment = var.resourceTags
-  }
-}

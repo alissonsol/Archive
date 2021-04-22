@@ -54,19 +54,19 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Required tools
     - Docker Desktop
       - `docker version`
-        - `Engine: Version: 20.10.0`
+        - `Engine: Version: 20.10.5`
       - `kubectl version`
-        - `Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", ...}`
-        - `Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", ...}`
+        - `Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.7", ...}`
+        - `Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.7", ...}`
     - PowerShell 7 (x64)
       - `$PSVersionTable`
-        - `PSVersion                      7.1.0`
+        - `PSVersion                      7.1.3`
     - Helm
       - `helm version`
-        - `version.BuildInfo{Version:"v3.4.2"...`
+        - `version.BuildInfo{Version:"v3.5.4"...`
     - Terraform
       - `terraform version`
-        - `Terraform v0.14.3`
+        - `Terraform v0.15+`
     - mkcert
       - `mkcert -version`
         - `v1.4.3`
@@ -76,16 +76,16 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
           - `aws-cli/2.1.13 Python/3.7.9 Windows/10 exe/AMD64 prompt/off`
       - Azure CLI
         - `az version`
-          - `"azure-cli": "2.16.0"`
+          - `"azure-cli": "2.22.0"`
       - Google Cloud SDK
         - `gcloud --version`
           - `Google Cloud SDK 321.0.0, bq 2.0.64, core 2020.12.11, gsutil 4.57`
     - Recommended tools
       - Visual Studio Code
-        - About: `1.52.1 (system setup)`
+        - About: `1.55.2 (system setup)`
       - Graphviz
         - `dot -V`
-          - `dot - graphviz version 2.44.1 (20200629.0800)`
+          - `dot - graphviz version 2.47.0 (20210316.0004)`
 
 See some additional guidance on how machines were setup for the [macOS](./mac-os.md) and [Ubuntu](./ubuntu.md) tests (no guarantees!).
 

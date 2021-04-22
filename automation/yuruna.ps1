@@ -82,6 +82,7 @@ if ($true -eq $verbose_mode) {
 
 $yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
 Set-Item -Path Env:yuruna_root -Value ${yuruna_root}
+Write-Debug "yuruna_root is $yuruna_root"
 Get-Module | Remove-Module *>&1 | Write-Verbose
 $requirementsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-requirements"
 $clearModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-clear"
@@ -97,12 +98,17 @@ Import-Module -Name $componentsModulePath
 Import-Module -Name $workloadsModulePath
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
-$project_root = Resolve-Path -Path $project_root -ErrorAction SilentlyContinue
+$resolved_root = Resolve-Path -Path $project_root -ErrorAction SilentlyContinue
+if ([string]::IsNullOrEmpty($resolved_root)) { Write-Information "Project folder not found: $project_root"; return $false; }
+$project_root = $resolved_root
 Set-Item -Path Env:project_root -Value ${project_root}
+Write-Debug "project_root is $project_root"
 
 $config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
 $config_root = Resolve-Path -Path $config_relative -ErrorAction SilentlyContinue
+if ([string]::IsNullOrEmpty($config_root)) { Write-Information "Configuration folder not found: $config_relative"; return $false; }
 Set-Item -Path Env:config_root -Value ${config_root}
+Write-Debug "config_root is $config_root"
 
 $transcriptFileName = [System.IO.Path]::GetTempFileName()
 $null = Start-Transcript $transcriptFileName

@@ -6,6 +6,7 @@
 ---
 globalVariables:
   namespace: "yrn42peerkeys"
+  resourceGroup: "yrn42peerkeys"
   containerPrefix: "yrn42peerkeys"
   registryName: "componentsRegistry"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
@@ -257,3 +258,6 @@ workloads:
       - kubectl: "expose deployment/${env:frontendApp}"
       - kubectl: "expose deployment/${env:backendApp}"
       - shell: 'Write-Information ">> Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
+      - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces"
+      - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'

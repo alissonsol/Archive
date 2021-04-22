@@ -1,6 +1,7 @@
 # Automating steps from https://github.com/microsoft/onnxruntime-training-examples/tree/master/huggingface-gpt2
 # One letter folder "t" (tmp) used to keep paths short
 Remove-Item -Path t -Force -Recurse -ErrorAction SilentlyContinue
+git config --global core.autocrlf input
 git clone https://github.com/microsoft/onnxruntime-training-examples.git t
 Set-Location t/huggingface-gpt2
 git clone https://github.com/huggingface/transformers.git

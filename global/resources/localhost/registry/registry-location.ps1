@@ -1,1 +1,1 @@
-Write-Output "{ ""registryLocation"": ""localhost:5000"" }" 
+Write-Output "{ ""registryLocation"": ""localhost:5000"" }"

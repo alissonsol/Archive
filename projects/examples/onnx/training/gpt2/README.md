@@ -13,12 +13,9 @@ What to search and replace in order to reuse this project as the basis for a new
 - yrn42onnxtraingpt2-dns -> DNS prefix. Example: yrn42
 - yrn42onnxtraingpt2-rg -> Name for group of resources (Azure). Example: yrn42
 - yrn42onnxtraingpt2-tags -> Resource tags. Example: yrn42
-- yrn42onnxtraingpt2-domain -> Domain for web email, site, Example: yrn42.com
-- yrn42onnxtraingpt2-host -> Host name. Example: www.yrn42.com
 - yrn42onnxtraingpt2-cluster -> Name for the K8S cluster (or at least a common prefix). Example: yrn42
-- yrn42onnxtraingpt2-uxname -> Name for site in the UX (This will be visible to end users). Example: yrn42
 
-Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42onnxtraingpt2-domain` first and then use this regular expression to search and replace the others:  `(yrn42onnxtraingpt2)[A-Za-z0-9\-]*`
+Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42onnxtraingpt2-tags` first and then use this regular expression to search and replace the others:  `(yrn42onnxtraingpt2)[A-Za-z0-9\-]*`
 
 Before deploying to the cloud environments, seek for `TO-SET` and set the required values. See section "Cloud deployment instructions".
 

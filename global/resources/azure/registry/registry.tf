@@ -1,14 +1,14 @@
 resource "azurerm_container_registry" "acr" {
   name                     = var.uniqueName
-  resource_group_name      = azurerm_resource_group.default.name
-  location                 = azurerm_resource_group.default.location
+  resource_group_name      = var.resourceGroup
+  location                 = var.resourceRegion
   sku                      = "Standard"
   admin_enabled            = true
 }
 
 data "azurerm_container_registry" "acr" {
   name                     = azurerm_container_registry.acr.name
-  resource_group_name      = azurerm_resource_group.default.name
+  resource_group_name      = var.resourceGroup
 }
 
 output "registryLocation" {

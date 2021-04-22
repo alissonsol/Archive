@@ -4,6 +4,14 @@ Shortcut to the many guides to install [requirements](./requirements.md) in the 
 
 Instructions under development for the Apple M1 machines. Steps under development.
 
+## Upgrading the environment
+
+If you previously performed the steps to install the requirements, get the latest versions with the command.
+
+```shell
+brew upgrade
+```
+
 ## Steps that may need manual interaction
 
 Steps that may need a password or other decisions before proceeding. First, install Brew (may need password and press to continue).

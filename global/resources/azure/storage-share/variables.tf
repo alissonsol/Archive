@@ -1,9 +1,13 @@
-variable "registryName" {
-  description = "Container registry name"
+variable "storageAccountName" {
+  description = "Storage account name"
 }
 
-variable "uniqueName" {
-  description = "Unique registry name"
+variable "storageShareName" {
+  description = "Storage share name"
+}
+
+variable "storageQuota" {
+  description = "Storage quota"
 }
 
 variable "resourceGroup" {

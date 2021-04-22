@@ -190,12 +190,15 @@ function Publish-WorkloadList {
                 # execute helm install in work folder
                 Write-Debug "`Helm execute from: $workFolder"
                 Push-Location $workFolder
+                Write-Debug "Helm lint"
                 $result = $(helm lint *>&1 | Write-Verbose)
-                Write-Debug "Helm lint`n$result"
+                if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
+                Write-Debug "Helm uninstall $installName"
                 $result = $(helm uninstall $installName *>&1 | Write-Verbose)
-                Write-Debug "Helm uninstall $installName`n$result"
+                if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
+                Write-Debug "Helm install $installName"
                 $result = $(helm install $installName . --debug *>&1 | Write-Verbose)
-                Write-Debug "Helm install $installName`n$result"
+                if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
                 Pop-Location
             }
             else {
@@ -223,7 +226,7 @@ function Publish-WorkloadList {
                 else {
                     $result = Invoke-Expression $expression *>&1 | Write-Verbose
                 }
-                Write-Debug "$result"
+                if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
                 Pop-Location
             }
         }

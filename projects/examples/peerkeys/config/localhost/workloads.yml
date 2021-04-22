@@ -5,31 +5,31 @@
 # Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
 ---
 globalVariables:
-  namespace: "yrn42peerkeys"
-  containerPrefix: "yrn42peerkeys"
-  registryName: "componentsRegistry"
+  namespace:             "yrn42peerkeys"
+  containerPrefix:       "yrn42peerkeys"
+  registryName:          "componentsRegistry"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
-  _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
-  dockerUsername: "placeholder"
-  dockerPassword: "placeholder"
-  ingressClass: "nginx"
-  etcdPassword: "yurunaDemo"
-  rsPrefix: "etcd"
-  rsip001: '${env:rsPrefix}001-0.${env:rsPrefix}001-headless.${env:containerPrefix}001.svc.cluster.local'
-  rspc001: 1379
-  rspp001: 1380
-  rsip002: '${env:rsPrefix}002-0.${env:rsPrefix}002-headless.${env:containerPrefix}002.svc.cluster.local'
-  rspc002: 2379
-  rspp002: 2380
-  rsip003: '${env:rsPrefix}003-0.${env:rsPrefix}003-headless.${env:containerPrefix}003.svc.cluster.local'
-  rspc003: 3379
-  rspp003: 3380
+  _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
+  dockerServer:          "http://${env:_registryLocation}"
+  dockerUsername:        "placeholder"
+  dockerPassword:        "placeholder"
+  ingressClass:          "nginx"
+  etcdPassword:          "yurunaDemo"
+  rsPrefix:              "etcd"
+  rsip001:               "${env:rsPrefix}001-0.${env:rsPrefix}001-headless.${env:containerPrefix}001.svc.cluster.local"
+  rspc001:               1379
+  rspp001:               1380
+  rsip002:               "${env:rsPrefix}002-0.${env:rsPrefix}002-headless.${env:containerPrefix}002.svc.cluster.local"
+  rspc002:               2379
+  rspp002:               2380
+  rsip003:               "${env:rsPrefix}003-0.${env:rsPrefix}003-headless.${env:containerPrefix}003.svc.cluster.local"
+  rspc003:               3379
+  rspp003:               3380
   # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
-  rsCluster: ${env:rsPrefix}001=http://${env:rsip001}:${env:rspp001}\,${env:rsPrefix}002=http://${env:rsip002}:${env:rspp002}\,${env:rsPrefix}003=http://${env:rsip003}:${env:rspp003}
-  rsClusterToken: nossila
+  rsCluster:             ${env:rsPrefix}001=http://${env:rsip001}:${env:rspp001}\,${env:rsPrefix}002=http://${env:rsip002}:${env:rspp002}\,${env:rsPrefix}003=http://${env:rsip003}:${env:rspp003}
+  rsClusterToken:        nossila
 
 workloads:
-
   # Deploy ingress just once, since it is just one cluster anyway
   - context: "docker-desktop"
     variables:
@@ -54,7 +54,7 @@ workloads:
           --set tcp.${env:rspp002}="${env:containerPrefix}002/${env:rsPrefix}002:${env:rspp002}"
           --set tcp.${env:rspc003}="${env:containerPrefix}003/${env:rsPrefix}003:${env:rspc003}"
           --set tcp.${env:rspp003}="${env:containerPrefix}003/${env:rsPrefix}003:${env:rspp003}"
-          # --debug
+          --debug
 
   - context: "${env:containerPrefix}001"
     variables:
@@ -234,3 +234,6 @@ workloads:
       - kubectl: "expose deployment/${env:frontendApp}"
       - kubectl: "expose deployment/${env:backendApp}"
       - shell: 'Write-Information ">> Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
+      - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces"
+      - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'

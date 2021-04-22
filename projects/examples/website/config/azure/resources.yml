@@ -1,31 +1,33 @@
 # Resources information - azure
 ---
 globalVariables:
-  namespace:        "yrn42website-ns"
-  clusterDnsPrefix: "yrn42website-dns"
-  resourceGroup:    "yrn42website-rg"
-  resourceTags:     "yrn42website-tags"
-  nodeCount:        1
-  registryName:     "componentsRegistry"
+  namespace:             "yrn42website-ns"
+  clusterDnsPrefix:      "yrn42website-dns"
+  resourceGroup:         "yrn42website-rg"
+  # regions: az account list-locations -o table
+  resourceRegion:        "westus2"
+  resourceTags:          "yrn42website-tags"
+  registryName:          "componentsRegistry"
+  clusterVersion:        "1.20.2"
+  nodeType:              "Standard_D2_v2"
+  nodeCount:             3
 
-# Careful: if the template needs a veriable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
-# registry
-- name:             "componentsRegistry"
-  template:         "azure/registry"
+# Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
+- name:                  "defaultResourceGroup"
+  template:              "azure/resource-group"
+  variables:
+
+- name:                  "componentsRegistry"
+  template:              "azure/registry"
   variables:
     # TO-SET: registry name must be globally unique
-    uniqueName:     "yrn42registry"
-    registryRegion: "westus2"
-    # resource group gets _registry appended to it, so registry is isolated in its own resource group
+    uniqueName:          "yrn42registry"
 
 # cluster reference
-- name:             "yrn42website-context"
-  template:         "azure/aks-cluster"
+- name:                  "yrn42website-context"
+  template:              "azure/aks-cluster"
   variables:
-    clusterName:    "yrn42website-aks"
+    clusterName:         "yrn42website-cluster"
     destinationContext:  "yrn42website-context"
-    clusterRegion:  "westus2"
-    clusterVersion: "1.20.2"
-    nodeType:       "Standard_D2_v2"
-    nodeCount:      3
+    nodeResourceGroup:   "${env:resourceGroup}-aks"

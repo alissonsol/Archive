@@ -1,10 +1,10 @@
 resource "azurerm_kubernetes_cluster" "default" {
   name                = var.clusterName
-  location            = azurerm_resource_group.default.location
-  resource_group_name = azurerm_resource_group.default.name
+  location            = var.resourceRegion
+  resource_group_name = var.resourceGroup
   dns_prefix          = var.clusterDnsPrefix
   kubernetes_version  = var.clusterVersion
-  node_resource_group = format("%s_nodes", azurerm_resource_group.default.name)
+  node_resource_group = var.nodeResourceGroup
 
   default_node_pool {
     name            = "default"

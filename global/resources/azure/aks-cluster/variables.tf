@@ -6,10 +6,6 @@ variable "clusterName" {
   description = "Cluster name"
 }
 
-variable "clusterRegion" {
-  description = "Cluster region"
-}
-
 variable "clusterVersion" {
   description = "Cluster Kubernetes version"
 }
@@ -22,12 +18,16 @@ variable "nodeType" {
   description = "Node type (vm size)"
 }
 
-variable "registryName" {
-  description = "Container registry name"
+variable "nodeResourceGroup" {
+  description = "Node resource group"
 }
 
 variable "resourceGroup" {
   description = "Resource group"
+}
+
+variable "resourceRegion" {
+  description = "Resource region"
 }
 
 variable "resourceTags" {

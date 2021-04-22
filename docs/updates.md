@@ -4,6 +4,8 @@
 
 Focused on major theme for the mid-month release.
 
+- 2021/04/21
+  - More script improvements and fixes: now can define variable based on another from the very previous line.
 - 2021/03/21
   - Script improvements. Now the `peerkeys` example is complete for localhost.
 - 2021/02/15

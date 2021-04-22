@@ -7,7 +7,7 @@ globalVariables:
   clusterVersion:   "1.20.2"
   nodeType:         "Standard_D2_v2"
   resourceGroup:    "yrn42peerkeys"
-  resourceTags:     "yrn42peerkeys"
+  resourceTags:     "yrn42peerkeys-tags"
   nodeCount:        1
   registryName:     "yrn42peerkeys"
 

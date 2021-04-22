@@ -98,15 +98,18 @@ function Publish-ResourceList {
             }
             # execute terraform apply from work folder
             Push-Location $workFolder
-            $result = terraform init
-            Write-Verbose "Terraform init: $result"
-            # $result = terraform plan -compact-warnings
-            # Write-Debug "Terraform plan: $result"
-            # $result = terraform graph | dot -Tsvg > graph.svg
-            # Write-Debug "Terraform graph: $result"
+
+            # warn if terraform already initialized
+            $terraformPath = Join-Path -Path $workFolder -ChildPath ".terraform"
+            if (Test-Path -Path $terraformPath) { Write-Information "-- WARNING: terraform already initialized. Resource may not be created. Use 'yuruna clear' to clear terraform state."; }
+            Write-Debug "Terraform init"
+            $result = $(terraform init *>&1 | Write-Verbose)
+            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
+            # terraform plan -compact-warnings
+            # terraform graph | dot -Tsvg > graph.svg
             Write-Debug "Executing terraform apply from $workFolder"
-            $result = terraform apply -auto-approve
-            Write-Verbose "Terraform apply: $result"
+            $result = $(terraform apply -auto-approve *>&1 | Write-Verbose)
+            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
             # resource.output file processing
             $jsonOutput = "$(terraform output -json)"
             if (![string]::IsNullOrEmpty($jsonOutput)) {

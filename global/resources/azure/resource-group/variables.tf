@@ -1,11 +1,3 @@
-variable "registryName" {
-  description = "Container registry name"
-}
-
-variable "uniqueName" {
-  description = "Unique registry name"
-}
-
 variable "resourceGroup" {
   description = "Resource group"
 }
