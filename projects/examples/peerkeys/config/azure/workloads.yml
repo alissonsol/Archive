@@ -5,29 +5,30 @@
 # Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
 ---
 globalVariables:
-  namespace: "yrn42peerkeys"
-  resourceGroup: "yrn42peerkeys"
-  containerPrefix: "yrn42peerkeys"
-  registryName: "componentsRegistry"
+  namespace:             "yrn42peerkeys"
+  containerPrefix:       "yrn42peerkeys"
+  registryName:          "componentsRegistry"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
-  _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
-  dockerUsername: "$(az acr credential show -n ${env:_registryLocation} --query username)"
-  dockerPassword: "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
-  ingressClass: "nginx"
-  etcdPassword: "yurunaDemo"
-  rsPrefix: "etcd"
-  rsip001: '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}001.hostname"))'
-  rspc001: 1379
-  rspp001: 1380
-  rsip002: '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}002.hostname"))'
-  rspc002: 2379
-  rspp002: 2380
-  rsip003: '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}003.hostname"))'
-  rspc003: 3379
-  rspp003: 3380
+  _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
+  dockerServer:          "http://${env:_registryLocation}.azurecr.io"
+  dockerUsername:        "placeholder"
+  dockerPassword:        "placeholder"
+  ingressClass:          "nginx"
+  resourceGroup:         "yrn42peerkeys"
+  etcdPassword:          "yurunaDemo"
+  rsPrefix:              "etcd"
+  rsip001:               '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}001.hostname"))'
+  rspc001:               1379
+  rspp001:               1380
+  rsip002:               '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}002.hostname"))'
+  rspc002:               2379
+  rspp002:               2380
+  rsip003:               '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}003.hostname"))'
+  rspc003:               3379
+  rspp003:               3380
   # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
-  rsCluster: ${env:rsPrefix}001=http://${env:rsip001}:${env:rspp001}\,${env:rsPrefix}002=http://${env:rsip002}:${env:rspp002}\,${env:rsPrefix}003=http://${env:rsip003}:${env:rspp003}
-  rsClusterToken: nossila
+  rsCluster:             ${env:rsPrefix}001=http://${env:rsip001}:${env:rspp001}\,${env:rsPrefix}002=http://${env:rsip002}:${env:rspp002}\,${env:rsPrefix}003=http://${env:rsip003}:${env:rspp003}
+  rsClusterToken:        nossila
 
 workloads:
 
@@ -64,11 +65,11 @@ workloads:
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
           --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"          
-          # --debug
+          --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-etcd"
         variables:
           installName: "${env:_basename}-deployment"
@@ -139,12 +140,12 @@ workloads:
           --set tcp.${env:_rspc}="${env:namespace}/${env:replicatedStateApp}:${env:_rspc}"
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
           --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
-          --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"          
-          # --debug
+          --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"
+          --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-etcd"
         variables:
           installName: "${env:_basename}-deployment"
@@ -216,11 +217,11 @@ workloads:
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
           --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"          
-          # --debug
+          --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation}.azurecr.io --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-etcd"
         variables:
           installName: "${env:_basename}-deployment"

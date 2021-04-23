@@ -122,6 +122,8 @@ function Publish-ResourceList {
         }
     }
 
+    if ((Get-Item $resourcesOutputFile).Length -gt 0) { Write-Information "Resources output file: $resourcesOutputFile"; }
+
     return $true;
 }
 

@@ -45,7 +45,7 @@ Add-Content -Path $tempFile.FullName -Value $(ConvertTo-Yaml $yaml)
 $kubeConfig = "${currentConfig}:${tempFile}"
 if ($IsWindows) { $kubeConfig = "${currentConfig};${tempFile}"; }
 Write-Verbose "KUBECONFIG: $kubeConfig"
-$originalKubeConfig = Get-Item -Path Env:KUBECONFIG
+$originalKubeConfig = Get-Item -Path Env:KUBECONFIG -ErrorAction SilentlyContinue
 Set-Item -Path Env:KUBECONFIG -Value $kubeConfig
 $combinedConfig = "${HOME}/.kube/config.yuruna"
 Remove-Item -Path $combinedConfig -Force -ErrorAction SilentlyContinue
