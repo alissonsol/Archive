@@ -56,7 +56,6 @@
 ## Azure
 
 - Global improvements
-- Website sample project ingress fix
 
 ## GCP
 

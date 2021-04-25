@@ -6,6 +6,7 @@
 ---
 globalVariables:
   namespace:             "yrn42peerkeys"
+  resourceGroup:         "yrn42peerkeys"
   containerPrefix:       "yrn42peerkeys"
   registryName:          "componentsRegistry"
   certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
@@ -14,7 +15,6 @@ globalVariables:
   dockerUsername:        "placeholder"
   dockerPassword:        "placeholder"
   ingressClass:          "nginx"
-  resourceGroup:         "yrn42peerkeys"
   etcdPassword:          "yurunaDemo"
   rsPrefix:              "etcd"
   rsip001:               '$([Environment]::GetEnvironmentVariable("${env:containerPrefix}001.hostname"))'
@@ -48,6 +48,7 @@ workloads:
       _rsip: '$([Environment]::GetEnvironmentVariable("rsip${env:_number}"))'
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "delete namespace ingress-basic --v=1"
       - kubectl: "create namespace ingress-basic --v=1"
@@ -63,7 +64,7 @@ workloads:
           --set controller.ingressClass=${env:ingressClass}
           --set tcp.${env:_rspc}="${env:namespace}/${env:replicatedStateApp}:${env:_rspc}"
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
-          --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"          
           --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"
@@ -124,6 +125,7 @@ workloads:
       _rsip: '$([Environment]::GetEnvironmentVariable("rsip${env:_number}"))'
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "delete namespace ingress-basic --v=1"
       - kubectl: "create namespace ingress-basic --v=1"
@@ -139,7 +141,7 @@ workloads:
           --set controller.ingressClass=${env:ingressClass}
           --set tcp.${env:_rspc}="${env:namespace}/${env:replicatedStateApp}:${env:_rspc}"
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
-          --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"
           --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"
@@ -200,6 +202,7 @@ workloads:
       _rsip: '$([Environment]::GetEnvironmentVariable("rsip${env:_number}"))'
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "delete namespace ingress-basic --v=1"
       - kubectl: "create namespace ingress-basic --v=1"
@@ -215,7 +218,7 @@ workloads:
           --set controller.ingressClass=${env:ingressClass}
           --set tcp.${env:_rspc}="${env:namespace}/${env:replicatedStateApp}:${env:_rspc}"
           --set tcp.${env:_rspp}="${env:namespace}/${env:replicatedStateApp}:${env:_rspp}"
-          --set controller.service.loadBalancerIP="$([Environment]::GetEnvironmentVariable("${env:contextName}.frontendIp"))"
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:contextName}"          
           --debug
       - kubectl: "delete namespace ${env:namespace} --v=1"

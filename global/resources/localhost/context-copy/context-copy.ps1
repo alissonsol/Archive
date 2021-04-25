@@ -1,18 +1,17 @@
 # yuruna helper: copy context
-# This code is hacky, and creates temporary file with keys in the .yuruna folder
-# Why?
-# Because it was indeed simple to "copy the context".
-# For that, one could just extract the cluster and the auth info and
-#   kubectl config set-context $destinationContext --cluster=$cluster --user=$authInfo
-# However, if you do that, when you later delete that "reference context", the YAML entries for the cluster and user are gone.
 # As a result, this code creates copies of those entries with the same name of the destinationContext
+#
+# Debug
+# Set-Item -Path Env:yuruna_root -Value ../../../.. (Just above automation)
+# Set-Item -Path Env:sourceContext -Value docker-desktop
+# Set-Item -Path Env:destinationContext -Value value
 
 $yuruna_root = ${env:yuruna_root}
-Write-Debug "yuruna_root: $yuruna_root"
+Write-Information "yuruna_root: $yuruna_root"
 $sourceContext = ${env:SOURCE_CONTEXT}
-Write-Debug "sourceContext: $sourceContext"
+Write-Information "sourceContext: $sourceContext"
 $destinationContext = ${env:DESTINATION_CONTEXT}
-Write-Debug "destinationContext: $destinationContext"
+Write-Information "destinationContext: $destinationContext"
 
 $modulePath = Join-Path -Path $yuruna_root -ChildPath "automation/import-yaml"
 Import-Module -Name $modulePath
@@ -27,6 +26,9 @@ $originalContext = kubectl config current-context
 kubectl config use-context $sourceContext *>&1 | Write-Verbose
 $currentContext = kubectl config current-context
 if ($currentContext -ne $sourceContext) { Write-Information "K8S source context not found: $sourceContext`n"; return $false; }
+
+# Remove destination context if already exists
+kubectl config unset $destinationContext *>&1 | Write-Verbose
 
 # Copy sourceContext to destinationContext
 Write-Debug "`n==== ********* Copying context '$sourceContext' to '$destinationContext' ************** =======";
