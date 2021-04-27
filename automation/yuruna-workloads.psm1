@@ -53,21 +53,19 @@ function Publish-WorkloadList {
         }
     }
 
-    # Debug info
+    # Resources output expanded, but not "saved"
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
-            $keys = @($resourcesOutputYaml.$resource.Keys)
-            foreach ($key in $keys) {
+            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
                 $resourceKey = "$resource.$key"
                 $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                 Write-Debug "resourcesOutput[$resourceKey] = $value"
                 Set-Item -Path Env:$resourceKey -Value ${value}
-                # Expanded already
-                $resourcesOutputYaml.$resource[$key] = $value
             }
         }
     }
 
+    # Global variables are saved expanded after first time
     if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
         $keys = @($workloadsYaml.globalVariables.Keys)
         foreach ($key in $keys) {
