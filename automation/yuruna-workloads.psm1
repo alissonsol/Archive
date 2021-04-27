@@ -56,20 +56,26 @@ function Publish-WorkloadList {
     # Debug info
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
-            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+            $keys = @($resourcesOutputYaml.$resource.Keys)
+            foreach ($key in $keys) {
                 $resourceKey = "$resource.$key"
                 $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
                 Write-Debug "resourcesOutput[$resourceKey] = $value"
                 Set-Item -Path Env:$resourceKey -Value ${value}
+                # Expanded already
+                $resourcesOutputYaml.$resource[$key] = $value
             }
         }
     }
 
     if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
-        foreach ($key in $workloadsYaml.globalVariables.Keys) {
+        $keys = @($workloadsYaml.globalVariables.Keys)
+        foreach ($key in $keys) {
             $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
             Write-Debug "globalVariables[$key] = $value"
             Set-Item -Path Env:$key -Value ${value}
+            # Expanded already
+            $workloadsYaml.globalVariables[$key] = $value
         }
     }
 

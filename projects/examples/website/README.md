@@ -72,7 +72,7 @@ As output, the following values will become available for later steps:
 
 - Check you can navigate to the endpoint reported after publishing the workloads.
 - Check services are available with the command: `kubectl get services --all-namespaces`
-- Check events with the command: `kubectl get events --all-namespaces`
+- Check cluster events with the command: `kubectl get events --all-namespaces`
 - In Azure, if the `EXTERNAL-IP` for the `nginx-ingress` is still loading after several minutes
   - Check if there is an event starting with `Error syncing load balancer: failed to ensure load balancer: ensurePublicIPExists for service...`
   - Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP. You can verify that in the <https://portal.azure.com>. Hint: it is the cluster name!
