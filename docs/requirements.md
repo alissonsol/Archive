@@ -19,6 +19,7 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - While in the Administrator PowerShell window, install the module "powershell-yaml"
     - Execute: `Install-Module -Name powershell-yaml`
 - Installed [Helm](https://helm.sh/docs/intro/install/) in the path.
+  - Download: `https://github.com/helm/helm/releases`
 - Installed [Terraform](https://www.terraform.io/downloads.html) in the path.
 - Installed [mkcert](https://github.com/FiloSottile/mkcert) in the path.
   - Run `mkcert -install`
@@ -50,23 +51,24 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Operating systems
     - Windows 10 Professional.
       - `ver`
-        - `Microsoft Windows [Version 10.0.19042.685]`
+        - `Microsoft Windows [Version 10.0.19043.1202]`
   - Required tools
     - Docker Desktop
       - `docker version`
-        - `Engine: Version: 20.10.5`
+        - `Engine: Version: 20.10.8`
       - `kubectl version`
-        - `Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.7", ...}`
-        - `Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.7", ...}`
+        - `Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.4", ...}`
+        - `Server Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.1", ...}`
     - PowerShell 7 (x64)
-      - `$PSVersionTable`
-        - `PSVersion                      7.1.3`
+      - `pwsh`
+        - `$PSVersionTable`
+          - `PSVersion                      7.1.4`
     - Helm
       - `helm version`
-        - `version.BuildInfo{Version:"v3.5.4"...`
+        - `version.BuildInfo{Version:"v3.6.3"...`
     - Terraform
       - `terraform version`
-        - `Terraform v0.15+`
+        - `Terraform v1.0.6`
     - mkcert
       - `mkcert -version`
         - `v1.4.3`
@@ -76,13 +78,13 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
           - `aws-cli/2.1.13 Python/3.7.9 Windows/10 exe/AMD64 prompt/off`
       - Azure CLI
         - `az version`
-          - `"azure-cli": "2.22.0"`
+          - `"azure-cli": "2.28.0"`
       - Google Cloud SDK
         - `gcloud --version`
           - `Google Cloud SDK 321.0.0, bq 2.0.64, core 2020.12.11, gsutil 4.57`
     - Recommended tools
       - Visual Studio Code
-        - About: `1.55.2 (system setup)`
+        - About: `1.60.0 (system setup)`
       - Graphviz
         - `dot -V`
           - `dot - graphviz version 2.47.0 (20210316.0004)`

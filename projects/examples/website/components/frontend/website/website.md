@@ -12,7 +12,7 @@ Frontend website for user authentication and human-computer interface
     - Solved with `dotnet add package Microsoft.VisualStudio.Azure.Containers.Tools.Targets --version 1.10.9`. Reference from [nuget](https://www.nuget.org/packages/Microsoft.VisualStudio.Azure.Containers.Tools.Targets/).
   - dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p { password here }
     - If getting error: `A valid HTTPS certificate is already present.`
-      - Cleanup with `dotnet dev-certs https --clean` and try again.
+      - Clean up with `dotnet dev-certs https --clean` and try again.
   - dotnet dev-certs https --trust
   - Right-click on project, select `Add -> Docker Support...`
 - Test project starting with `IIS Express`, and possibly the project name (`website`)

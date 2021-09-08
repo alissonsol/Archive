@@ -6,7 +6,7 @@ Follow the instructions to create resources, build components and deploy the wor
 
 ## Search and replace
 
-What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
+Reuse this project by search and replacing placeholders in case-sensitive mode.
 
 - yrn42peerkeys-tags -> Resource tags. Example: yrn42
 
@@ -16,7 +16,7 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `peerkeys` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+Below are the end-to-end steps to deploy the `peerkeys` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
 - Create resources
 

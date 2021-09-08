@@ -4,7 +4,7 @@ Folder structure template project.
 
 ## Search and replace
 
-What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
+Reuse this project by search and replacing placeholders in case-sensitive mode.
 
 - yrn42template-prefix -> Common project prefix for containers. Example: yrn42
 - yrn42template-ns -> Kubernetes namespace for installing containers. Example: yrn42
@@ -22,7 +22,7 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `template` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+Below are the end-to-end steps to deploy the `template` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
 - Create resources
 
@@ -76,6 +76,6 @@ As output, the following values will become available for later steps:
   - Azure requires a globally unique registry name.
     - Ping `yourname.azurecr.io` and confirm that name is not already in use.
     - Set the value just to the unique host name, like `yrn42template` (not `yrn42template.azurecr.io`).
-- Afterwards, execute the same commands above, replacing `localhost` with `azure`.
+- Afterward, execute the same commands above, replacing `localhost` with `azure`.
 
 Back to main [readme](../../../README.md). Back to list of [examples](../README.md).

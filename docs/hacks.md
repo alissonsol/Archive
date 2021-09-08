@@ -42,7 +42,7 @@ See also [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/
 
 Usually, the Docker functionality to `Reset to factory defaults` is the best path to a solution.
 
-Afterwards, remove the `~/.kube` folder and enable Kubernetes again (this loses at least some configuration, and possibly data).
+Afterward, remove the `~/.kube` folder and enable Kubernetes again (this loses at least some configuration, and possibly data).
 
 ## Azure deletes static IP when deleting an ingress using it
 

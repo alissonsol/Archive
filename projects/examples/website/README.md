@@ -4,7 +4,7 @@ A simple .NET C# website container deployed to a Kubernetes cluster.
 
 ## Search and replace
 
-What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
+Reuse this project by search and replacing placeholders in case-sensitive mode.
 
 - yrn42website-prefix -> Common project prefix for containers. Example: yrn42
 - yrn42website-ns -> Kubernetes namespace for installing containers. Example: yrn42
@@ -21,7 +21,7 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
 - Create resources
 
@@ -93,6 +93,6 @@ As output, the following values will become available for later steps:
     - Ping `yourname.azurecr.io` and confirm that name is not already in use.
     - Set the value just to the unique host name, like `yrn42website` (not `yrn42website.azurecr.io`).
   - The current value is intentionally left empty so that validation will point out the need to edit the files.
-- Afterwards, execute the same commands above, replacing `localhost` with `azure`.
+- Afterward, execute the same commands above, replacing `localhost` with `azure`.
 
 Back to main [readme](../../../README.md). Back to list of [examples](../README.md).

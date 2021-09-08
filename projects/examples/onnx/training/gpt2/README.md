@@ -6,7 +6,7 @@ Based on example [Accelerate GPT2 fine-tuning with ONNX Runtime Training](https:
 
 ## Search and replace
 
-What to search and replace in order to reuse this project as the basis for a new one. Search in case-sensitive mode.
+Reuse this project by search and replacing placeholders in case-sensitive mode.
 
 - yrn42onnxtraingpt2-prefix -> Common project prefix for containers. Example: yrn42
 - yrn42onnxtraingpt2-ns -> Kubernetes namespace for installing containers. Example: yrn42
@@ -21,7 +21,7 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 ## End to end deployment
 
-Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). Execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
 - Create resources
 
