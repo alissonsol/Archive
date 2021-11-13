@@ -194,7 +194,7 @@ function Confirm-WorkloadList {
     if ($null -eq $yaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
     foreach ($workload in $yaml.workloads) {
         # context should exist
-        $contextName = $workload['context']
+        $contextName = $ExecutionContext.InvokeCommand.ExpandString($workload['context'])
         if ([string]::IsNullOrEmpty($contextName)) { Write-Information "workloads.context cannot be null or empty in file: $workloadsFile"; return $false; }
         $originalContext = kubectl config current-context
         kubectl config use-context $contextName *>&1 | Write-Verbose

@@ -231,6 +231,10 @@ function Publish-WorkloadList {
                     $result = Invoke-Expression $expression *>&1 | Write-Verbose
                 }
                 if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
+                if (-Not (0 -eq $LASTEXITCODE)) {
+                    Write-Information "EXITCODE: $LASTEXITCODE for: $expression"
+                    return $false;
+                }
                 Pop-Location
             }
         }

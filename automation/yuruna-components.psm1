@@ -74,7 +74,6 @@ function Publish-ComponentList {
         if (-Not (Test-Path -Path $buildFolder)) { Write-Information "Components folder not found: $buildFolder`nUsed in file: $componentsFile"; return $false; }
         Write-Information "-- Component: $project from $buildFolder"
 
-
         # Notice how there is not string expansion for the components script
         $componentVars = [ordered]@{}
         # apply global variables, resources.output variables, workload variables
@@ -132,11 +131,19 @@ function Publish-ComponentList {
             $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($preProcessor)
             Write-Information "preProcessor: $executionCommand"
             Invoke-Expression $executionCommand
+            if (-Not (0 -eq $LASTEXITCODE)) {
+                Write-Information "EXITCODE: $LASTEXITCODE for preProcessor: $executionCommand"
+                return $false;
+            }
         }
         # build
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($buildCommand)
         Write-Debug "Build: $executionCommand"
         Invoke-Expression $executionCommand
+        if (-Not (0 -eq $LASTEXITCODE)) {
+            Write-Information "EXITCODE: $LASTEXITCODE for Build: $executionCommand"
+            return $false;
+        }
         # postProcessor
         $postProcessor = $componentVars['postProcessor']
         if ([string]::IsNullOrEmpty($postProcessor)) { $postProcessor = $componentsYaml.globalVariables['postProcessor'] }
@@ -144,6 +151,10 @@ function Publish-ComponentList {
             $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($postProcessor)
             Write-Information "postProcessor: $executionCommand"
             Invoke-Expression $executionCommand
+            if (-Not (0 -eq $LASTEXITCODE)) {
+                Write-Information "EXITCODE: $LASTEXITCODE for postProcessor: $executionCommand"
+                return $false;
+            }
         }
         Pop-Location
         # tag and push component to registry
@@ -156,15 +167,27 @@ function Publish-ComponentList {
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($tagCommand)
         Write-Debug "Tag: $executionCommand"
         Invoke-Expression $executionCommand
+        if (-Not (0 -eq $LASTEXITCODE)) {
+            Write-Information "EXITCODE: $LASTEXITCODE for Tag: $executionCommand"
+            return $false;
+        }
         # TODO: generic registry login approach
         $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
         if ($registryLocation -like '*azurecr.io*') {
             $executionCommand = $ExecutionContext.InvokeCommand.ExpandString("az acr login -n $registryLocation *>&1")
             Invoke-Expression $executionCommand *>&1 | Write-Verbose
+            if (-Not (0 -eq $LASTEXITCODE)) {
+                Write-Information "EXITCODE: $LASTEXITCODE for: $executionCommand"
+                return $false;
+            }
         }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)
         Write-Debug "Push: $executionCommand"
         Invoke-Expression $executionCommand
+        if (-Not (0 -eq $LASTEXITCODE)) {
+            Write-Information "EXITCODE: $LASTEXITCODE for Push: $executionCommand"
+            return $false;
+        }
     }
 
     return $true;
