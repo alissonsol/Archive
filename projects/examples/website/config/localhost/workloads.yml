@@ -25,10 +25,10 @@ workloads:
     _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
   # Uninstall previous workloads: idempotent
-  - kubectl: "delete namespace ${env:namespace} --v=1"
-  - kubectl: "delete namespace ingress-basic --v=1"
-  - kubectl: "delete clusterrole nginx-ingress-ingress-nginx"
-  - kubectl: "delete clusterrolebinding nginx-ingress-ingress-nginx"
+  - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
+  - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+  - kubectl: "delete clusterrole nginx-ingress-ingress-nginx --ignore-not-found=true"
+  - kubectl: "delete clusterrolebinding nginx-ingress-ingress-nginx --ignore-not-found=true"
   # Install dependencies
   - kubectl: "create namespace ${env:namespace} --v=1"
   - kubectl: "create namespace ingress-basic --v=1"

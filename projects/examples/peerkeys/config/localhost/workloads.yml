@@ -35,7 +35,7 @@ workloads:
     variables:
       namespace: "default"
     deployments:
-      - kubectl: "delete namespace ingress-basic --v=1"
+      - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
       - kubectl: "create namespace ingress-basic --v=1"
       - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
       - helm: "repo update"
@@ -73,7 +73,7 @@ workloads:
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
     deployments:
-      - kubectl: "delete namespace ${env:namespace} --v=1"
+      - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
@@ -132,7 +132,7 @@ workloads:
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
     deployments:
-      - kubectl: "delete namespace ${env:namespace} --v=1"
+      - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
@@ -191,7 +191,7 @@ workloads:
       _rspc: '$([Environment]::GetEnvironmentVariable("rspc${env:_number}"))'
       _rspp: '$([Environment]::GetEnvironmentVariable("rspp${env:_number}"))'
     deployments:
-      - kubectl: "delete namespace ${env:namespace} --v=1"
+      - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
