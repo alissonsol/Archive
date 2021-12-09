@@ -18,6 +18,7 @@
 $yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "..")
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
 Import-Module -Name $validationModulePath
+
 function Publish-ComponentList {
     param (
         $project_root,
@@ -133,7 +134,7 @@ function Publish-ComponentList {
             Invoke-Expression $executionCommand
             if (-Not (0 -eq $LASTEXITCODE)) {
                 Write-Information "EXITCODE: $LASTEXITCODE for preProcessor: $executionCommand"
-                return $false;
+                return ($ErrorActionPreference -eq "Continue");
             }
         }
         # build
@@ -142,7 +143,7 @@ function Publish-ComponentList {
         Invoke-Expression $executionCommand
         if (-Not (0 -eq $LASTEXITCODE)) {
             Write-Information "EXITCODE: $LASTEXITCODE for Build: $executionCommand"
-            return $false;
+            return ($ErrorActionPreference -eq "Continue");
         }
         # postProcessor
         $postProcessor = $componentVars['postProcessor']
@@ -153,7 +154,7 @@ function Publish-ComponentList {
             Invoke-Expression $executionCommand
             if (-Not (0 -eq $LASTEXITCODE)) {
                 Write-Information "EXITCODE: $LASTEXITCODE for postProcessor: $executionCommand"
-                return $false;
+                return ($ErrorActionPreference -eq "Continue");
             }
         }
         Pop-Location
@@ -169,7 +170,7 @@ function Publish-ComponentList {
         Invoke-Expression $executionCommand
         if (-Not (0 -eq $LASTEXITCODE)) {
             Write-Information "EXITCODE: $LASTEXITCODE for Tag: $executionCommand"
-            return $false;
+            return ($ErrorActionPreference -eq "Continue");
         }
         # TODO: generic registry login approach
         $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
@@ -178,7 +179,7 @@ function Publish-ComponentList {
             Invoke-Expression $executionCommand *>&1 | Write-Verbose
             if (-Not (0 -eq $LASTEXITCODE)) {
                 Write-Information "EXITCODE: $LASTEXITCODE for: $executionCommand"
-                return $false;
+                return ($ErrorActionPreference -eq "Continue");
             }
         }
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)
@@ -186,7 +187,7 @@ function Publish-ComponentList {
         Invoke-Expression $executionCommand
         if (-Not (0 -eq $LASTEXITCODE)) {
             Write-Information "EXITCODE: $LASTEXITCODE for Push: $executionCommand"
-            return $false;
+            return ($ErrorActionPreference -eq "Continue");
         }
     }
 
