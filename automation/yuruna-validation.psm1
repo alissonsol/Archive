@@ -69,11 +69,13 @@ function Confirm-ResourceList {
     if (!(Confirm-GlobalVariableList $yaml $resourcesFile)) { return $false; }
 
     # Validate resources list
-    if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
+    if ($null -eq $yaml.resources) { Write-Information "Resources cannot be null or empty in file: $resourcesFile"; return $false; }
     foreach ($resource in $yaml.resources) {
         $resourceName = $resource['name']
+        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "Resource without name in file: $resourcesFile"; return $false; }
+        $resourceNameExpanded = $ExecutionContext.InvokeCommand.ExpandString($resourceName)
+        if ([string]::IsNullOrEmpty($resourceNameExpanded)) { Write-Information "Resource '$resourceName' may expand to empty name in file: $resourcesFile"; }
         $resourceTemplate = $resource['template']
-        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
         $templateProjectFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
         if (($null -eq $templateProjectFolder) -or (-Not (Test-Path -Path $templateProjectFolder))) {
             $templateGlobalFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction SilentlyContinue
@@ -151,7 +153,7 @@ function Confirm-ComponentList {
     if (!(Confirm-GlobalVariableList $yaml $componentsFile)) { return $false; }
 
     # Validate components list
-    if ($null -eq $yaml.components) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
+    if ($null -eq $yaml.components) { Write-Information "Components null or empty in file: $componentsFile"; }
     foreach ($component in $yaml.components) {
         $project = $component['project']
         if ([string]::IsNullOrEmpty($project)) { Write-Information "component.project cannot be null or empty in file: $componentsFile"; return $false; }
@@ -191,7 +193,7 @@ function Confirm-WorkloadList {
     if (!(Confirm-GlobalVariableList $yaml $workloadsFile)) { return $false; }
 
     # Validate workloads list
-    if ($null -eq $yaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
+    if ($null -eq $yaml.workloads) { Write-Information "Workloads null or empty in file: $workloadsFile"; }
     foreach ($workload in $yaml.workloads) {
         # context should exist
         $contextName = $ExecutionContext.InvokeCommand.ExpandString($workload['context'])

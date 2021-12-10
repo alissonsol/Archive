@@ -36,8 +36,8 @@ function Publish-ComponentList {
     $componentsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/components.yml"
     if (-Not (Test-Path -Path $componentsFile)) { Write-Information "File not found: $componentsFile"; return $false; }
     $componentsYaml = ConvertFrom-File $componentsFile
-    if ($null -eq $componentsYaml) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
-    if ($null -eq $componentsYaml.components) { Write-Information "components cannot be null or empty in file: $componentsFile"; return $false; }
+    if ($null -eq $componentsYaml) { Write-Information "Components null or empty in file: $componentsFile"; return $true; }
+    if ($null -eq $componentsYaml.components) { Write-Information "Components null or empty in file: $componentsFile"; return $true; }
 
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null

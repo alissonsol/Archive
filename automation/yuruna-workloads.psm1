@@ -37,8 +37,8 @@ function Publish-WorkloadList {
     $workloadsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/workloads.yml"
     if (-Not (Test-Path -Path $workloadsFile)) { Write-Information "File not found: $workloadsFile"; return $false; }
     $workloadsYaml = ConvertFrom-File $workloadsFile
-    if ($null -eq $workloadsYaml) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
-    if ($null -eq $workloadsYaml.workloads) { Write-Information "workloads cannot be null or empty in file: $workloadsFile"; return $false; }
+    if ($null -eq $workloadsYaml) { Write-Information "Workloads null or empty in file: $workloadsFile"; return $true; }
+    if ($null -eq $workloadsYaml.workloads) { Write-Information "Workloads null or empty in file: $workloadsFile"; return $true; }
 
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null

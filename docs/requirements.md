@@ -51,24 +51,24 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Operating systems
     - Windows 10 Professional.
       - `ver`
-        - `Microsoft Windows [Version 10.0.19043.1202]`
+        - `Microsoft Windows [Version 10.0.19044.1387]`
   - Required tools
     - Docker Desktop
       - `docker version`
-        - `Engine: Version: 20.10.8`
+        - `Engine: Version: 20.10.11`
       - `kubectl version`
-        - `Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.4", ...}`
-        - `Server Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.1", ...}`
+        - `Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.22.4", ...}`
+        - `Server Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.5", ...}`
     - PowerShell 7 (x64)
       - `pwsh`
         - `$PSVersionTable`
-          - `PSVersion                      7.1.4`
+          - `PSVersion                      7.2.0`
     - Helm
       - `helm version`
-        - `version.BuildInfo{Version:"v3.6.3"...`
+        - `version.BuildInfo{Version:"v3.7.1"...`
     - Terraform
       - `terraform version`
-        - `Terraform v1.0.6`
+        - `Terraform v1.1.0`
     - mkcert
       - `mkcert -version`
         - `v1.4.3`
@@ -84,7 +84,7 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
           - `Google Cloud SDK 321.0.0, bq 2.0.64, core 2020.12.11, gsutil 4.57`
     - Recommended tools
       - Visual Studio Code
-        - About: `1.60.0 (system setup)`
+        - About: `1.62.3 (system setup)`
       - Graphviz
         - `dot -V`
           - `dot - graphviz version 2.47.0 (20210316.0004)`

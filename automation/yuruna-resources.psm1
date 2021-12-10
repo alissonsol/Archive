@@ -40,20 +40,27 @@ function Publish-ResourceList {
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     New-Item -Path $resourcesOutputFile -ItemType File -Force
 
-    # Debug info: Notice how there is not string expansion for the components script
-    if (-Not ($null -eq  $yaml.globalVariables)) {
-        foreach ($key in $yaml.globalVariables.Keys) {
-            $value = $yaml.globalVariables[$key]
+    # Global variables are saved expanded after first time
+    if ((-Not ($null -eq $yaml.globalVariables))  -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
+        $keys = @($yaml.globalVariables.Keys)
+        foreach ($key in $keys) {
+            $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])
             Write-Debug "globalVariables[$key] = $value"
+            Set-Item -Path Env:$key -Value ${value}
+            # Expanded already
+            $yaml.globalVariables[$key] = $value
         }
     }
 
     # For each resource in resources.yml
-    if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
+    if ($null -eq $yaml.resources) { Write-Information "Resources null or empty in file: $resourcesFile"; return $true; }
     foreach ($resource in $yaml.resources) {
         $resourceName = $resource['name']
+        $resourceNameExpanded = $ExecutionContext.InvokeCommand.ExpandString($resourceName)
+        Write-Debug "$resourceName = $resourceNameExpanded"
+        $resourceName = $resourceNameExpanded
         $resourceTemplate = $resource['template']
-        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
+        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "Resource without name in file: $resourcesFile"; return $false; }
         # resource template can be empty: just naming already existing resource
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
             $templateFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue

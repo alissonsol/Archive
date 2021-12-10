@@ -32,13 +32,25 @@ function Clear-Configuration {
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
+    # Global variables are saved expanded after first time
+    if ((-Not ($null -eq $yaml.globalVariables))  -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
+        $keys = @($yaml.globalVariables.Keys)
+        foreach ($key in $keys) {
+            $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])
+            Write-Debug "globalVariables[$key] = $value"
+            Set-Item -Path Env:$key -Value ${value}
+            # Expanded already
+            $yaml.globalVariables[$key] = $value
+        }
+    }
+
     # For each resource in resources.yml
-    if ($null -eq $yaml.resources) { Write-Information "resources cannot be null or empty in file: $resourcesFile"; return $false; }
+    if ($null -eq $yaml.resources) { Write-Information "Resources null or empty in file: $resourcesFile"; return $true; }
     foreach ($resource in $yaml.resources) {
-        $resourceName = $resource['name']
+        $resourceName = $ExecutionContext.InvokeCommand.ExpandString($resource['name'])
         $resourceTemplate = $resource['template']
         Write-Debug "resource: $resourceName - template: $resourceTemplate"
-        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "resource without name in file: $resourcesFile"; return $false; }
+        if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "Resource without name in file: $resourcesFile"; return $false; }
         # resource template can be empty: just naming already existing resource
         if (![string]::IsNullOrEmpty($resourceTemplate)) {
             # go to work folder under .yuruna
