@@ -56,7 +56,6 @@ workloads:
   - chart: "frontend/website"
     variables:
       installName: "yrn42website-install-website"
-  - kubectl: "expose deployment/website"
   - shell: "Write-Information \">> Enpoint: https://${env:websiteHost}\""
   - shell: "Write-Information \">> Set DNS: ${env:websiteHost} -> ${env:_frontendIp}\""
   - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces"'
