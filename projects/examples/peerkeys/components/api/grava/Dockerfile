@@ -12,10 +12,9 @@ ENV BUILD_FLAG=${DEV:+Debug}
 ENV BUILD_FLAG=${BUILD_FLAG:-Release}
 
 WORKDIR /app
-ENV ASPNETCORE_URLS http://+:8088
-EXPOSE 8088
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+# grava
 WORKDIR /src
 COPY ["grava.csproj", "grava/"]
 RUN dotnet restore "grava/grava.csproj"
@@ -28,5 +27,11 @@ RUN dotnet publish "grava.csproj" -c "$BUILD_FLAG" -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+ENV ASPNETCORE_URLS http://+:8088
+EXPOSE 8088
+
 COPY --from=publish /app/publish .
+
+RUN apt-get update && apt-get install -y net-tools iputils-ping
+
 ENTRYPOINT ["dotnet", "grava.dll"]

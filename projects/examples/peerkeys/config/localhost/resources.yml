@@ -1,43 +1,46 @@
 # Resources information - localhost
 ---
 globalVariables:
-  namespace:        "yrn42peerkeys"
-  clusterDnsPrefix: "yrn42peerkeys"
-  clusterRegion:    "westus2"
-  clusterVersion:   "1.20.2"
-  nodeType:         "Standard_D2_v2"
-  resourceGroup:    "yrn42peerkeys"
-  resourceTags:     "yrn42peerkeys-tags"
-  nodeCount:        1
-  registryName:     "yrn42peerkeys"
+  namespace:             "yrn42peerkeys"
+  clusterDnsPrefix:      "yrn42peerkeys"
+  resourceGroup:         "yrn42peerkeys"
+  # regions: az account list-locations -o table
+  resourceRegion:        "westus2"
+  resourceTags:          "yrn42peerkeys-tags"
+  registryName:          "componentsRegistry"  
+  clusterVersion:        "1.20.2"
+  nodeType:              "Standard_D2_v2"
+  nodeCount:             1
 
 resources:
 # localhost registry container
-- name:             "componentsRegistry"
-  template:         "localhost/registry"
+- name:                  "componentsRegistry"
+  template:              "localhost/registry"
   variables:
+    # TO-SET: registry name must be globally unique
+    uniqueName:          "yrn42peerkeys"
 
 # Create references to the default context
 # context-copy 001
-- name:             "yrn42peerkeys001"
-  template:         "localhost/context-copy"
+- name:                  "yrn42peerkeys001"
+  template:              "localhost/context-copy"
   variables:
-    clusterName:    "yrn42peerkeys001"
-    sourceContext:  "docker-desktop"
+    clusterName:         "yrn42peerkeys001"
+    sourceContext:       "docker-desktop"
     destinationContext:  "yrn42peerkeys001"
 
 # context-copy 002
-- name:             "yrn42peerkeys002"
-  template:         "localhost/context-copy"
+- name:                  "yrn42peerkeys002"
+  template:              "localhost/context-copy"
   variables:
-    clusterName:    "yrn42peerkeys002"
-    sourceContext:  "docker-desktop"
+    clusterName:         "yrn42peerkeys002"
+    sourceContext:       "docker-desktop"
     destinationContext:  "yrn42peerkeys002"
 
 # context-copy 003
-- name:             "yrn42peerkeys003"
-  template:         "localhost/context-copy"
+- name:                  "yrn42peerkeys003"
+  template:              "localhost/context-copy"
   variables:
-    clusterName:    "yrn42peerkeys003"
-    sourceContext:  "docker-desktop"
+    clusterName:         "yrn42peerkeys003"
+    sourceContext:       "docker-desktop"
     destinationContext:  "yrn42peerkeys003"

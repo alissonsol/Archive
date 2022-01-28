@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 namespace grava.Controllers
 {
@@ -9,14 +10,28 @@ namespace grava.Controllers
     [ApiController]
     public class KeyValueController : ControllerBase
     {
-        // private static readonly Dictionary<string, string> _dictionary = new RslDictionary<string, string>();
-        private static EtcdDictionary<string, string> _dictionary = new EtcdDictionary<string, string>();
+        private static readonly string backendClusterSelection = Environment.GetEnvironmentVariable("backendClusterSelection");
+        private static readonly bool useEtcd = String.IsNullOrEmpty(backendClusterSelection) || backendClusterSelection.Equals("etcd", StringComparison.OrdinalIgnoreCase);
+        private static readonly IDictionary<string, string> _dictionary = useEtcd ? new EtcdDictionary<string, string>() : new EtcdDictionary<string, string>();
+        private static bool isInitialized;
 
+        public KeyValueController()
+        {
+            if (!isInitialized)
+            {
+                System.Console.WriteLine("-- KeyValueController()");
+                System.Console.WriteLine(string.Format("useEtcd: {0}", useEtcd.ToString()));
+                System.Console.WriteLine(string.Format("backendClusterSelection: {0}", backendClusterSelection));
+                System.Console.WriteLine(string.Format("dictionary: {0}", _dictionary.ToString()));
+                isInitialized = true;
+            }
+        }
+        
         // curl -X GET "{backendUrl}" -H  "accept: text/plain"
         [HttpGet]
         public string Get()
         {
-            System.Console.WriteLine(string.Format("grava.Get[]"));
+            System.Console.WriteLine(string.Format("\n{0} - grava.Get[]", DateTime.Now.ToLongTimeString()));
 
             StringBuilder sb = new StringBuilder();
             foreach (string k in _dictionary.Keys)
@@ -31,14 +46,15 @@ namespace grava.Controllers
         [HttpGet("{key}")]
         public string Get(string key)
         {
-            System.Console.WriteLine(string.Format("grava.Get[{0}]", key));
+            System.Console.WriteLine(string.Format("\n{0} - grava.Get[{1}]", DateTime.Now.ToLongTimeString(), key));
 
+            string value = string.Empty;
             if (_dictionary.ContainsKey(key))
             {
-                return _dictionary[key];
+                value = _dictionary[key];
             }
 
-            return string.Empty;
+            return value;
         }
 
         // curl -X PUT "{backendUrl}/[key]" -H  "accept: */*" -H  "Content-Type: text/plain" -d "[value]"
@@ -46,7 +62,7 @@ namespace grava.Controllers
         [Consumes("text/plain")]
         public void Put(string key, [FromBody] string value)
         {
-            System.Console.WriteLine(string.Format("grava.Put[{0}] = {1}", key, value));
+            System.Console.WriteLine(string.Format("\n{0} - grava.Put[{1}] = {2}", DateTime.Now.ToLongTimeString(), key, value));
 
             if (_dictionary.ContainsKey(key))
             {
@@ -62,7 +78,7 @@ namespace grava.Controllers
         [HttpDelete("{key}")]
         public string Delete(string key)
         {
-            System.Console.WriteLine(string.Format("grava.Delete[{0}]", key));
+            System.Console.WriteLine(string.Format("\n{0} - grava.Delete[{1}]", DateTime.Now.ToLongTimeString(), key));
 
             string value = string.Empty;
             if (_dictionary.ContainsKey(key))
