@@ -61,6 +61,7 @@ These steps can then be executed to install Terraform, Helm and optionally Visua
 brew install terraform
 brew install helm
 brew install graphviz
+brew install wget
 brew install --cask visual-studio-code
 ```
 

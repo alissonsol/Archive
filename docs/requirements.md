@@ -19,10 +19,12 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - While in the Administrator PowerShell window, install the module "powershell-yaml"
     - Execute: `Install-Module -Name powershell-yaml`
 - Installed [Helm](https://helm.sh/docs/intro/install/) in the path.
-  - Download: `https://github.com/helm/helm/releases`
+  - Download: [`https://github.com/helm/helm/releases`](https://github.com/helm/helm/releases)
 - Installed [Terraform](https://www.terraform.io/downloads.html) in the path.
 - Installed [mkcert](https://github.com/FiloSottile/mkcert) in the path.
   - Run `mkcert -install`
+- Installed [wget](https://www.gnu.org/software/wget/) in the path.
+  - Binaries for Windows at [webfolderio.github.io](https://webfolderio.github.io/wget-windows/)
 - Cloud-specific
   - AWS
     - Created [AWS Account](https://aws.amazon.com/free)
@@ -55,39 +57,42 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Required tools
     - Docker Desktop
       - `docker version`
-        - `Engine: Version: 20.10.11`
+        - `Engine: Version: 20.10.12, API version: 1.41 (minimum version 1.12)`
       - `kubectl version`
-        - `Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.22.4", ...}`
-        - `Server Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.5", ...}`
+        - `Client Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.5", ...}`
+        - `Server Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.5", ...}`
     - PowerShell 7 (x64)
       - `pwsh`
         - `$PSVersionTable`
-          - `PSVersion                      7.2.0`
+          - `PSVersion                      7.2.1`
     - Helm
       - `helm version`
-        - `version.BuildInfo{Version:"v3.7.1"...`
+        - `version.BuildInfo{Version:"v3.8.0"...`
     - Terraform
       - `terraform version`
-        - `Terraform v1.1.0`
+        - `Terraform v1.1.4`
     - mkcert
       - `mkcert -version`
         - `v1.4.3`
+    - wget
+      - `wget --version`
+        - `GNU Wget 1.21.2`
     - Cloud-specific
       - AWS CLI
         - `aws --version`
-          - `aws-cli/2.1.13 Python/3.7.9 Windows/10 exe/AMD64 prompt/off`
+          - `aws-cli/2.4.15 Python/3.9.10 Darwin/21.3.0 source/x86_64 prompt/off`
       - Azure CLI
         - `az version`
-          - `"azure-cli": "2.28.0"`
+          - `"azure-cli": "2.32.0"`
       - Google Cloud SDK
         - `gcloud --version`
-          - `Google Cloud SDK 321.0.0, bq 2.0.64, core 2020.12.11, gsutil 4.57`
+          - `Google Cloud SDK 370.0.0, bq 2.0.73, core 2022.01.21, gsutil 5.6`
     - Recommended tools
       - Visual Studio Code
-        - About: `1.62.3 (system setup)`
+        - About: `1.63.2 (system setup)`
       - Graphviz
         - `dot -V`
-          - `dot - graphviz version 2.47.0 (20210316.0004)`
+          - `dot - graphviz version 2.50.0 (20211204.2007)`
 
 See some additional guidance on how machines were setup for the [macOS](./mac-os.md) and [Ubuntu](./ubuntu.md) tests (no guarantees!).
 
