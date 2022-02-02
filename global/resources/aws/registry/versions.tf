@@ -1,12 +1,12 @@
-# https://registry.terraform.io/providers/hashicorp/azurerm/latest
+# https://registry.terraform.io/providers/hashicorp/aws/latest
 
 terraform {
   required_version = ">= 1.1"
 
   required_providers {
-    azurerm = {
-      version = "~> 2.94.0"
-      source = "hashicorp/azurerm"
+    aws = {
+      version = "~> 3.74.0"
+      source = "hashicorp/aws"
     }
     kubernetes = {
       version = "~> 2.7.1"

@@ -23,6 +23,10 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
+For macOS Monterey, confirm that port 5000 is not in use and stop any service using it. See Stack Overflow [issue](https://stackoverflow.com/questions/69818376/localhost5000-unavailable-in-macos-v12-monterey).
+
+For Windows, confirm that port 80 is not in use and stop any [service using it](https://stackoverflow.com/questions/1960750/how-do-i-find-which-program-is-using-port-80-in-windows). Usually that is the default HTTP service (`net stop http`).
+
 - Create resources
 
 ```shell

@@ -5,7 +5,7 @@ globalVariables:
   clusterDnsPrefix:      "yrn42website-dns"
   resourceGroup:         "yrn42website-rg"
   # regions: az account list-locations -o table
-  resourceRegion:        "westus2"
+  resourceRegion:        "us-east-1"
   resourceTags:          "yrn42website-tags"
   registryName:          "componentsRegistry"
   clusterVersion:        "1.22.4"
@@ -14,20 +14,16 @@ globalVariables:
 
 resources:
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
-- name:                  "defaultResourceGroup"
-  template:              "azure/resource-group"
-  variables:
-
 - name:                  "componentsRegistry"
-  template:              "azure/registry"
+  template:              "aws/registry"
   variables:
     # TO-SET: registry name must be globally unique
     uniqueName:          "yrn42registry"
 
 # cluster reference
-- name:                  "yrn42website-context"
-  template:              "aws/eks-cluster"
-  variables:
-    clusterName:         "yrn42website-cluster"
-    destinationContext:  "yrn42website-context"
-    nodeResourceGroup:   "${env:resourceGroup}-eks"
+#- name:                  "yrn42website-context"
+#  template:              "aws/eks-cluster"
+#  variables:
+#    clusterName:         "yrn42website-cluster"
+#    destinationContext:  "yrn42website-context"
+#    nodeResourceGroup:   "${env:resourceGroup}-eks"
