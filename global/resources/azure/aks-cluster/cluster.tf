@@ -31,7 +31,7 @@ resource "azurerm_kubernetes_cluster" "default" {
     }
   }  
 
-  # Azure-specific: imports the cluster context to local .kube/config
+  # Imports the cluster context to local .kube/config
   provisioner "local-exec" {
     command = "./cluster-import.ps1"
     interpreter = ["pwsh", "-Command"]

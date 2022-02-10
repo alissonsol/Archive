@@ -1,15 +1,15 @@
 # https://registry.terraform.io/providers/hashicorp/aws/latest
 
 terraform {
-  required_version = ">= 1.1"
+  required_version = ">= 1.1.5"
 
   required_providers {
     aws = {
-      version = "~> 3.74.0"
+      version = "~> 3.74.1"
       source = "hashicorp/aws"
     }
     kubernetes = {
-      version = "~> 2.7.1"
+      version = "~> 2.8.0"
       source = "hashicorp/kubernetes"
     }
     local = {

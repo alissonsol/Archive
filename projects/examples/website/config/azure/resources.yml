@@ -8,6 +8,7 @@ globalVariables:
   resourceRegion:        "westus2"
   resourceTags:          "yrn42website-tags"
   registryName:          "componentsRegistry"
+  # az aks get-versions --location {resourceRegion} -o table
   clusterVersion:        "1.22.4"
   nodeType:              "Standard_D2_v2"
   nodeCount:             3

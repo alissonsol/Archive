@@ -8,7 +8,8 @@ globalVariables:
   resourceRegion:        "us-east-1"
   resourceTags:          "yrn42website-tags"
   registryName:          "componentsRegistry"
-  clusterVersion:        "1.22.4"
+  # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html
+  clusterVersion:        "1.21"
   nodeType:              "Standard_D2_v2"
   nodeCount:             3
 
@@ -21,9 +22,9 @@ resources:
     uniqueName:          "yrn42registry"
 
 # cluster reference
-#- name:                  "yrn42website-context"
-#  template:              "aws/eks-cluster"
-#  variables:
-#    clusterName:         "yrn42website-cluster"
-#    destinationContext:  "yrn42website-context"
-#    nodeResourceGroup:   "${env:resourceGroup}-eks"
+- name:                  "yrn42website-context"
+  template:              "aws/eks-cluster"
+  variables:
+    clusterName:         "yrn42website-cluster"
+    destinationContext:  "yrn42website-context"
+    nodeResourceGroup:   "${env:resourceGroup}-eks"
