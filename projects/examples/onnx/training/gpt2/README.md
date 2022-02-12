@@ -23,6 +23,8 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
+**NOTE**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](../../../docs/faq.md).
+
 - Create resources
 
 ```shell
