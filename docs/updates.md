@@ -4,6 +4,8 @@
 
 Focused on major theme for the mid-month release.
 
+- 2022/02/15
+  - Reorg of folder with examples
 - 2021/04/21
   - More script improvements and fixes: now can define variable based on another from the very previous line.
 - 2021/03/21

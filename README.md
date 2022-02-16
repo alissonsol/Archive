@@ -19,6 +19,8 @@ These steps need be executed just once, unless you modify configurations.
 
 ## Using `yuruna` to deploy Kubernetes-based applications
 
+**IMPORTANT**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](docs/faq.md).
+
 Include the `automation` folder in the path. Then deploy resources, build components, and install workloads.
 
 ```shell
@@ -27,23 +29,23 @@ yuruna.ps1 components [project_root] [config_subfolder]
 yuruna.ps1 workloads  [project_root] [config_subfolder]
 ```
 
-Deploying the [peerkeys](projects/examples/peerkeys/README.md) example to the localhost. Running commands from the automation folder.
+Deploying the [peerkeys](examples/peerkeys/README.md) example to the localhost. Running commands from the automation folder.
 
 ```shell
-./yuruna.ps1 resources  ../projects/examples/peerkeys localhost
-./yuruna.ps1 components ../projects/examples/peerkeys localhost
-./yuruna.ps1 workloads  ../projects/examples/peerkeys localhost
+./yuruna.ps1 resources  ../examples/peerkeys localhost
+./yuruna.ps1 components ../examples/peerkeys localhost
+./yuruna.ps1 workloads  ../examples/peerkeys localhost
 ```
 
-Deploying the [website](projects/examples/website/README.md) example to Azure, showing debug and verbose messages.
+Deploying the [website](examples/website/README.md) example to Azure, showing debug and verbose messages.
 
 ```shell
-./yuruna.ps1 resources  ../projects/examples/website azure -debug_mode $true -verbose_mode $true
-./yuruna.ps1 components ../projects/examples/website azure -debug_mode $true -verbose_mode $true
-./yuruna.ps1 workloads  ../projects/examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 resources  ../examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 components ../examples/website azure -debug_mode $true -verbose_mode $true
+./yuruna.ps1 workloads  ../examples/website azure -debug_mode $true -verbose_mode $true
 ```
 
-See project [examples](projects/examples/README.md) and check the [syntax](docs/syntax.md) documentation for more details.
+See project [examples](examples/README.md) and check the [syntax](docs/syntax.md) documentation for more details.
 
 ## Notes
 

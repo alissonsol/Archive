@@ -4,7 +4,7 @@
 
 ### P0, P1
 
-- peerkeys (and source cloudtalk): etcd updates
+- peerkeys: etcd updates (PASSWORD?)
 - How to "pack and move" to another machine
 - Implement `yuruna requirements` that tests for requirements.
 - Before "cloud-based" scripts execute, validate session

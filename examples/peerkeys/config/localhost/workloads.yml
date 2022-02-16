@@ -1,0 +1,252 @@
+# Workloads information - localhost
+# Ref: https://etcd.io/docs/current/op-guide/configuration/ + https://github.com/bitnami/charts/tree/master/bitnami/etcd + https://etcd.io/docs/v3.4.0/op-guide/container/ and comments at end!
+# Example of escaping to the value to be parsed inside container: ``$``(MY_POD_IP``)
+# Notes: Using internal Docker addresses since etcd refuses the client or peer URLs when trying to bind to the host name or IP
+# Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
+---
+globalVariables:
+  namespace:             "yrn42peerkeys"
+  clusterDnsPrefix:      "yrn42peerkeys"
+  containerPrefix:       "yrn42peerkeys"
+  registryName:          "componentsRegistry"
+  certManagerIssuerEmail: "certificates@yrn42peerkeys.app"
+  _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
+  dockerUsername:        "placeholder"
+  dockerPassword:        "placeholder"
+  ingressClass: "nginx"
+  etcdPassword: "yurunaDemo"
+  etcdPrefix: "etcd"
+  etcdip001: '${env:etcdPrefix}001-0.${env:etcdPrefix}001-headless.${env:containerPrefix}001.svc.cluster.local'
+  etcdpc001: 1379
+  etcdpp001: 1380
+  etcdip002: '${env:etcdPrefix}002-0.${env:etcdPrefix}002-headless.${env:containerPrefix}002.svc.cluster.local'
+  etcdpc002: 2379
+  etcdpp002: 2380
+  etcdip003: '${env:etcdPrefix}003-0.${env:etcdPrefix}003-headless.${env:containerPrefix}003.svc.cluster.local'
+  etcdpc003: 3379
+  etcdpp003: 3380
+  # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
+  etcdCluster: ${env:etcdPrefix}001=http://${env:etcdip001}:${env:etcdpp001}\,${env:etcdPrefix}002=http://${env:etcdip002}:${env:etcdpp002}\,${env:etcdPrefix}003=http://${env:etcdip003}:${env:etcdpp003}
+  etcdClusterToken: nossila
+
+workloads:
+
+  # Cleanup and ingress
+  - context: "docker-desktop"
+    variables:
+      namespace: "default"
+    deployments:
+      # Always delete everything first, so that no references are created to existing resources previously available
+      - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:containerPrefix}001 --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:containerPrefix}002 --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:containerPrefix}003 --ignore-not-found=true --v=1"
+      - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+      - kubectl: "delete secret registry-credential --ignore-not-found=true"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
+          
+  - context: "${env:clusterDnsPrefix}001-localhost"
+    variables:
+      _number: "001"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      frontendApp: "${env:_basename}-site"
+      frontendPathBase: "front${env:_number}"
+      backendApp: "${env:_basename}-grava"
+      backendPathBase: "back${env:_number}"
+      replicatedStateApp: "${env:etcdPrefix}${env:_number}"
+      replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _etcdip: '$([Environment]::GetEnvironmentVariable("etcdip${env:_number}"))'
+      _etcdpc: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      _etcdpp: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+    deployments:
+      - kubectl: "create namespace ${env:namespace} --v=1"
+      - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - chart: "replicator-app"
+        variables:
+          installName: "${env:_basename}-deployment"
+      - helm: "repo add bitnami https://charts.bitnami.com/bitnami"
+      - helm: "repo update"
+      - helm: >
+          install ${env:replicatedStateApp} bitnami/etcd
+          --namespace ${env:namespace}
+          --set persistence.enabled=false
+          --set auth.rbac.enabled=false
+          --set containerPorts.client=${env:_etcdpc}
+          --set containerPorts.peer=${env:_etcdpp}
+          --set service.port=${env:_etcdpc}
+          --set service.peerPort=${env:_etcdpp}
+          --set service.type=LoadBalancer
+          --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
+          --set extraEnvVars[0].value=yes
+          --set extraEnvVars[1].name=ETCD_NAME
+          --set extraEnvVars[1].value=${env:replicatedStateApp}
+          --set extraEnvVars[2].name=ETCD_ADVERTISE_CLIENT_URLS
+          --set extraEnvVars[2].value=http://${env:_etcdip}:${env:_etcdpc}
+          --set extraEnvVars[3].name=ETCD_LISTEN_CLIENT_URLS
+          --set extraEnvVars[3].value=http://0.0.0.0:${env:_etcdpc}
+          --set extraEnvVars[4].name=ETCD_INITIAL_ADVERTISE_PEER_URLS
+          --set extraEnvVars[4].value=http://${env:_etcdip}:${env:_etcdpp}
+          --set extraEnvVars[5].name=ETCD_LISTEN_PEER_URLS
+          --set extraEnvVars[5].value=http://0.0.0.0:${env:_etcdpp}
+          --set extraEnvVars[6].name=ETCD_INITIAL_CLUSTER
+          --set extraEnvVars[6].value=${env:etcdCluster}
+          --set extraEnvVars[7].name=ETCD_INITIAL_CLUSTER_STATE
+          --set extraEnvVars[7].value=new
+          --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
+          --set extraEnvVars[8].value=${env:etcdClusterToken}
+          --debug
+      - kubectl: "expose deployment/${env:frontendApp}"
+      - kubectl: "expose deployment/${env:backendApp}"
+      - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
+
+  - context: "${env:clusterDnsPrefix}002-localhost"
+    variables:
+      _number: "002"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      frontendApp: "${env:_basename}-site"
+      frontendPathBase: "front${env:_number}"
+      backendApp: "${env:_basename}-grava"
+      backendPathBase: "back${env:_number}"
+      replicatedStateApp: "${env:etcdPrefix}${env:_number}"
+      replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _etcdip: '$([Environment]::GetEnvironmentVariable("etcdip${env:_number}"))'
+      _etcdpc: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      _etcdpp: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+    deployments:
+      - kubectl: "create namespace ${env:namespace} --v=1"
+      - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - chart: "replicator-app"
+        variables:
+          installName: "${env:_basename}-deployment"
+      - helm: "repo add bitnami https://charts.bitnami.com/bitnami"
+      - helm: "repo update"
+      - helm: >
+          install ${env:replicatedStateApp} bitnami/etcd
+          --namespace ${env:namespace}
+          --set persistence.enabled=false
+          --set auth.rbac.enabled=false
+          --set containerPorts.client=${env:_etcdpc}
+          --set containerPorts.peer=${env:_etcdpp}
+          --set service.port=${env:_etcdpc}
+          --set service.peerPort=${env:_etcdpp}
+          --set service.type=LoadBalancer
+          --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
+          --set extraEnvVars[0].value=yes
+          --set extraEnvVars[1].name=ETCD_NAME
+          --set extraEnvVars[1].value=${env:replicatedStateApp}
+          --set extraEnvVars[2].name=ETCD_ADVERTISE_CLIENT_URLS
+          --set extraEnvVars[2].value=http://${env:_etcdip}:${env:_etcdpc}
+          --set extraEnvVars[3].name=ETCD_LISTEN_CLIENT_URLS
+          --set extraEnvVars[3].value=http://0.0.0.0:${env:_etcdpc}
+          --set extraEnvVars[4].name=ETCD_INITIAL_ADVERTISE_PEER_URLS
+          --set extraEnvVars[4].value=http://${env:_etcdip}:${env:_etcdpp}
+          --set extraEnvVars[5].name=ETCD_LISTEN_PEER_URLS
+          --set extraEnvVars[5].value=http://0.0.0.0:${env:_etcdpp}
+          --set extraEnvVars[6].name=ETCD_INITIAL_CLUSTER
+          --set extraEnvVars[6].value=${env:etcdCluster}
+          --set extraEnvVars[7].name=ETCD_INITIAL_CLUSTER_STATE
+          --set extraEnvVars[7].value=new
+          --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
+          --set extraEnvVars[8].value=${env:etcdClusterToken}
+          --debug
+      - kubectl: "expose deployment/${env:frontendApp}"
+      - kubectl: "expose deployment/${env:backendApp}"
+      - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
+
+  - context: "${env:clusterDnsPrefix}003-localhost"
+    variables:
+      _number: "003"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      frontendApp: "${env:_basename}-site"
+      frontendPathBase: "front${env:_number}"
+      backendApp: "${env:_basename}-grava"
+      backendPathBase: "back${env:_number}"
+      replicatedStateApp: "${env:etcdPrefix}${env:_number}"
+      replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _etcdip: '$([Environment]::GetEnvironmentVariable("etcdip${env:_number}"))'
+      _etcdpc: '$([Environment]::GetEnvironmentVariable("etcdpc${env:_number}"))'
+      _etcdpp: '$([Environment]::GetEnvironmentVariable("etcdpp${env:_number}"))'
+    deployments:
+      - kubectl: "create namespace ${env:namespace} --v=1"
+      - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - chart: "replicator-app"
+        variables:
+          installName: "${env:_basename}-deployment"
+      - helm: "repo add bitnami https://charts.bitnami.com/bitnami"
+      - helm: "repo update"
+      - helm: >
+          install ${env:replicatedStateApp} bitnami/etcd
+          --namespace ${env:namespace}
+          --set persistence.enabled=false
+          --set auth.rbac.enabled=false
+          --set containerPorts.client=${env:_etcdpc}
+          --set containerPorts.peer=${env:_etcdpp}
+          --set service.port=${env:_etcdpc}
+          --set service.peerPort=${env:_etcdpp}
+          --set service.type=LoadBalancer
+          --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
+          --set extraEnvVars[0].value=yes
+          --set extraEnvVars[1].name=ETCD_NAME
+          --set extraEnvVars[1].value=${env:replicatedStateApp}
+          --set extraEnvVars[2].name=ETCD_ADVERTISE_CLIENT_URLS
+          --set extraEnvVars[2].value=http://${env:_etcdip}:${env:_etcdpc}
+          --set extraEnvVars[3].name=ETCD_LISTEN_CLIENT_URLS
+          --set extraEnvVars[3].value=http://0.0.0.0:${env:_etcdpc}
+          --set extraEnvVars[4].name=ETCD_INITIAL_ADVERTISE_PEER_URLS
+          --set extraEnvVars[4].value=http://${env:_etcdip}:${env:_etcdpp}
+          --set extraEnvVars[5].name=ETCD_LISTEN_PEER_URLS
+          --set extraEnvVars[5].value=http://0.0.0.0:${env:_etcdpp}
+          --set extraEnvVars[6].name=ETCD_INITIAL_CLUSTER
+          --set extraEnvVars[6].value=${env:etcdCluster}
+          --set extraEnvVars[7].name=ETCD_INITIAL_CLUSTER_STATE
+          --set extraEnvVars[7].value=new
+          --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
+          --set extraEnvVars[8].value=${env:etcdClusterToken}
+          --debug
+      - kubectl: "expose deployment/${env:frontendApp}"
+      - kubectl: "expose deployment/${env:backendApp}"
+      - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
+
+  - context: "docker-desktop"
+    variables:
+      namespace: "default"
+      _gravapod001: '$(kubectl get pods --selector=app=${env:containerPrefix}001-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _gravapod002: '$(kubectl get pods --selector=app=${env:containerPrefix}002-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _gravapod003: '$(kubectl get pods --selector=app=${env:containerPrefix}003-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+    deployments:
+      - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+      # Ingress
+      - kubectl: "create namespace ingress-basic --v=1"
+      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+      - helm: "repo update"
+      - helm: >
+          install nginx-ingress ingress-nginx/ingress-nginx
+          --namespace ingress-basic
+          --set controller.replicaCount=2
+          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set controller.service.loadBalancerIP="placeholder"
+          --set controller.admissionWebhooks.enabled=false
+          --set controller.ingressClass=${env:ingressClass}
+          --set tcp.${env:etcdpc001}="${env:containerPrefix}001/${env:etcdPrefix}001:${env:etcdpc001}"
+          --set tcp.${env:etcdpp001}="${env:containerPrefix}001/${env:etcdPrefix}001:${env:etcdpp001}"
+          --set tcp.${env:etcdpc002}="${env:containerPrefix}002/${env:etcdPrefix}002:${env:etcdpc002}"
+          --set tcp.${env:etcdpp002}="${env:containerPrefix}002/${env:etcdPrefix}002:${env:etcdpp002}"
+          --set tcp.${env:etcdpc003}="${env:containerPrefix}003/${env:etcdPrefix}003:${env:etcdpc003}"
+          --set tcp.${env:etcdpp003}="${env:containerPrefix}003/${env:etcdPrefix}003:${env:etcdpp003}"
+          --debug
+      - shell: 'Write-Information "   Ingress installed"'
