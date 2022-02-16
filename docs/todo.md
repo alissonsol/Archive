@@ -4,7 +4,10 @@
 
 ### P0, P1
 
+- cloudtalk: Azure "readiness" signal
 - peerkeys: etcd updates (PASSWORD?)
+- cloudtalk: in ARM, `apt-get install -y aspnetcore-runtime-5.0` is not working
+  - More investigation needed: <https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian>
 - How to "pack and move" to another machine
 - Implement `yuruna requirements` that tests for requirements.
 - Before "cloud-based" scripts execute, validate session
