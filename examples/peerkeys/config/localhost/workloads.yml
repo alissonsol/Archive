@@ -28,6 +28,7 @@ globalVariables:
   # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
   etcdCluster: ${env:etcdPrefix}001=http://${env:etcdip001}:${env:etcdpp001}\,${env:etcdPrefix}002=http://${env:etcdip002}:${env:etcdpp002}\,${env:etcdPrefix}003=http://${env:etcdip003}:${env:etcdpp003}
   etcdClusterToken: nossila
+  waitTimeout: 30s
 
 workloads:
 
@@ -44,8 +45,8 @@ workloads:
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
       - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
-      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
           
   - context: "${env:clusterDnsPrefix}001-localhost"
     variables:

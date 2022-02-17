@@ -14,6 +14,8 @@ resources:
 - name:                  "componentsRegistry"
   template:              "localhost/registry"
   variables:
+    # TO-SET: registry name must be globally unique
+    uniqueName:          "${env:clusterDnsPrefix}$(Get-Random)"
 
 # context-copy 001
 - name:                  "${env:clusterDnsPrefix}001-localhost"

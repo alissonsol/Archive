@@ -23,6 +23,7 @@ globalVariables:
   certsDir: certs
   certsServiceFile: ${env:certsName}.${env:certsType}.service.txt
   ironCerts: addr1=${env:ironPrefix}001.${env:containerPrefix}001 port1=${env:ironp001} addr2=${env:ironPrefix}002.${env:containerPrefix}002 port2=${env:ironp002} addr3=${env:ironPrefix}003.${env:containerPrefix}003 port3=${env:ironp003}
+  waitTimeout: 30s
 
 workloads:
 
@@ -39,8 +40,8 @@ workloads:
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
       - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
-      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
           
   - context: "${env:clusterDnsPrefix}001-localhost"
     variables:

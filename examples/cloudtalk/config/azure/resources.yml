@@ -8,6 +8,7 @@ globalVariables:
   registryName:          "componentsRegistry"
   # regions: az account list-locations -o table
   resourceRegion:        "westus2"
+  # https://github.com/Azure/AKS/releases
   # cluster versions: az aks get-versions --location [location] -o table
   clusterVersion:        "1.23.3"
   nodeType:              "Standard_D2_v2"
@@ -24,7 +25,7 @@ resources:
   template:              "azure/registry"
   variables:
     # TO-SET: registry name must be globally unique
-    uniqueName:          "${env:clusterDnsPrefix}"
+    uniqueName:          "${env:clusterDnsPrefix}$(Get-Random)"
     resourceGroup:       "${env:resourceGroupPrefix}"
 
 # 001 - eastus

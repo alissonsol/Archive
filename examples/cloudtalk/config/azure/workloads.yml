@@ -14,22 +14,20 @@ globalVariables:
   dockerPassword:        "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
   ingressClass: "nginx"
   ironPrefix: ironrslkv
-  _ironpod001: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}001-azure.hostname"))
-  _ironpod002: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}002-azure.hostname"))
-  _ironpod003: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}003-azure.hostname"))
-  _gravapod001: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}001-azure.hostname"))
-  _gravapod002: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}002-azure.hostname"))
-  _gravapod003: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}003-azure.hostname"))
+  _frontend001: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}001-azure.hostname"))
+  _frontend002: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}002-azure.hostname"))
+  _frontend003: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}003-azure.hostname"))
   ironp001: 4001
   ironp002: 4002
   ironp003: 4003
   ironServices: ${env:ironPrefix}001 ${env:ironp001} ${env:ironPrefix}002 ${env:ironp002} ${env:ironPrefix}003 ${env:ironp003}
-  ironMachines: ${env:ironPrefix}001.${env:containerPrefix}001 ${env:ironp001} ${env:ironPrefix}002.${env:containerPrefix}002 ${env:ironp002} ${env:ironPrefix}003.${env:containerPrefix}003 ${env:ironp003}
+  ironMachines: ${env:_frontend001} ${env:ironp001} ${env:_frontend001} ${env:ironp002} ${env:_frontend001} ${env:ironp003}
   certsName: certs
   certsType: IronRSLKV
   certsDir: certs
   certsServiceFile: ${env:certsName}.${env:certsType}.service.txt
-  ironCerts: addr1=${env:_ironpod001} port1=${env:ironp001} addr2=${env:_ironpod002} port2=${env:ironp002} addr3=${env:_ironpod003} port3=${env:ironp003}
+  ironCerts: addr1=${env:_frontend001} port1=${env:ironp001} addr2=${env:_frontend002} port2=${env:ironp002} addr3=${env:_frontend003} port3=${env:ironp003}
+  waitTimeout: 5m
 
 workloads:
 
@@ -138,10 +136,8 @@ workloads:
           --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
           --debug
       - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
-      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
-      # copy back
-      - kubectl: "cp ../${env:certsDir} $(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=\":metadata.name\"):/workspace/${env:certsDir} --namespace ${env:containerPrefix}${env:_number}"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
   - context: "${env:clusterDnsPrefix}002-azure"
     variables:
@@ -186,10 +182,8 @@ workloads:
           --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
           --debug
       - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
-      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
-      # copy back
-      - kubectl: "cp ../${env:certsDir} $(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=\":metadata.name\"):/workspace/${env:certsDir} --namespace ${env:containerPrefix}${env:_number}"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
   - context: "${env:clusterDnsPrefix}003-azure"
     variables:
@@ -234,11 +228,45 @@ workloads:
           --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
           --debug
       - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"'
-      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=30s"
-      # copy back
-      - kubectl: "cp ../${env:certsDir} $(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=\":metadata.name\"):/workspace/${env:certsDir} --namespace ${env:containerPrefix}${env:_number}"
+      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
-      # any content can be the signalFile
-      #- kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} $(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=\":metadata.name\"):/workspace/signalFile --namespace ${env:containerPrefix}${env:_number}"
-      #- shell: 'Write-Information "   Signal sent to ironrslkv pods"'
+  # copy folder with certs to iron pod, the services file to the grava pod, and signalFile to start the ironrslkv
+  - context: "${env:clusterDnsPrefix}001-azure"
+    variables:
+      _number: "001"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+    deployments:
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"
+      - shell: 'Write-Information "   Signal sent: ${env:contextName}"'
+
+  - context: "${env:clusterDnsPrefix}002-azure"
+    variables:
+      _number: "002"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+    deployments:
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"
+      - shell: 'Write-Information "   Signal sent: ${env:contextName}"'
+
+  - context: "${env:clusterDnsPrefix}003-azure"
+    variables:
+      _number: "003"
+      _basename: "${env:containerPrefix}${env:_number}"
+      namespace: "${env:_basename}"
+      _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+    deployments:
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"
+      - shell: 'Write-Information "   Signal sent: ${env:contextName}"'
