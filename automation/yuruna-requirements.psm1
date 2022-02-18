@@ -21,9 +21,26 @@ Import-Module -Name $modulePath
 
 function Confirm-RequirementList {
 
-    Write-Output "Confirm-RequirementList not yet implemented" -InformationAction Stop; Exit -1;
+    $requirementsFile = Join-Path -Path $PSScriptRoot -ChildPath "yuruna-requirements.yml"
+    if (-Not (Test-Path -Path $requirementsFile)) { Write-Information "File not found: $requirementsFile"; return $false; }
+    $requirementsYaml = ConvertFrom-File $requirementsFile
+    if ($null -eq $requirementsYaml) { Write-Information "Requirements null or empty in file: $requirementsFile"; return $true; }
+    if ($null -eq $requirementsYaml.requirements) { Write-Information "Components null or empty in file: $requirementsFile"; return $true; }
 
-    return $true;
+    if (-Not ($null -eq $requirementsYaml.requirements)) {
+        $output = "{0,20}" -f "Tool" + "{0,16}" -f "Required" + "  {0}" -f "Found"
+        Write-Host $output
+        foreach ($tool in $requirementsYaml.requirements) {
+            $toolName = $tool['tool']
+            $toolCommand = $tool['command']
+            $toolVersion = $tool['version']
+            $toolFound = Invoke-Expression $toolCommand *>&1
+            $output = "{0,20}" -f $toolName + "{0,16}" -f $toolVersion + "  {0}" -f $toolFound
+            Write-Host $output
+        }
+    }
+
+    return $true
 }
 
 Export-ModuleMember -Function * -Alias *

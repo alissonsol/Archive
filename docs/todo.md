@@ -9,8 +9,6 @@
 - cloudtalk: in ARM, `apt-get install -y aspnetcore-runtime-5.0` is not working
   - More investigation needed: <https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian>
 - How to "pack and move" to another machine
-- Implement `yuruna requirements` that tests for requirements.
-  - Check locally for availability of `docker` and `kubectl` commands.
 - Before "cloud-based" scripts execute, validate session
 - Validation: repeated resource names and other duplications like context names
 - Seek for TODO tag.

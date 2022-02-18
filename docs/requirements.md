@@ -55,44 +55,9 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
       - `ver`
         - `Microsoft Windows [Version 10.0.19044.1387]`
   - Required tools
-    - Docker Desktop
-      - `docker version`
-        - `Engine: Version: 20.10.12, API version: 1.41 (minimum version 1.12)`
-      - `kubectl version`
-        - `Client Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.5", ...}`
-        - `Server Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.5", ...}`
-    - PowerShell 7 (x64)
-      - `pwsh`
-        - `$PSVersionTable`
-          - `PSVersion                      7.2.1`
-    - Helm
-      - `helm version`
-        - `version.BuildInfo{Version:"v3.8.0"...`
-    - Terraform
-      - `terraform version`
-        - `Terraform v1.1.4`
-    - mkcert
-      - `mkcert -version`
-        - `v1.4.3`
-    - wget
-      - `wget --version`
-        - `GNU Wget 1.21.2`
-    - Cloud-specific
-      - AWS CLI
-        - `aws --version`
-          - `aws-cli/2.4.15 Python/3.9.10 Darwin/21.3.0 source/x86_64 prompt/off`
-      - Azure CLI
-        - `az version`
-          - `"azure-cli": "2.32.0"`
-      - Google Cloud SDK
-        - `gcloud --version`
-          - `Google Cloud SDK 370.0.0, bq 2.0.73, core 2022.01.21, gsutil 5.6`
-    - Recommended tools
-      - Visual Studio Code
-        - About: `1.63.2 (system setup)`
-      - Graphviz
-        - `dot -V`
-          - `dot - graphviz version 2.50.0 (20211204.2007)`
+    - Check with the implemented command `yuruna requirements`
+      - It will show for each tool what was the version in the test environment and version locally found.
+      - Follow links above to install or update tools.
 
 See some additional guidance on how machines were setup for the [macOS](./mac-os.md) and [Ubuntu](./ubuntu.md) tests (no guarantees!).
 

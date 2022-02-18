@@ -9,21 +9,29 @@ globalVariables:
   registryName:          "componentsRegistry"
   certManagerIssuerEmail: "certificates@cloudtalk.app"
   _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
+  dockerServer:          "${env:_registryLocation}"
   dockerUsername: "placeholder"
   dockerPassword: "placeholder"
   ingressClass: "nginx"
   ironPrefix: ironrslkv
-  ironp001: 4001
-  ironp002: 4002
-  ironp003: 4003
+  _frontend001: ${env:ironPrefix}001.${env:containerPrefix}001
+  _frontend002: ${env:ironPrefix}002.${env:containerPrefix}002
+  _frontend003: ${env:ironPrefix}003.${env:containerPrefix}003
+  # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+  ironp001: 42001
+  ironp002: 42002
+  ironp003: 42003
+  ironc001: 43001
+  ironc002: 43002
+  ironc003: 43003
   ironServices: ${env:ironPrefix}001 ${env:ironp001} ${env:ironPrefix}002 ${env:ironp002} ${env:ironPrefix}003 ${env:ironp003}
-  ironMachines: ${env:ironPrefix}001.${env:containerPrefix}001 ${env:ironp001} ${env:ironPrefix}002.${env:containerPrefix}002 ${env:ironp002} ${env:ironPrefix}003.${env:containerPrefix}003 ${env:ironp003}
+  ironMachines: ${env:_frontend001} ${env:ironp001} ${env:_frontend002} ${env:ironp002} ${env:_frontend003} ${env:ironp003}
   certsName: certs
   certsType: IronRSLKV
   certsDir: certs
   certsServiceFile: ${env:certsName}.${env:certsType}.service.txt
-  ironCerts: addr1=${env:ironPrefix}001.${env:containerPrefix}001 port1=${env:ironp001} addr2=${env:ironPrefix}002.${env:containerPrefix}002 port2=${env:ironp002} addr3=${env:ironPrefix}003.${env:containerPrefix}003 port3=${env:ironp003}
-  waitTimeout: 30s
+  ironCerts: addr1=${env:_frontend001} port1=${env:ironp001} addr2=${env:_frontend002} port2=${env:ironp002} addr3=${env:_frontend003} port3=${env:ironp003}
+  waitTimeout: 1m
 
 workloads:
 
@@ -56,7 +64,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6001'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
@@ -83,7 +91,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6002'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server2.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
@@ -110,7 +118,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6003'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server3.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"

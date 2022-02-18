@@ -4,6 +4,107 @@ Scratch pad for commands and investigations.
 
 ## New debugging info
 
+### 
+
+Same issue before and after starting servers. Grave log.
+
+```shell
+00:22:30 - grava.Get[a]
+-- RslDictionary.ContainsKey(a): Sending a request with sequence number 0 to IronfleetIoFramework.PublicIdentity
+#timeout; rotating to server 1
+Stopped authenticating connection to certs.IronRSLKV.server3 (key rLMOs+cd) @ cloudtalk003-azure.westus2.cloudapp.azure.com:42003 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+#timeout; rotating to server 2
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server3 (key rLMOs+cd) @ cloudtalk003-azure.westus2.cloudapp.azure.com:42003 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server2 (key sj5lYzAW) @ cloudtalk002-azure.northeurope.cloudapp.azure.com:42002 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server3 (key rLMOs+cd) @ cloudtalk003-azure.westus2.cloudapp.azure.com:42003 because of the following exception, but will try again later if necessary:
+#timeout; rotating to server 0
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+#timeout; rotating to server 1
+#timeout; rotating to server 2
+```
+
+ironrslkv log
+
+```shell
+-- launch started --
+Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
+OK
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+Hit:1 http://deb.debian.org/debian bullseye InRelease
+Get:2 http://deb.debian.org/debian bullseye-updates InRelease [39.4 kB]
+Get:3 http://security.debian.org/debian-security bullseye-security InRelease [44.1 kB]
+Get:5 https://packages.microsoft.com/debian/11/prod bullseye InRelease [10.5 kB]
+Get:4 https://packages.cloud.google.com/apt kubernetes-xenial InRelease [9383 B]
+Get:6 http://security.debian.org/debian-security bullseye-security/main amd64 Packages [119 kB]
+Get:7 https://packages.microsoft.com/debian/11/prod bullseye/main amd64 Packages [37.0 kB]
+Get:8 https://packages.cloud.google.com/apt kubernetes-xenial/main amd64 Packages [53.9 kB]
+Fetched 313 kB in 8s (38.6 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+kubectl
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 8927 kB of archives.
+After this operation, 46.6 MB of additional disk space will be used.
+Get:1 https://packages.cloud.google.com/apt kubernetes-xenial/main amd64 kubectl amd64 1.23.4-00 [8927 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 8927 kB in 1s (8119 kB/s)
+Selecting previously unselected package kubectl.
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 28472 files and directories currently installed.)
+Preparing to unpack .../kubectl_1.23.4-00_amd64.deb ...
+Unpacking kubectl (1.23.4-00) ...
+Setting up kubectl (1.23.4-00) ...
+--
+certsDir: certs
+certsServiceFile: certs.IronRSLKV.service.txt
+certsServerFile: certs.IronRSLKV.server1.private.txt
+signalFile: signalFile
+_ironinstance: ironrslkv003
+podAddr: 10.244.2.15
+--
+Waiting for: signalFile
+Signal received
+IronRSLKVServer program started
+Processing command-line arguments
+Deleted private key file after reading it since RSL servers should never run twice.
+[[READY]]
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server2 (key sj5lYzAW) @ cloudtalk002-azure.northeurope.cloudapp.azure.com:42002 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server2 (key sj5lYzAW) @ cloudtalk002-azure.northeurope.cloudapp.azure.com:42002 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server1 (key lrdSWDOH) @ cloudtalk001-azure.eastus.cloudapp.azure.com:42001 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server2 (key sj5lYzAW) @ cloudtalk002-azure.northeurope.cloudapp.azure.com:42002 because of the following exception, but will try again later if necessary:
+Stopped authenticating connection to certs.IronRSLKV.server3 (key rLMOs+cd) @ cloudtalk003-azure.westus2.cloudapp.azure.com:42003 because of the following exception, but will try again later if necessary:
+```
+
 ### Test from terminal in some ironrsl container
 
 ```shell

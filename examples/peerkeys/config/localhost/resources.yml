@@ -4,7 +4,7 @@ globalVariables:
   namespace:             "yrn42peerkeys"
   clusterDnsPrefix:      "yrn42peerkeys"
   resourceGroup:         "yrn42peerkeys"
-  resourceTags:          "yrn42peerkeys-tags"
+  resourceTags:          "yrn42peerkeys"
   registryName:          "componentsRegistry"  
 
 resources:

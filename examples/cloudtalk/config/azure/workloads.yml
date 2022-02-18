@@ -17,11 +17,15 @@ globalVariables:
   _frontend001: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}001-azure.hostname"))
   _frontend002: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}002-azure.hostname"))
   _frontend003: $([Environment]::GetEnvironmentVariable("${env:clusterDnsPrefix}003-azure.hostname"))
-  ironp001: 4001
-  ironp002: 4002
-  ironp003: 4003
+  # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+  ironp001: 42001
+  ironp002: 42002
+  ironp003: 42003
+  ironc001: 43001
+  ironc002: 43002
+  ironc003: 43003
   ironServices: ${env:ironPrefix}001 ${env:ironp001} ${env:ironPrefix}002 ${env:ironp002} ${env:ironPrefix}003 ${env:ironp003}
-  ironMachines: ${env:_frontend001} ${env:ironp001} ${env:_frontend001} ${env:ironp002} ${env:_frontend001} ${env:ironp003}
+  ironMachines: ${env:_frontend001} ${env:ironp001} ${env:_frontend002} ${env:ironp002} ${env:_frontend003} ${env:ironp003}
   certsName: certs
   certsType: IronRSLKV
   certsDir: certs
@@ -44,6 +48,7 @@ workloads:
       - kubectl: "config set-context --current --namespace=default --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
       - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - shell: 'Write-Information "   Cleaned ${env:contextName}"'
 
   - context: "${env:clusterDnsPrefix}002-azure"
     variables:
@@ -56,6 +61,7 @@ workloads:
       - kubectl: "config set-context --current --namespace=default --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
       - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - shell: 'Write-Information "   Cleaned ${env:contextName}"'
 
   - context: "${env:clusterDnsPrefix}003-azure"
     variables:
@@ -68,6 +74,7 @@ workloads:
       - kubectl: "config set-context --current --namespace=default --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
       - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - shell: 'Write-Information "   Cleaned ${env:contextName}"'
 
   # Artifact creation phase
 
@@ -92,10 +99,12 @@ workloads:
       - kubectl: "run ${env:certsContainer} --image=${env:dockerServer}/${env:containerPrefix}/${env:ironPrefix}:latest --env=\"certsName=${env:certsName}\" --env=\"certsType=${env:certsType}\" --env=\"certsDir=${env:certsDir}\" --env=\"ironCerts=${env:ironCerts}\" --command -- bash -c '/workspace/certs.sh'"
       - shell: "Start-Sleep -s 30"
       - kubectl: "cp ${env:certsContainer}:/workspace/${env:certsDir} ../${env:certsDir}"
+      - shell: 'Write-Information "   Certificates created"'
 
   - context: "${env:clusterDnsPrefix}001-azure"
     variables:
       _number: "001"
+      certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
       _basename: "${env:containerPrefix}${env:_number}"
       namespace: "${env:_basename}"
       frontendApp: "${env:_basename}-site"
@@ -106,8 +115,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6001'
-      certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
@@ -120,28 +128,12 @@ workloads:
       - kubectl: "expose deployment/${env:backendApp}"
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
-      # Ingress
-      - kubectl: "create namespace ingress-basic --v=1"
-      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
-      - helm: "repo update"
-      - helm: >
-          install nginx-ingress ingress-nginx/ingress-nginx
-          --namespace ingress-basic
-          --set controller.replicaCount=2
-          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set controller.service.loadBalancerIP="${env:_frontendIp}"
-          --set controller.admissionWebhooks.enabled=false
-          --set controller.ingressClass=${env:ingressClass}
-          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
-          --debug
-      - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
   - context: "${env:clusterDnsPrefix}002-azure"
     variables:
       _number: "002"
+      certsServerFile: ${env:certsName}.${env:certsType}.server2.private.txt
       _basename: "${env:containerPrefix}${env:_number}"
       namespace: "${env:_basename}"
       frontendApp: "${env:_basename}-site"
@@ -152,8 +144,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6002'
-      certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
@@ -166,28 +157,12 @@ workloads:
       - kubectl: "expose deployment/${env:backendApp}"
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
-      # Ingress
-      - kubectl: "create namespace ingress-basic --v=1"
-      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
-      - helm: "repo update"
-      - helm: >
-          install nginx-ingress ingress-nginx/ingress-nginx
-          --namespace ingress-basic
-          --set controller.replicaCount=2
-          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set controller.service.loadBalancerIP="${env:_frontendIp}"
-          --set controller.admissionWebhooks.enabled=false
-          --set controller.ingressClass=${env:ingressClass}
-          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
-          --debug
-      - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
   - context: "${env:clusterDnsPrefix}003-azure"
     variables:
       _number: "003"
+      certsServerFile: ${env:certsName}.${env:certsType}.server3.private.txt
       _basename: "${env:containerPrefix}${env:_number}"
       namespace: "${env:_basename}"
       frontendApp: "${env:_basename}-site"
@@ -198,8 +173,7 @@ workloads:
       _ironinstance: "${env:ironPrefix}${env:_number}"
       _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '6003'
-      certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
@@ -212,23 +186,6 @@ workloads:
       - kubectl: "expose deployment/${env:backendApp}"
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
-      # Ingress
-      - kubectl: "create namespace ingress-basic --v=1"
-      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
-      - helm: "repo update"
-      - helm: >
-          install nginx-ingress ingress-nginx/ingress-nginx
-          --namespace ingress-basic
-          --set controller.replicaCount=2
-          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set controller.service.loadBalancerIP="${env:_frontendIp}"
-          --set controller.admissionWebhooks.enabled=false
-          --set controller.ingressClass=${env:ingressClass}
-          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
-          --debug
-      - shell: 'Write-Information "   Ingress installed"'
-      - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
 
   # copy folder with certs to iron pod, the services file to the grava pod, and signalFile to start the ironrslkv
@@ -239,7 +196,28 @@ workloads:
       namespace: "${env:_basename}"
       _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
       _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _ironinstance: "${env:ironPrefix}${env:_number}"
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
+      # Ingress
+      - kubectl: "create namespace ingress-basic --v=1"
+      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+      - helm: "repo update"
+      - helm: >
+          install nginx-ingress ingress-nginx/ingress-nginx
+          --namespace ingress-basic
+          --set controller.replicaCount=2
+          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
+          --set controller.admissionWebhooks.enabled=false
+          --set controller.ingressClass=${env:ingressClass}
+          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
+          --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"
@@ -252,7 +230,28 @@ workloads:
       namespace: "${env:_basename}"
       _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
       _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _ironinstance: "${env:ironPrefix}${env:_number}"
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
+      # Ingress
+      - kubectl: "create namespace ingress-basic --v=1"
+      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+      - helm: "repo update"
+      - helm: >
+          install nginx-ingress ingress-nginx/ingress-nginx
+          --namespace ingress-basic
+          --set controller.replicaCount=2
+          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
+          --set controller.admissionWebhooks.enabled=false
+          --set controller.ingressClass=${env:ingressClass}
+          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
+          --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"
@@ -265,7 +264,28 @@ workloads:
       namespace: "${env:_basename}"
       _ironpod: '$(kubectl get pods --selector=app=${env:ironPrefix}${env:_number} --all-namespaces --no-headers -o custom-columns=":metadata.name")'
       _gravapod: '$(kubectl get pods --selector=app=${env:containerPrefix}${env:_number}-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
+      _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+      _ironinstance: "${env:ironPrefix}${env:_number}"
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
+      _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
     deployments:
+      # Ingress
+      - kubectl: "create namespace ingress-basic --v=1"
+      - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+      - helm: "repo update"
+      - helm: >
+          install nginx-ingress ingress-nginx/ingress-nginx
+          --namespace ingress-basic
+          --set controller.replicaCount=2
+          --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
+          --set controller.admissionWebhooks.enabled=false
+          --set controller.ingressClass=${env:ingressClass}
+          --set tcp.${env:_ironServerPort}="${env:containerPrefix}${env:_number}/${env:ironPrefix}${env:_number}:${env:_ironServerPort}"
+          --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod}:/workspace/signalFile --namespace ${env:namespace}"

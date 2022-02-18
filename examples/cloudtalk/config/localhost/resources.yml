@@ -10,7 +10,6 @@ globalVariables:
 resources:
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 
-# localhost registry container
 - name:                  "componentsRegistry"
   template:              "localhost/registry"
   variables:

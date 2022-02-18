@@ -62,9 +62,9 @@
 #>
 
 param (
-    [string]$operation,
-    [string]$project_root,
-    [string]$config_subfolder,
+    [string]$operation=$null,
+    [string]$project_root=$null,
+    [string]$config_subfolder=$null,
     [bool]$debug_mode=$false,
     [bool]$verbose_mode=$false
 )
@@ -90,12 +90,12 @@ $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuru
 $resourcesModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-resources"
 $componentsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-components"
 $workloadsModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-workloads"
-Import-Module -Name $requirementsModulePath
-Import-Module -Name $clearModulePath
-Import-Module -Name $validationModulePath
-Import-Module -Name $resourcesModulePath
-Import-Module -Name $componentsModulePath
-Import-Module -Name $workloadsModulePath
+Import-Module -Name $requirementsModulePath -Force
+Import-Module -Name $clearModulePath -Force
+Import-Module -Name $validationModulePath -Force
+Import-Module -Name $resourcesModulePath -Force
+Import-Module -Name $componentsModulePath -Force
+Import-Module -Name $workloadsModulePath -Force
 
 if ([string]::IsNullOrEmpty($project_root)) { $project_root = Get-Location; }
 $resolved_root = Resolve-Path -Path $project_root -ErrorAction SilentlyContinue
@@ -106,7 +106,6 @@ Write-Debug "project_root is $project_root"
 
 $config_relative = Join-Path -Path $project_root -ChildPath "config/$config_subfolder"
 $config_root = Resolve-Path -Path $config_relative -ErrorAction SilentlyContinue
-if ([string]::IsNullOrEmpty($config_root)) { Write-Information "Configuration folder not found: $config_relative"; return $false; }
 Set-Item -Path Env:config_root -Value ${config_root}
 Write-Debug "config_root is $config_root"
 
