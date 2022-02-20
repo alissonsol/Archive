@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 0.1
+.VERSION 0.3
 .GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
 .AUTHOR Alisson Sol
 .COMPANYNAME None
@@ -28,7 +28,7 @@ function Publish-ComponentList {
     if (!(Confirm-ComponentList $project_root $config_subfolder)) { return $false; }
     Write-Debug "---- Publishing Components"
     # For each component in components.yml
-    #   apply global variables, resources.output variables, workload variables
+    #   apply resources global variables, resources.output variables, global variables, components variables
     #   execute build command in the folder
     #     command is parameter in components.yml
     #   tag and push component to registry
@@ -48,10 +48,19 @@ function Publish-ComponentList {
     # Debug info
     if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
-            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
-                $resourceKey = "$resource.$key"
-                $value = $resourcesOutputYaml.$resource[$key].value
-                Write-Debug "resourcesOutput[$resourceKey] = $value"
+            if ($resource -eq "globalVariables") {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$key"
+                    $value = $resourcesOutputYaml.$resource[$key]
+                    Write-Debug "globalVariables[$resourceKey] = $value"
+                }
+            }
+            else {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$resource.$key"
+                    $value = $resourcesOutputYaml.$resource[$key].value
+                    Write-Debug "resourcesOutput[$resourceKey] = $value"
+                }
             }
         }
     }
@@ -77,17 +86,28 @@ function Publish-ComponentList {
 
         # Notice how there is not string expansion for the components script
         $componentVars = [ordered]@{}
-        # apply global variables, resources.output variables, workload variables
+        # apply resources global variables, resources.output variables, global variables, components variables
         if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
             foreach ($resource in $resourcesOutputYaml.Keys) {
-                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
-                    $resourceKey = "$resource.$key"
-                    $value = $resourcesOutputYaml.$resource[$key].value
-                    $componentVars[$resourceKey] = $value
-                    Set-Item -Path Env:$resourceKey -Value ${value}
+                if ($resource -eq "globalVariables") {
+                    foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                        $resourceKey = "$key"
+                        $value = $resourcesOutputYaml.$resource[$key]
+                        $componentVars[$resourceKey] = $value
+                        Set-Item -Path Env:$resourceKey -Value ${value}
+                    }
+                }
+                else {
+                    foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                        $resourceKey = "$resource.$key"
+                        $value = $resourcesOutputYaml.$resource[$key].value
+                        $componentVars[$resourceKey] = $value
+                        Set-Item -Path Env:$resourceKey -Value ${value}
+                    }
                 }
             }
         }
+
         if (-Not ($null -eq $componentsYaml.globalVariables)) {
             foreach ($key in $componentsYaml.globalVariables.Keys) {
                 $value = $componentsYaml.globalVariables[$key]
@@ -95,7 +115,8 @@ function Publish-ComponentList {
                 Set-Item -Path Env:$key -Value ${value}
             }
         }
-        if ((-Not ($null -eq $component.variables))  -and (-Not ($null -eq  $component.variables.Keys))) {
+
+        if ((-Not ($null -eq $component.variables)) -and (-Not ($null -eq  $component.variables.Keys))) {
             foreach ($key in $component.variables.Keys) {
                 $value = $component.variables[$key]
                 $componentVars[$key] = $value
@@ -103,6 +124,7 @@ function Publish-ComponentList {
                 Set-Item -Path Env:$key -Value ${value}
             }
         }
+
         # execute build command in the folder
         # command is parameter in components.yml
         $buildCommand = $component['buildCommand']
@@ -137,6 +159,7 @@ function Publish-ComponentList {
                 return ($ErrorActionPreference -eq "Continue");
             }
         }
+
         # build
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($buildCommand)
         Write-Debug "Build: $executionCommand"
@@ -145,6 +168,7 @@ function Publish-ComponentList {
             Write-Information "EXITCODE: $LASTEXITCODE for Build: $executionCommand"
             return ($ErrorActionPreference -eq "Continue");
         }
+
         # postProcessor
         $postProcessor = $componentVars['postProcessor']
         if ([string]::IsNullOrEmpty($postProcessor)) { $postProcessor = $componentsYaml.globalVariables['postProcessor'] }
@@ -158,6 +182,7 @@ function Publish-ComponentList {
             }
         }
         Pop-Location
+
         # tag and push component to registry
         $tagCommand = $component['tagCommand']
         if ([string]::IsNullOrEmpty($tagCommand)) { $tagCommand = $componentsYaml.globalVariables['tagCommand']; }
@@ -172,6 +197,7 @@ function Publish-ComponentList {
             Write-Information "EXITCODE: $LASTEXITCODE for Tag: $executionCommand"
             return ($ErrorActionPreference -eq "Continue");
         }
+
         # TODO: generic registry login approach
         $registryLocation = $([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))
         if ($registryLocation -like '*azurecr.io*') {
@@ -182,6 +208,7 @@ function Publish-ComponentList {
                 return ($ErrorActionPreference -eq "Continue");
             }
         }
+
         $executionCommand = $ExecutionContext.InvokeCommand.ExpandString($pushCommand)
         Write-Debug "Push: $executionCommand"
         Invoke-Expression $executionCommand

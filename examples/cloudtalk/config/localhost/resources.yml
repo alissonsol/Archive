@@ -1,41 +1,46 @@
 # Resources information - localhost
 ---
 globalVariables:
+  runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
+  runTag:                "localhost"
   namespace:             "cloudtalk"
-  clusterDnsPrefix:      "cloudtalk"
+  containerPrefix:       "cloudtalk"
+  clusterDnsPrefix:      "cloudtalk-${env:runId}"
   resourceGroup:         "cloudtalk"
-  resourceTags:          "cloudtalk"
+  resourceTags:          "cloudtalk-${env:runId}"
   registryName:          "componentsRegistry"
 
-resources:
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
-
+resources:
 - name:                  "componentsRegistry"
   template:              "localhost/registry"
   variables:
-    # TO-SET: registry name must be globally unique
-    uniqueName:          "${env:clusterDnsPrefix}$(Get-Random)"
+    # TO-SET: registry name must be globally unique, without dashes
+    uniqueName:          "${env:namespace}${env:runId}${env:runTag}"
 
 # context-copy 001
-- name:                  "${env:clusterDnsPrefix}001-localhost"
+- name:                  "${env:clusterDnsPrefix}-${env:runTag}-001"
   template:              "localhost/context-copy"
   variables:
-    clusterName:         "${env:clusterDnsPrefix}001-localhost"
+    _number: "001"
+    clusterName:         "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
     sourceContext:       "docker-desktop"
-    destinationContext:  "${env:clusterDnsPrefix}001-localhost"
+    destinationContext:  "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
 
 # context-copy 002
-- name:                  "${env:clusterDnsPrefix}002-localhost"
+- name:                  "${env:clusterDnsPrefix}-${env:runTag}-002"
   template:              "localhost/context-copy"
   variables:
-    clusterName:         "${env:clusterDnsPrefix}002-localhost"
+    _number: "002"
+    clusterName:         "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
     sourceContext:       "docker-desktop"
-    destinationContext:  "${env:clusterDnsPrefix}002-localhost"
+    destinationContext:  "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
 
 # context-copy 003
-- name:                  "${env:clusterDnsPrefix}003-localhost"
+- name:                  "${env:clusterDnsPrefix}-${env:runTag}-003"
   template:              "localhost/context-copy"
   variables:
-    clusterName:         "${env:clusterDnsPrefix}003-localhost"
+    _number: "003"
+    clusterName:         "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
     sourceContext:       "docker-desktop"
-    destinationContext:  "${env:clusterDnsPrefix}003-localhost"
+    destinationContext:  "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"

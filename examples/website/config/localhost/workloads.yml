@@ -1,10 +1,6 @@
 # Workloads information - localhost
 ---
 globalVariables:
-  namespace:             "yrn42website-ns"
-  resourceGroup:         "yrn42website-rg"
-  containerPrefix:       "yrn42website-prefix"
-  registryName:          "componentsRegistry"
   # TO-SET: set domain below, like yrn42.com
   # websiteDomain:         "yrn42website-domain"
   websiteDomain:         "yrn42.com"
@@ -21,7 +17,7 @@ globalVariables:
   ingressClass:          "nginx"
 
 workloads:
-- context: "yrn42website-localhost"
+- context: "${env:clusterDnsPrefix}-${env:runTag}"
   variables:
     _hostname: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.hostname\"))"
     _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
@@ -66,7 +62,7 @@ workloads:
   - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=90s"
   - chart: "frontend/website"
     variables:
-      installName: "yrn42website-install-website"
+      installName: "${env:clusterDnsPrefix}-${env:runTag}"
   - shell: "Write-Information \">> Enpoint: https://${env:websiteHost}\""
   - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=90s"'
   - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=90s"

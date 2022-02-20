@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 0.1
+.VERSION 0.2
 .GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
 .AUTHOR Alisson Sol
 .COMPANYNAME None
@@ -41,23 +41,29 @@ function Publish-ResourceList {
     New-Item -Path $resourcesOutputFile -ItemType File -Force
 
     # Global variables are saved expanded after first time
-    if ((-Not ($null -eq $yaml.globalVariables))  -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
+    $globalVariables = [ordered]@{}
+    if ((-Not ($null -eq $yaml.globalVariables)) -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
         $keys = @($yaml.globalVariables.Keys)
         foreach ($key in $keys) {
             $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])
-            Write-Debug "globalVariables[$key] = $value"
+            Write-Debug "resources.globalVariables[$key] = $value"
             Set-Item -Path Env:$key -Value ${value}
             # Expanded already
             $yaml.globalVariables[$key] = $value
+            # Saved to resourcesOutput, so it becomes reusable
+            $globalVariables.Add($key, $value)
         }
     }
+    $yamlExpanded = @{ }
+    $yamlExpanded.Add("globalVariables", $globalVariables)
+    Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $yamlExpanded)
 
     # For each resource in resources.yml
     if ($null -eq $yaml.resources) { Write-Information "Resources null or empty in file: $resourcesFile"; return $true; }
     foreach ($resource in $yaml.resources) {
         $resourceName = $resource['name']
         $resourceNameExpanded = $ExecutionContext.InvokeCommand.ExpandString($resourceName)
-        Write-Debug "$resourceName = $resourceNameExpanded"
+        Write-Verbose "$resourceName = $resourceNameExpanded"
         $resourceName = $resourceNameExpanded
         $resourceTemplate = $resource['template']
         if ([string]::IsNullOrEmpty($resourceName)) { Write-Information "Resource without name in file: $resourcesFile"; return $false; }
@@ -92,7 +98,7 @@ function Publish-ResourceList {
                 foreach ($key in $resource.variables.Keys) {
                     $value = $resource.variables[$key]
                     $terraformVars[$key] = $value
-                    Write-Debug "resourceVariables[$key] = $value"
+                    Write-Verbose "resourceVariables[$key] = $value"
                 }
             }
             foreach ($key in $terraformVars.Keys) {
@@ -101,7 +107,7 @@ function Publish-ResourceList {
                 $line = "$key = `"$value`""
                 Add-Content -Path $terraformVarsFile -Value $line
                 Set-Item -Path Env:$key -Value ${value}
-                Write-Verbose "$line"
+                Write-Debug "$line"
             }
             # execute terraform apply from work folder
             Push-Location $workFolder

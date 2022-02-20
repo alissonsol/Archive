@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 0.1
+.VERSION 0.2
 .GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
 .AUTHOR Alisson Sol
 .COMPANYNAME None
@@ -124,13 +124,21 @@ function Confirm-ResourceOutputList {
     # Validate resources output list
     if ($null -eq $yaml) { Write-Information "resources output cannot be null or empty in file: $resourcesOutputFile"; return $false; }
     Write-Verbose "---- Validating Resources Output"
-    foreach ($key in $yaml.Keys) {
-        $context = $key
-        foreach ($output in $yaml[$context].Keys) {
-            $variableName = $output
-            $variableValue = $yaml[$context][$variableName].Value
-            Write-Verbose "resourceOutput[$context][$variableName] = $variableValue"
-            if ([string]::IsNullOrEmpty($variableValue)) { Write-Information "resourceOutput[$context][$variableName] have null or empty value in: $resourcesOutputFile"; return $false; }
+    foreach ($resource in $yaml.Keys) {
+        if ($resource -eq "globalVariables") {
+            foreach ($key in $yaml.$resource.Keys) {
+                $variableName = $key
+                $variableValue = $yaml.$resource[$key]
+                Write-Verbose "globalVariables[$variableName] = $variableValue"
+            }
+        }
+        else {
+            foreach ($key in $yaml.$resource.Keys) {
+                $variableName = $key
+                $variableValue = $yaml.$resource[$key].value
+                Write-Verbose "resourcesOutput[$resource][$variableName] = $variableValue"
+                if ([string]::IsNullOrEmpty($variableValue)) { Write-Information "resourceOutput[$resource][$variableName] have null or empty value in: $resourcesOutputFile"; return $false; }
+            }
         }
     }
 

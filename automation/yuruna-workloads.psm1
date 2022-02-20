@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 0.1
+.VERSION 0.2
 .GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
 .AUTHOR Alisson Sol
 .COMPANYNAME None
@@ -31,7 +31,7 @@ function Publish-WorkloadList {
     #   switch to context
     #     apply deployments: chart, kubectl, helm, or shell
     #       copy chart to work folder under .yuruna
-    #       apply global variables, resources.output variables, workload variables
+    #       apply resources global variables, resources.output variables, global variables, workload variables
     #         execute helm install in work folder
     #       other expressions use ${env:vars}
     $workloadsFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/workloads.yml"
@@ -53,20 +53,31 @@ function Publish-WorkloadList {
         }
     }
 
+    # Debug info
     # Resources output expanded, but not "saved"
-    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq $resourcesOutputYaml.Keys))) {
+    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
         foreach ($resource in $resourcesOutputYaml.Keys) {
-            foreach ($key in $resourcesOutputYaml.$resource.Keys) {
-                $resourceKey = "$resource.$key"
-                $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
-                Write-Debug "resourcesOutput[$resourceKey] = $value"
-                Set-Item -Path Env:$resourceKey -Value ${value}
+            if ($resource -eq "globalVariables") {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$key"
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key])
+                    Write-Debug "globalVariables[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
+                }
+            }
+            else {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$resource.$key"
+                    $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                    Write-Debug "resourcesOutput[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
+                }
             }
         }
     }
 
     # Global variables are saved expanded after first time
-    if ((-Not ($null -eq $workloadsYaml.globalVariables))  -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
+    if ((-Not ($null -eq $workloadsYaml.globalVariables)) -and (-Not ($null -eq $workloadsYaml.globalVariables.Keys))) {
         $keys = @($workloadsYaml.globalVariables.Keys)
         foreach ($key in $keys) {
             $value = $ExecutionContext.InvokeCommand.ExpandString($workloadsYaml.globalVariables[$key])
@@ -92,7 +103,7 @@ function Publish-WorkloadList {
         }
         Set-Item -Path Env:contextName -Value ${contextName}
 
-        if ((-Not ($null -eq $workload.variables))  -and (-Not ($null -eq $workload.variables.Keys))) {
+        if ((-Not ($null -eq $workload.variables)) -and (-Not ($null -eq $workload.variables.Keys))) {
             foreach ($key in $workload.variables.Keys) {
                 $value = $ExecutionContext.InvokeCommand.ExpandString($workload.variables[$key])
                 Write-Debug "workloadVariables[$key] = $value"
@@ -120,15 +131,25 @@ function Publish-WorkloadList {
             if (!($isChart -or $isKubectl -or $isHelm -or $isShell)) { Write-Information "context.deployment should be 'chart', 'kubectl', 'helm' or 'shell' in file: $workloadsFile"; return $false; }
 
             $deploymentVars = [ordered]@{}
-            # apply global variables, resources.output variables, workload variables, deployment variables
+            # apply resources global variables, resources.output variables, global variables, components variables
             # previous loops just presented values for debugging
             if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
                 foreach ($resource in $resourcesOutputYaml.Keys) {
-                    foreach ($key in $resourcesOutputYaml.$resource.Keys) {
-                        $resourceKey = "$resource.$key"
-                        $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
-                        $deploymentVars[$resourceKey] = $value
-                        Set-Item -Path Env:$resourceKey -Value ${value}
+                    if ($resource -eq "globalVariables") {
+                        foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                            $resourceKey = "$key"
+                            $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key])
+                            $deploymentVars[$resourceKey] = $value
+                            Set-Item -Path Env:$resourceKey -Value ${value}
+                        }
+                    }
+                    else {
+                        foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                            $resourceKey = "$resource.$key"
+                            $value = $ExecutionContext.InvokeCommand.ExpandString($resourcesOutputYaml.$resource[$key].value)
+                            $deploymentVars[$resourceKey] = $value
+                            Set-Item -Path Env:$resourceKey -Value ${value}
+                        }
                     }
                 }
             }

@@ -3,35 +3,35 @@
 # Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
 ---
 globalVariables:
-  namespace:             "cloudtalk"
-  clusterDnsPrefix:      "cloudtalk"
-  containerPrefix:       "cloudtalk"
-  registryName:          "componentsRegistry"
   certManagerIssuerEmail: "certificates@cloudtalk.app"
-  _registryLocation: '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
-  dockerServer:          "${env:_registryLocation}"
-  dockerUsername: "placeholder"
-  dockerPassword: "placeholder"
-  ingressClass: "nginx"
-  ironPrefix: ironrslkv
-  _frontend001: ${env:ironPrefix}001.${env:containerPrefix}001
-  _frontend002: ${env:ironPrefix}002.${env:containerPrefix}002
-  _frontend003: ${env:ironPrefix}003.${env:containerPrefix}003
+  _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
+  dockerServer:          "http://${env:_registryLocation}"
+  dockerUsername:        "placeholder"
+  dockerPassword:        "placeholder"
+  ingressClass:          "nginx"
+  ironPrefix:            "ironrslkv"
+  _namespace001:         "${env:clusterDnsPrefix}-${env:runTag}-001"
+  _namespace002:         "${env:clusterDnsPrefix}-${env:runTag}-002"
+  _namespace003:         "${env:clusterDnsPrefix}-${env:runTag}-003"
+  _frontend001:          "${env:ironPrefix}001.${env:_namespace001}"
+  _frontend002:          "${env:ironPrefix}002.${env:_namespace002}"
+  _frontend003:          "${env:ironPrefix}003.${env:_namespace003}"
+  _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:_namespace001}.frontendIp\"))"
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-  ironp001: 42001
-  ironp002: 42002
-  ironp003: 42003
-  ironc001: 43001
-  ironc002: 43002
-  ironc003: 43003
-  ironServices: ${env:ironPrefix}001 ${env:ironp001} ${env:ironPrefix}002 ${env:ironp002} ${env:ironPrefix}003 ${env:ironp003}
-  ironMachines: ${env:_frontend001} ${env:ironp001} ${env:_frontend002} ${env:ironp002} ${env:_frontend003} ${env:ironp003}
-  certsName: certs
-  certsType: IronRSLKV
-  certsDir: certs
-  certsServiceFile: ${env:certsName}.${env:certsType}.service.txt
-  ironCerts: addr1=${env:_frontend001} port1=${env:ironp001} addr2=${env:_frontend002} port2=${env:ironp002} addr3=${env:_frontend003} port3=${env:ironp003}
-  waitTimeout: 1m
+  _ironServerPort001:    "42001"
+  _ironServerPort002:    "42002"
+  _ironServerPort003:    "42003"
+  _ironClientPort001:    "43001"
+  _ironClientPort002:    "43002"
+  _ironClientPort003:    "43003"
+  ironServices:          "${env:ironPrefix}001 ${env:_ironServerPort001} ${env:ironPrefix}002 ${env:_ironServerPort002} ${env:ironPrefix}003 ${env:_ironServerPort003}"
+  ironMachines:          "${env:_frontend001} ${env:_ironServerPort001} ${env:_frontend002} ${env:_ironServerPort002} ${env:_frontend003} ${env:_ironServerPort003}"
+  certsName:             "certs"
+  certsType:             "IronRSLKV"
+  certsDir:              "certs"
+  certsServiceFile:      "${env:certsName}.${env:certsType}.service.txt"
+  ironCerts:             "addr1=${env:_frontend001} port1=${env:_ironServerPort001} addr2=${env:_frontend002} port2=${env:_ironServerPort002} addr3=${env:_frontend003} port3=${env:_ironServerPort003}"
+  waitTimeout:           "2m"
 
 workloads:
 
@@ -42,34 +42,34 @@ workloads:
     deployments:
       # Always delete everything first, so that no references are created to existing resources previously available
       - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
-      - kubectl: "delete namespace ${env:containerPrefix}001 --ignore-not-found=true --v=1"
-      - kubectl: "delete namespace ${env:containerPrefix}002 --ignore-not-found=true --v=1"
-      - kubectl: "delete namespace ${env:containerPrefix}003 --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:_namespace001} --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:_namespace002} --ignore-not-found=true --v=1"
+      - kubectl: "delete namespace ${env:_namespace003} --ignore-not-found=true --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       - kubectl: "delete secret registry-credential --ignore-not-found=true"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
           
-  - context: "${env:clusterDnsPrefix}001-localhost"
+  - context: "${env:clusterDnsPrefix}-${env:runTag}-001"
     variables:
       _number: "001"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:_basename}"
+      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
       backendPathBase: "back${env:_number}"
       _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
       _ironinstance: "${env:ironPrefix}${env:_number}"
-      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("_ironServerPort${env:_number}"))'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("_ironClientPort${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server1.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-app"
         variables:
           installName: "${env:_basename}-deployment"
@@ -78,25 +78,25 @@ workloads:
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
-  - context: "${env:clusterDnsPrefix}002-localhost"
+  - context: "${env:clusterDnsPrefix}-${env:runTag}-002"
     variables:
       _number: "002"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:_basename}"
+      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
       backendPathBase: "back${env:_number}"
       _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
       _ironinstance: "${env:ironPrefix}${env:_number}"
-      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("_ironServerPort${env:_number}"))'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("_ironClientPort${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server2.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-app"
         variables:
           installName: "${env:_basename}-deployment"
@@ -105,25 +105,25 @@ workloads:
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
-  - context: "${env:clusterDnsPrefix}003-localhost"
+  - context: "${env:clusterDnsPrefix}-${env:runTag}-003"
     variables:
       _number: "003"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:_basename}"
+      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
       backendPathBase: "back${env:_number}"
       _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
       _ironinstance: "${env:ironPrefix}${env:_number}"
-      _ironServerPort: '$([Environment]::GetEnvironmentVariable("ironp${env:_number}"))'
+      _ironServerPort: '$([Environment]::GetEnvironmentVariable("_ironServerPort${env:_number}"))'
+      _ironClientPort: '$([Environment]::GetEnvironmentVariable("_ironClientPort${env:_number}"))'
       _ironparams: "${env:ironServices} ${env:_ironinstance} ${env:_ironServerPort}"
-      _ironClientPort: '$([Environment]::GetEnvironmentVariable("ironc${env:_number}"))'
       certsServerFile: ${env:certsName}.${env:certsType}.server3.private.txt
     deployments:
       - kubectl: "create namespace ${env:namespace} --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-      - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+      - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
       - chart: "replicator-app"
         variables:
           installName: "${env:_basename}-deployment"
@@ -154,20 +154,20 @@ workloads:
       - shell: "Remove-Item -Path ../${env:certsDir} -Force -Recurse -ErrorAction SilentlyContinue"
       # run certs.sh to create new certs and copy to local folder
       - kubectl: "run ${env:certsContainer} --image=${env:_registryLocation}/${env:containerPrefix}/${env:ironPrefix}:latest --env=\"certsName=${env:certsName}\" --env=\"certsType=${env:certsType}\" --env=\"certsDir=${env:certsDir}\" --env=\"ironCerts=${env:ironCerts}\" --command -- bash -c '/workspace/certs.sh'"
-      - shell: "Start-Sleep -s 30"
+      - shell: "Start-Sleep -s 60"
       - kubectl: "cp ${env:certsContainer}:/workspace/${env:certsDir} ../${env:certsDir}"
       # copy back
-      - kubectl: "cp ../${env:certsDir} ${env:_ironpod001}:/workspace/${env:certsDir} --namespace ${env:containerPrefix}001"
-      - kubectl: "cp ../${env:certsDir} ${env:_ironpod002}:/workspace/${env:certsDir} --namespace ${env:containerPrefix}002"
-      - kubectl: "cp ../${env:certsDir} ${env:_ironpod003}:/workspace/${env:certsDir} --namespace ${env:containerPrefix}003"
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod001}:/workspace/${env:certsDir} --namespace ${env:_namespace001}"
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod002}:/workspace/${env:certsDir} --namespace ${env:_namespace002}"
+      - kubectl: "cp ../${env:certsDir} ${env:_ironpod003}:/workspace/${env:certsDir} --namespace ${env:_namespace003}"
       # copy certsServiceFile to the grava pods
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod001}:/app/ --namespace ${env:containerPrefix}001"
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod002}:/app/ --namespace ${env:containerPrefix}002"
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod003}:/app/ --namespace ${env:containerPrefix}003"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod001}:/app/ --namespace ${env:_namespace001}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod002}:/app/ --namespace ${env:_namespace002}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod003}:/app/ --namespace ${env:_namespace003}"
       # any content can be the signalFile
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod001}:/workspace/signalFile --namespace ${env:containerPrefix}001"
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod002}:/workspace/signalFile --namespace ${env:containerPrefix}002"
-      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod003}:/workspace/signalFile --namespace ${env:containerPrefix}003"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod001}:/workspace/signalFile --namespace ${env:_namespace001}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod002}:/workspace/signalFile --namespace ${env:_namespace002}"
+      - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod003}:/workspace/signalFile --namespace ${env:_namespace003}"
       - shell: 'Write-Information "   Signal sent to ironrslkv pods"'
       # Ingress
       - kubectl: "create namespace ingress-basic --v=1"
@@ -179,11 +179,11 @@ workloads:
           --set controller.replicaCount=2
           --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
           --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set controller.service.loadBalancerIP="placeholder"
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
-          --set tcp.${env:ironp001}="${env:containerPrefix}001/${env:ironPrefix}001:${env:ironp001}"
-          --set tcp.${env:ironp002}="${env:containerPrefix}002/${env:ironPrefix}002:${env:ironp002}"
-          --set tcp.${env:ironp003}="${env:containerPrefix}003/${env:ironPrefix}003:${env:ironp003}"
+          --set tcp.${env:ironp001}="${env:_namespace001}/${env:ironPrefix}001:${env:ironp001}"
+          --set tcp.${env:ironp002}="${env:_namespace002}/${env:ironPrefix}002:${env:ironp002}"
+          --set tcp.${env:ironp003}="${env:_namespace003}/${env:ironPrefix}003:${env:ironp003}"
           --debug
       - shell: 'Write-Information "   Ingress installed"'

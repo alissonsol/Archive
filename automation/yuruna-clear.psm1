@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 0.1
+.VERSION 0.2
 .GUID 06e8bceb-f7aa-47e8-a633-1fc36173d278
 .AUTHOR Alisson Sol
 .COMPANYNAME None
@@ -33,7 +33,7 @@ function Clear-Configuration {
     $yaml = ConvertFrom-File $resourcesFile
 
     # Global variables are saved expanded after first time
-    if ((-Not ($null -eq $yaml.globalVariables))  -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
+    if ((-Not ($null -eq $yaml.globalVariables)) -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
         $keys = @($yaml.globalVariables.Keys)
         foreach ($key in $keys) {
             $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])

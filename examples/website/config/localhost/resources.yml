@@ -1,24 +1,27 @@
 # Resources information - localhost
 ---
 globalVariables:
-  namespace:             "yrn42website-ns"
-  clusterDnsPrefix:      "yrn42website-dns"
-  resourceGroup:         "yrn42website-rg"
-  resourceTags:          "yrn42website-tags"
-  nodeCount:             1
+  runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
+  runTag:                "localhost"
+  namespace:             "website"
+  containerPrefix:       "website"
+  clusterDnsPrefix:      "website-${env:runId}"
+  resourceGroup:         "website"
+  resourceTags:          "website-${env:runId}"
   registryName:          "componentsRegistry"
 
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
-# localhost registry container
 - name:                  "componentsRegistry"
   template:              "localhost/registry"
   variables:
-  
+    # TO-SET: registry name must be globally unique, without dashes
+    uniqueName:          "${env:namespace}${env:runId}${env:runTag}"
+
 # localhost cluster reference
-- name:                  "yrn42website-localhost"
+- name:                  "${env:clusterDnsPrefix}-${env:runTag}"
   template:              "localhost/context-copy"
   variables:
-    clusterName:         "yrn42website-cluster"
+    clusterName:         "${env:clusterDnsPrefix}-${env:runTag}"
     sourceContext:       "docker-desktop"
-    destinationContext:  "yrn42website-localhost"
+    destinationContext:  "${env:clusterDnsPrefix}-${env:runTag}"
