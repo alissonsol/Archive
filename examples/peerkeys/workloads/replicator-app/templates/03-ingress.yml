@@ -4,9 +4,9 @@ kind: Ingress
 metadata:
   name: {{ .Values.frontendApp }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingressClass }}
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  ingressClassName: {{ .Values.ingressClass }}
   rules:
   - http:
       paths:
@@ -23,9 +23,9 @@ kind: Ingress
 metadata:
   name: {{ .Values.backendApp }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingressClass }}
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  ingressClassName: {{ .Values.ingressClass }}
   rules:
   - http:
       paths:

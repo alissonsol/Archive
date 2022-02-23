@@ -3,6 +3,14 @@
 # Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
 ---
 globalVariables:
+  # TO-SET: set domain below, like yrn42.com
+  # websiteDomain:         "yrn42website-domain"
+  websiteDomain:         "yrn42.com"
+  # TO-SET: set site address below, like www.yrn42.com
+  # websiteHost:           "www.yrn42website-domain"
+  # see: https://letsencrypt.org/docs/certificates-for-localhost/
+  websiteHost:           "localhost"
+  websiteTlsSecret:      "website-tls-secret"
   certManagerIssuerEmail: "certificates@cloudtalk.app"
   _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
   dockerServer:          "http://${env:_registryLocation}"
@@ -10,13 +18,14 @@ globalVariables:
   dockerPassword:        "placeholder"
   ingressClass:          "nginx"
   ironPrefix:            "ironrslkv"
-  _namespace001:         "${env:clusterDnsPrefix}-${env:runTag}-001"
-  _namespace002:         "${env:clusterDnsPrefix}-${env:runTag}-002"
-  _namespace003:         "${env:clusterDnsPrefix}-${env:runTag}-003"
+  _namespace001:         "${env:project}-${env:runId}-001"
+  _namespace002:         "${env:project}-${env:runId}-002"
+  _namespace003:         "${env:project}-${env:runId}-003"
   _frontend001:          "${env:ironPrefix}001.${env:_namespace001}"
   _frontend002:          "${env:ironPrefix}002.${env:_namespace002}"
   _frontend003:          "${env:ironPrefix}003.${env:_namespace003}"
-  _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:_namespace001}.frontendIp\"))"
+  # Use any of the frontendIps for the patching in the localhost
+  _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:runTag}-${env:_namespace001}.frontendIp\"))"
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
   _ironServerPort001:    "42001"
   _ironServerPort002:    "42002"
@@ -51,11 +60,11 @@ workloads:
       - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
           
-  - context: "${env:clusterDnsPrefix}-${env:runTag}-001"
+  - context: "${env:runTag}-${env:project}-${env:runId}-001"
     variables:
       _number: "001"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
+      namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
@@ -78,11 +87,11 @@ workloads:
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
-  - context: "${env:clusterDnsPrefix}-${env:runTag}-002"
+  - context: "${env:runTag}-${env:project}-${env:runId}-002"
     variables:
       _number: "002"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
+      namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
@@ -105,11 +114,11 @@ workloads:
       - kubectl: "expose deployment/${env:_ironinstance}"
       - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
-  - context: "${env:clusterDnsPrefix}-${env:runTag}-003"
+  - context: "${env:runTag}-${env:project}-${env:runId}-003"
     variables:
       _number: "003"
       _basename: "${env:containerPrefix}${env:_number}"
-      namespace: "${env:clusterDnsPrefix}-${env:runTag}-${env:_number}"
+      namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
       frontendApp: "${env:_basename}-site"
       frontendPathBase: "front${env:_number}"
       backendApp: "${env:_basename}-grava"
@@ -148,6 +157,9 @@ workloads:
       _gravapod002: '$(kubectl get pods --selector=app=${env:containerPrefix}002-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
       _gravapod003: '$(kubectl get pods --selector=app=${env:containerPrefix}003-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
     deployments:
+      # Install dependencies
+      - kubectl: "create namespace ingress-basic --v=1"
+      - kubectl: "label namespace ingress-basic cert-manager.io/disable-validation=true --v=1"
       - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
       # certs-creation
       - kubectl: "delete pod ${env:certsContainer} --now 1 --ignore-not-found=true"
@@ -169,21 +181,39 @@ workloads:
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod002}:/workspace/signalFile --namespace ${env:_namespace002}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod003}:/workspace/signalFile --namespace ${env:_namespace003}"
       - shell: 'Write-Information "   Signal sent to ironrslkv pods"'
+      # For localhost: manually create certificate
+      - shell: "mkcert -install"
+      - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
+      - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"
+      - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
+      # Certificate
+      - helm: "repo add jetstack https://charts.jetstack.io"
+      - helm: "repo update"
+      - helm: >
+          install cert-manager jetstack/cert-manager
+          --namespace ingress-basic
+          --version v1.7.1
+          --set installCRDs=true
+          --set nodeSelector."beta\.kubernetes\.io/os"=linux
+          # --debug      
       # Ingress
-      - kubectl: "create namespace ingress-basic --v=1"
       - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
       - helm: "repo update"
       - helm: >
           install nginx-ingress ingress-nginx/ingress-nginx
           --namespace ingress-basic
-          --set controller.replicaCount=2
+          --set controller.replicaCount=1
           --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
           --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-          --set controller.service.loadBalancerIP="${env:_frontendIp}"
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
-          --set tcp.${env:ironp001}="${env:_namespace001}/${env:ironPrefix}001:${env:ironp001}"
-          --set tcp.${env:ironp002}="${env:_namespace002}/${env:ironPrefix}002:${env:ironp002}"
-          --set tcp.${env:ironp003}="${env:_namespace003}/${env:ironPrefix}003:${env:ironp003}"
-          --debug
-      - shell: 'Write-Information "   Ingress installed"'
+          --set controller.service.loadBalancerIP="${env:_frontendIp}"
+          --set tcp.${env:_ironServerPort001}="${env:_namespace001}/${env:ironPrefix}001:${env:_ironServerPort001}"
+          --set tcp.${env:_ironServerPort002}="${env:_namespace002}/${env:ironPrefix}002:${env:_ironServerPort002}"
+          --set tcp.${env:_ironServerPort003}="${env:_namespace003}/${env:ironPrefix}003:${env:_ironServerPort003}"
+          # --debug
+      - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
+      - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
+      - kubectl: "patch svc nginx-ingress-ingress-nginx-controller -n ingress-basic -p '{\\\"spec\\\": {\\\"type\\\": \\\"LoadBalancer\\\", \\\"externalIPs\\\":[\\\"${env:_frontendIp}\\\"]}}'"
+      - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'
+      - shell: 'Write-Information "-- Check services: kubectl get svc --all-namespaces"'

@@ -1,20 +1,24 @@
 # Resources information - azure
 ---
 globalVariables:
-  namespace:             "yrn42website-ns"
-  clusterDnsPrefix:      "yrn42website-dns"
-  resourceGroup:         "yrn42website-rg"
+  runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
+  runTag:                "azure"
+  project:               "website"
+  namespace:             "${env:project}"
+  containerPrefix:       "${env:project}"
+  clusterDnsPrefix:      "${env:project}-${env:runId}"
+  resourceGroup:         "${env:project}-${env:runId}"
+  resourceTags:          "${env:project}-${env:runId}"
+  registryName:          "componentsRegistry"
   # regions: az account list-locations -o table
   resourceRegion:        "westus2"
-  resourceTags:          "yrn42website-tags"
-  registryName:          "componentsRegistry"
   # az aks get-versions --location {resourceRegion} -o table
   clusterVersion:        "1.22.4"
   nodeType:              "Standard_D2_v2"
   nodeCount:             3
 
-resources:
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
+resources:
 - name:                  "defaultResourceGroup"
   template:              "azure/resource-group"
   variables:
@@ -22,13 +26,13 @@ resources:
 - name:                  "componentsRegistry"
   template:              "azure/registry"
   variables:
-    # TO-SET: registry name must be globally unique
-    uniqueName:          "yrn42registry"
+    # TO-SET: registry name must be globally unique, without dashes
+    uniqueName:          "${env:project}${env:runId}"
 
 # cluster reference
-- name:                  "yrn42website-azure"
+- name:                  "${env:runTag}-${env:project}-${env:runId}"
   template:              "azure/aks-cluster"
   variables:
-    clusterName:         "yrn42website-cluster"
-    destinationContext:  "yrn42website-azure"
+    clusterName:         "${env:project}-${env:runId}"
+    destinationContext:  "${env:runTag}-${env:project}-${env:runId}"
     nodeResourceGroup:   "${env:resourceGroup}-aks"

@@ -7,7 +7,6 @@ metadata:
   labels:
     app: website
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingressClass }}
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
@@ -17,6 +16,7 @@ metadata:
         rewrite ^ https://www.$request_uri permanent;
       }
 spec:
+  ingressClassName: {{ .Values.ingressClass }}
   tls:
   - hosts:
     - {{ .Values.websiteHost }}

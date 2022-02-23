@@ -92,6 +92,7 @@ function Publish-ResourceList {
                 foreach ($key in $yaml.globalVariables.Keys) {
                     $value = $yaml.globalVariables[$key]
                     $terraformVars[$key] = $value
+                    Set-Item -Path Env:$key -Value ${value}
                 }
             }
             if (-Not ($null -eq  $resource.variables)) {
@@ -99,6 +100,7 @@ function Publish-ResourceList {
                     $value = $resource.variables[$key]
                     $terraformVars[$key] = $value
                     Write-Verbose "resourceVariables[$key] = $value"
+                    Set-Item -Path Env:$key -Value ${value}
                 }
             }
             foreach ($key in $terraformVars.Keys) {

@@ -54,6 +54,7 @@ workloads:
       - kubectl: "create namespace ingress-basic --v=1"
       - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
       - helm: "repo update"
+      # Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP.
       - helm: >
           install nginx-ingress ingress-nginx/ingress-nginx
           --namespace ingress-basic
@@ -131,6 +132,7 @@ workloads:
       - kubectl: "create namespace ingress-basic --v=1"
       - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
       - helm: "repo update"
+      # Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP.
       - helm: >
           install nginx-ingress ingress-nginx/ingress-nginx
           --namespace ingress-basic
@@ -208,6 +210,7 @@ workloads:
       - kubectl: "create namespace ingress-basic --v=1"
       - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
       - helm: "repo update"
+      # Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP.      
       - helm: >
           install nginx-ingress ingress-nginx/ingress-nginx
           --namespace ingress-basic

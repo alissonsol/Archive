@@ -5,18 +5,21 @@
 - Why I cannot connect to <https://localhost> in a Windows machine?
 
   - Try to stop HTTP and related processes.
-    - Find which process is holding port 80 with `netstat -nao | find ":80"`. 
-    - You need to stop the Web service (`net stop http`).
+    - Find which process is holding port 80: `netstat -nao | find ":80"`
+    - You may need to stop the Web service: `net stop http`
       - That may be hard due to issues like [HTTP services can't be stopped when the Microsoft Web Deployment Service is installed](https://docs.microsoft.com/en-us/troubleshoot/iis/http-service-fail-stopped). Try to stop that service also (`net stop msdepsvc`), reboot, and try steps again.
   - If you run `net stop http` again and still see a service `BranchCache` that keeps needing to be stopped then disable it using the PowerShell cmdlet [`Disable-BC`](https://docs.microsoft.com/en-us/powershell/module/branchcache/disable-bc).
 
 - Example doesn't work if executed twice or after another example.
 
   - If you run an example, clear it, and port 80 is still in use, try quitting Docker and starting again.
+  - Check if the ports are exposed to the external IP address: `kubectl get svc --all-namespaces`
 
 - Why the local registry is not working in the macOS?
 
   - For macOS Monterey, confirm that port 5000 is not in use and stop any service using it. See Stack Overflow [issue](https://stackoverflow.com/questions/69818376/localhost5000-unavailable-in-macos-v12-monterey).
+    - See instructions on how to check port usage in the macOS in this [article](https://stackoverflow.com/questions/4421633/who-is-listening-on-a-given-tcp-port-on-mac-os-x).
+      - Recent versions of macOS: `lsof -nP -iTCP -sTCP:LISTEN | grep 80`
 
 - Why applications from inside the container cannot connect to outside?
 

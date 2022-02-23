@@ -25,16 +25,18 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Run `mkcert -install`
 - Installed [wget](https://www.gnu.org/software/wget/) in the path.
   - Binaries for Windows at [webfolderio.github.io](https://webfolderio.github.io/wget-windows/)
-- Cloud-specific
-  - AWS
-    - Created [AWS Account](https://aws.amazon.com/free)
-    - Installed [AWS CLI](https://aws.amazon.com/cli/)
-  - Azure
-    - Created [Azure Account](https://azure.microsoft.com/free)
-    - Installed [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-  - Google Cloud SDK
-    - Created [Google Cloud Account](https://console.cloud.google.com/freetrial)
-    - Install the [Google Cloud SDK CLI](https://cloud.google.com/sdk/docs/install)
+
+## Cloud tools
+
+- AWS
+  - Created [AWS Account](https://aws.amazon.com/free)
+  - Installed [AWS CLI](https://aws.amazon.com/cli/)
+- Azure
+  - Created [Azure Account](https://azure.microsoft.com/free)
+  - Installed [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- Google Cloud SDK
+  - Created [Google Cloud Account](https://console.cloud.google.com/freetrial)
+  - Install the [Google Cloud SDK CLI](https://cloud.google.com/sdk/docs/install)
 - DNS provider and instructions to create A record
   - Instructions for [Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-creating.html)
   - Instructions for [Azure DNS](https://docs.microsoft.com/en-us/azure/dns/dns-getstarted-portal)
@@ -46,6 +48,7 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
   - Installed [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) extension.
   - Installed extension for [Kubernetes](https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools).
 - Installed [Graphviz](https://graphviz.org/download/) in the path.
+- Installed [K9S](https://k9scli.io/topics/install/) in the path.
 
 ## Development environment
 

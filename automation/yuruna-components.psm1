@@ -53,6 +53,7 @@ function Publish-ComponentList {
                     $resourceKey = "$key"
                     $value = $resourcesOutputYaml.$resource[$key]
                     Write-Debug "globalVariables[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
                 }
             }
             else {
@@ -60,6 +61,7 @@ function Publish-ComponentList {
                     $resourceKey = "$resource.$key"
                     $value = $resourcesOutputYaml.$resource[$key].value
                     Write-Debug "resourcesOutput[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
                 }
             }
         }
@@ -69,6 +71,7 @@ function Publish-ComponentList {
         foreach ($key in $componentsYaml.globalVariables.Keys) {
             $value = $componentsYaml.globalVariables[$key]
             Write-Debug "globalVariables[$key] = $value"
+            Set-Item -Path Env:$key -Value ${value}
         }
     }
 
@@ -142,8 +145,8 @@ function Publish-ComponentList {
         foreach ($key in $componentVars.Keys) {
             $value = $componentVars[$key]
             if ([string]::IsNullOrEmpty($value)) { Write-Debug "WARNING: empty value for $key" }
-            Set-Item -Path Env:$key -Value ${value}
             Write-Debug "$project[Env:$key] is $(Get-Content -Path Env:$key)"
+            Set-Item -Path Env:$key -Value ${value}
         }
 
         Push-Location $componentsPath
