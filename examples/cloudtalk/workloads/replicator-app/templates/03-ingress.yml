@@ -5,6 +5,11 @@ metadata:
   name: {{ .Values.frontendApp }}
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "10"
+    nginx.ingress.kubernetes.io/proxy-connect-timout: "10"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
 spec:
   ingressClassName: {{ .Values.ingressClass }}
   rules:
@@ -24,6 +29,11 @@ metadata:
   name: {{ .Values.backendApp }}
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "10"
+    nginx.ingress.kubernetes.io/proxy-connect-timout: "10"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
 spec:
   ingressClassName: {{ .Values.ingressClass }}
   rules:
