@@ -38,7 +38,7 @@ globalVariables:
   certsDir:              "certs"
   certsServiceFile:      "${env:certsName}.${env:certsType}.service.txt"
   ironCerts:             "addr1=${env:_frontend001} port1=${env:_ironServerPort001} addr2=${env:_frontend002} port2=${env:_ironServerPort002} addr3=${env:_frontend003} port3=${env:_ironServerPort003}"
-  waitTimeout:           "5m"
+  waitTimeout:           "10m"
 
 workloads:
 
@@ -222,7 +222,7 @@ workloads:
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
-          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:containerPrefix}${env:_number}:${env:_ironServerPort}"
+          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:_ironinstance}:${env:_ironServerPort}"
           # --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
@@ -257,7 +257,7 @@ workloads:
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
-          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:containerPrefix}${env:_number}:${env:_ironServerPort}"
+          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:_ironinstance}:${env:_ironServerPort}"
           # --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"
@@ -292,7 +292,7 @@ workloads:
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
           --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
-          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:containerPrefix}${env:_number}:${env:_ironServerPort}"
+          --set tcp.${env:_ironServerPort}="${env:namespace}/${env:_ironinstance}:${env:_ironServerPort}"
           # --debug
       - kubectl: "cp ../${env:certsDir} ${env:_ironpod}:/workspace/${env:certsDir} --namespace ${env:namespace}"
       - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_gravapod}:/app/ --namespace ${env:namespace}"

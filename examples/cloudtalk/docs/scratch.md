@@ -2,6 +2,15 @@
 
 Scratch pad for commands and investigations.
 
+## Debugging summary
+
+- Get terminal into `ironrslkvNNN`
+- `env` shows the environment variables. Check `ironMachines`
+- `ping` remote servers to confirm DNS resolution
+- `netstat -ltnp` will show processes listening in a certain port
+- `ifconfig` will show the network addresses
+- `dotnet /workspace/Ironclad/ironfleet/bin/IronRSLKVClient.dll certs/certs.IronRSLKV.service.txt nthreads=10 duration=30 setfraction=0.25 deletefraction=0.05 print=true verbose=true`
+
 ## New debugging info
 
 ### 

@@ -22,8 +22,8 @@ spec:
           containerPort: {{ .Values._ironServerPort }}
         resources:
             limits:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "256Mi"
+              cpu: "200m"
         env:
           - name: "_ironinstance"
             value: {{ (printf "\"%s\"" .Values._ironinstance) }}
