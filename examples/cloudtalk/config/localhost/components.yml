@@ -17,3 +17,4 @@ components:
   variables:
 - project:               "ironrslkv"
   buildPath:             "api/ironrslkv"
+  variables:

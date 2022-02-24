@@ -1,8 +1,0 @@
-apiVersion: v2
-name: yrn42onnxtraingpt2-tuning
-description: Accelerate GPT2 fine-tuning with ONNX Runtime Training
-
-type: application
-version: 0.1.0
-appVersion: 0.1.0
-icon: https://github.com/cncf/artwork/blob/master/projects/helm/icon/color/helm-icon-color.svg

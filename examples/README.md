@@ -14,12 +14,6 @@
 
 - [peerkeys](peerkeys/README.md) demonstrates key/value replication across nodes using [etcd](https://etcd.io/).
 
-## ONNX
-
-Automating some ONNX examples.
-
-- [ONNX GPT-2 training](onnx/training/gpt2/README.md): Accelerate GPT2 fine-tuning with ONNX Runtime Training
-
 ## Template
 
 - This is just the [folder structure](./template/) to create a new project.

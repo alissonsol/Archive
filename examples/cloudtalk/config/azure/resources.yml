@@ -28,21 +28,21 @@ resources:
 - name:                  "rg001"
   template:              "azure/resource-group"
   variables:
-    _number: "001"
+    _number:             "001"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"
     resourceRegion:      "eastus"
 
 - name:                  "rg002"
   template:              "azure/resource-group"
   variables:
-    _number: "002"
+    _number:             "002"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"
     resourceRegion:      "northeurope"
 
 - name:                  "rg003"
   template:              "azure/resource-group"
   variables:
-    _number: "003"
+    _number:             "003"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"
     resourceRegion:      "westus2"
 
@@ -56,7 +56,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-001"
   template:              "azure/aks-cluster"
   variables:
-    _number: "001"
+    _number:             "001"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"
@@ -67,7 +67,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-002"
   template:              "azure/aks-cluster"
   variables:
-    _number: "002"
+    _number:             "002"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"
@@ -78,7 +78,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-003"
   template:              "azure/aks-cluster"
   variables:
-    _number: "003"
+    _number:             "003"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
     resourceGroup:       "${env:project}-${env:runId}-${env:_number}"

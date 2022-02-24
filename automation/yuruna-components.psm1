@@ -145,8 +145,8 @@ function Publish-ComponentList {
         foreach ($key in $componentVars.Keys) {
             $value = $componentVars[$key]
             if ([string]::IsNullOrEmpty($value)) { Write-Debug "WARNING: empty value for $key" }
-            Write-Debug "$project[Env:$key] is $(Get-Content -Path Env:$key)"
             Set-Item -Path Env:$key -Value ${value}
+            Write-Debug "$project[Env:$key] is $(Get-Content -Path Env:$key)"
         }
 
         Push-Location $componentsPath

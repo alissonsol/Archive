@@ -205,6 +205,7 @@ workloads:
           --set controller.replicaCount=1
           --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
           --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+          --set controller.service.externalTrafficPolicy="Local"
           --set controller.admissionWebhooks.enabled=false
           --set controller.ingressClass=${env:ingressClass}
           --set controller.service.loadBalancerIP="${env:_frontendIp}"
@@ -212,8 +213,8 @@ workloads:
           --set tcp.${env:_ironServerPort002}="${env:_namespace002}/${env:ironPrefix}002:${env:_ironServerPort002}"
           --set tcp.${env:_ironServerPort003}="${env:_namespace003}/${env:ironPrefix}003:${env:_ironServerPort003}"
           # --debug
+      - kubectl: "patch svc nginx-ingress-ingress-nginx-controller -n ingress-basic -p '{\\\"spec\\\": {\\\"type\\\": \\\"LoadBalancer\\\", \\\"externalIPs\\\":[\\\"${env:_frontendIp}\\\"]}}'"
       - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
       - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
-      - kubectl: "patch svc nginx-ingress-ingress-nginx-controller -n ingress-basic -p '{\\\"spec\\\": {\\\"type\\\": \\\"LoadBalancer\\\", \\\"externalIPs\\\":[\\\"${env:_frontendIp}\\\"]}}'"
       - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'
       - shell: 'Write-Information "-- Check services: kubectl get svc --all-namespaces"'

@@ -16,8 +16,8 @@ globalVariables:
   dockerServer:          "${env:_registryLocation}.azurecr.io"
   dockerUsername:        "$(az acr credential show -n ${env:_registryLocation} --query username)"
   dockerPassword:        "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
-  ingressClass: "nginx"
-  ironPrefix: ironrslkv
+  ingressClass:          "nginx"
+  ironPrefix:            "ironrslkv"
   _namespace001:         "${env:project}-${env:runId}-001"
   _namespace002:         "${env:project}-${env:runId}-002"
   _namespace003:         "${env:project}-${env:runId}-003"
