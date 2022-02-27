@@ -38,13 +38,15 @@ metadata:
   labels:
     app: website
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: port80
       port: 80
       targetPort: 80
+      protocol: TCP
     - name: port443
       port: 443
       targetPort: 443
+      protocol: TCP
   selector:
     app: website

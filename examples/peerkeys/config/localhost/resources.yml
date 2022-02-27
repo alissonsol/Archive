@@ -23,7 +23,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-001"
   template:              "localhost/context-copy"
   variables:
-    _number: "001"
+    _number:             "001"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
@@ -32,7 +32,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-002"
   template:              "localhost/context-copy"
   variables:
-    _number: "002"
+    _number:             "002"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
@@ -41,7 +41,7 @@ resources:
 - name:                  "${env:runTag}-${env:project}-${env:runId}-003"
   template:              "localhost/context-copy"
   variables:
-    _number: "003"
+    _number:             "003"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
     sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"

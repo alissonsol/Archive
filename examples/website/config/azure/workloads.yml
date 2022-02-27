@@ -63,7 +63,7 @@ workloads:
   - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
   - chart: "frontend/website"
     variables:
-      installName: "${env:clusterDnsPrefix}-${env:runTag}"
+      installName: "website-${env:runId}"
   - shell: "Write-Information \">> Enpoint: https://${env:websiteHost}\""
   - shell: "Write-Information \">> Set DNS: ${env:websiteHost} -> ${env:_frontendIp}\""
   - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'

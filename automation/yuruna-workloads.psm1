@@ -112,7 +112,7 @@ function Publish-WorkloadList {
         }
 
         $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName"
-        New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction Si
+        $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction Si
         #context should exist
         $originalContext = kubectl config current-context
         kubectl config use-context $contextName *>&1 | Write-Verbose
@@ -192,14 +192,14 @@ function Publish-WorkloadList {
                 }
                 # copy chart to work folder under .yuruna
                 $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads/$contextName/$installName"
-                New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+                $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
                 $workFolder = Resolve-Path -Path $workFolder
                 Write-Debug "Copying chart from: $chartFolder to $workFolder"
                 Copy-Item "$chartFolder/*" -Destination $workFolder -Recurse -Container -ErrorAction SilentlyContinue
 
                 # deploymentVars to values.yaml
                 $helmValuesFile = Join-Path -Path $workFolder -ChildPath "values.yaml"
-                New-Item -Path $helmValuesFile -ItemType File -Force
+                $null = New-Item -Path $helmValuesFile -ItemType File -Force
                 foreach ($key in $deploymentVars.Keys) {
                     $value = $deploymentVars[$key]
                     # https://helm.sh/docs/intro/using_helm/#the-format-and-limitations-of---set
@@ -254,6 +254,7 @@ function Publish-WorkloadList {
                 if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
                 if (-Not (0 -eq $LASTEXITCODE)) {
                     Write-Information "EXITCODE: $LASTEXITCODE for: $expression"
+                    Pop-Location
                     return ($ErrorActionPreference -eq "Continue");
                 }
                 Pop-Location

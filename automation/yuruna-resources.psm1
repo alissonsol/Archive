@@ -19,14 +19,20 @@ $yuruna_root = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath ".."
 $validationModulePath = Join-Path -Path $yuruna_root -ChildPath "automation/yuruna-validation"
 Import-Module -Name $validationModulePath
 
-function Publish-ResourceList {
+$globalVariables = [ordered]@{}
+
+function Publish-ResourceListHelper {
+    [OutputType([Boolean])]
+    [CmdletBinding(PositionalBinding=$false)]
     param (
-        $project_root,
-        $config_subfolder
+        [string] $project_root,
+        [string] $config_subfolder,
+        [string] $executionCommand,
+        [bool] $isInitialization
     )
 
+    Write-Debug "     Execution command: $executionCommand"
     if (!(Confirm-ResourceList $project_root $config_subfolder)) { return $false; }
-    Write-Debug "---- Publishing Resources"
     # For each resource in resources.yml
     #   copy template to work folder under .yuruna
     #   apply variables from resources.yml
@@ -37,26 +43,28 @@ function Publish-ResourceList {
     if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
     $yaml = ConvertFrom-File $resourcesFile
 
-    $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
-    New-Item -Path $resourcesOutputFile -ItemType File -Force
-
-    # Global variables are saved expanded after first time
-    $globalVariables = [ordered]@{}
-    if ((-Not ($null -eq $yaml.globalVariables)) -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
-        $keys = @($yaml.globalVariables.Keys)
-        foreach ($key in $keys) {
-            $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])
-            Write-Debug "resources.globalVariables[$key] = $value"
-            Set-Item -Path Env:$key -Value ${value}
-            # Expanded already
-            $yaml.globalVariables[$key] = $value
-            # Saved to resourcesOutput, so it becomes reusable
-            $globalVariables.Add($key, $value)
+    if ($isInitialization) {
+        # Global variables are saved expanded after first time
+        if ((-Not ($null -eq $yaml.globalVariables)) -and (-Not ($null -eq $yaml.globalVariables.Keys))) {
+            $keys = @($yaml.globalVariables.Keys)
+            foreach ($key in $keys) {
+                $value = $ExecutionContext.InvokeCommand.ExpandString($yaml.globalVariables[$key])
+                Write-Debug "resources.globalVariables[$key] = $value"
+                Set-Item -Path Env:$key -Value ${value}
+                # Expanded already
+                $yaml.globalVariables[$key] = $value
+                # Saved to resourcesOutput, so it becomes reusable
+                $globalVariables.Add($key, $value)
+            }
         }
     }
-    $yamlExpanded = @{ }
-    $yamlExpanded.Add("globalVariables", $globalVariables)
-    Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $yamlExpanded)
+    else {
+        $yamlExpanded = @{ }
+        $yamlExpanded.Add("globalVariables", $globalVariables)
+        $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
+        $null = New-Item -Path $resourcesOutputFile -ItemType File -Force
+        Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $yamlExpanded)
+    }
 
     # For each resource in resources.yml
     if ($null -eq $yaml.resources) { Write-Information "Resources null or empty in file: $resourcesFile"; return $true; }
@@ -72,30 +80,33 @@ function Publish-ResourceList {
             $templateFolder = Join-Path -Path $project_root -ChildPath "resources/$resourceTemplate" -ErrorAction SilentlyContinue
             if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder))) {
                 $templateFolder = Join-Path -Path $yuruna_root  -ChildPath "global/resources/$resourceTemplate" -ErrorAction SilentlyContinue
-                if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder)))  {
+                if (($null -eq $templateFolder) -or (-Not (Test-Path -Path $templateFolder))) {
                     Write-Information "Resources template not found locally or globally: $resourceTemplate`nUsed in file: $resourcesFile";
                     return $false;
                 }
             }
-            Write-Information "-- Resource: $resourceName from template $templateFolder"
+            if ($isInitialization) {
+                Write-Information "-- Initializing: $resourceName from template $templateFolder"
+            }
+            else {
+                Write-Information "-- Creating: $resourceName from template $templateFolder"
+            }
             # copy template to work folder under .yuruna
             $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources/$resourceName"
-            New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+            $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
             $workFolder = Resolve-Path -Path $workFolder
             Get-ChildItem -Path "$workFolder/*.tf" | Remove-Item -Force -ErrorAction SilentlyContinue
             Copy-Item "$templateFolder/*" -Destination $workFolder -Recurse -Container -ErrorAction SilentlyContinue
 
             $terraformVarsFile = Join-Path -Path $workFolder -ChildPath "terraform.tfvars"
-            New-Item -Path $terraformVarsFile -ItemType File -Force
+            $null = New-Item -Path $terraformVarsFile -ItemType File -Force
             $terraformVars = [ordered]@{}
-            if (-Not ($null -eq  $yaml.globalVariables)) {
-                foreach ($key in $yaml.globalVariables.Keys) {
-                    $value = $yaml.globalVariables[$key]
-                    $terraformVars[$key] = $value
-                    Set-Item -Path Env:$key -Value ${value}
-                }
+            foreach ($key in $globalVariables.Keys) {
+                $value = $globalVariables[$key]
+                $terraformVars[$key] = $value
+                Set-Item -Path Env:$key -Value ${value}
             }
-            if (-Not ($null -eq  $resource.variables)) {
+            if (-Not ($null -eq $resource.variables)) {
                 foreach ($key in $resource.variables.Keys) {
                     $value = $resource.variables[$key]
                     $terraformVars[$key] = $value
@@ -116,30 +127,57 @@ function Publish-ResourceList {
 
             # warn if terraform already initialized
             $terraformPath = Join-Path -Path $workFolder -ChildPath ".terraform"
-            if (Test-Path -Path $terraformPath) { Write-Information "-- WARNING: terraform already initialized. Resource may not be created. Use 'yuruna clear' to clear terraform state."; }
+            if ($isInitialization -and (Test-Path -Path $terraformPath)) {
+                Write-Information "-- WARNING: terraform already initialized: $terraformPath `n   Resource may not be created. Use 'yuruna clear' to clear terraform state.";
+                Pop-Location;
+                return $false;
+            }
             Write-Debug "Terraform init"
             $result = $(terraform init *>&1 | Write-Verbose)
-            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
-            # terraform plan -compact-warnings
-            # terraform graph | dot -Tsvg > graph.svg
-            Write-Debug "Executing terraform apply from $workFolder"
-            $result = $(terraform apply -auto-approve *>&1 | Write-Verbose)
+            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }    
+            Write-Debug "Executing terraform command from $workFolder"
+            $result = $($(Invoke-Expression $executionCommand) *>&1 | Write-Verbose)
             if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
             # resource.output file processing
-            $jsonOutput = "$(terraform output -json)"
-            if (![string]::IsNullOrEmpty($jsonOutput)) {
-                $terraformYaml = $jsonOutput | ConvertFrom-Json
-                $tuple = @{ }
-                $tuple."$resourceName" = $terraformYaml
-                Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $tuple)
+            if (-Not $isInitialization) {
+                $jsonOutput = "$(terraform output -json)"
+                if (![string]::IsNullOrEmpty($jsonOutput)) {
+                    $terraformYaml = $jsonOutput | ConvertFrom-Json
+                    $tuple = @{ }
+                    $tuple."$resourceName" = $terraformYaml
+                    Add-Content -Path $resourcesOutputFile -Value $(ConvertTo-Yaml $tuple)
+                }
             }
             Pop-Location
         }
     }
 
-    if ((Get-Item $resourcesOutputFile).Length -gt 0) { Write-Information "Resources output file: $resourcesOutputFile"; }
+    if (-Not $isInitialization) {
+        if ((Get-Item $resourcesOutputFile).Length -gt 0) { Write-Information "Resources output file: $resourcesOutputFile"; }
+    }
 
     return $true;
+}
+
+function Publish-ResourceList {
+    param (
+        $project_root,
+        $config_subfolder
+    )
+
+    Write-Debug "---- Publishing Resources"
+    # terraform plan -compact-warnings
+    # terraform graph | dot -Tsvg > graph.svg
+    # terraform apply -auto-approve
+
+    $executionCommand = "terraform plan -compact-warnings"
+    $result = Publish-ResourceListHelper -project_root $project_root -config_subfolder $config_subfolder -executionCommand $executionCommand -isInitialization $true
+    if ($result) {
+        $executionCommand = "terraform apply -auto-approve"
+        return Publish-ResourceListHelper -project_root $project_root -config_subfolder $config_subfolder -executionCommand $executionCommand -isInitialization $false
+    }
+
+    return $false;
 }
 
 Export-ModuleMember -Function * -Alias *

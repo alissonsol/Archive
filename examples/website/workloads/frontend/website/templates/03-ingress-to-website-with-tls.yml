@@ -7,12 +7,9 @@ metadata:
   labels:
     app: website
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "9999"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "9999"
     cert-manager.io/cluster-issuer: "letsencrypt"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($host = '' ) {
@@ -29,7 +26,7 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: /(.*)
+        path: /
         backend:
           service:
             name: website
