@@ -7,6 +7,7 @@
 - peerkeys: etcd updates (PASSWORD?)
 - cloudtalk: in ARM, `apt-get install -y aspnetcore-runtime-5.0` is not working
   - More investigation needed: <https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian>
+- Use MetalLB or other solution to replace port forward in bare metal: <https://kubernetes.github.io/ingress-nginx/deploy/baremetal/>
 - How to "pack and move" to another machine
 - Before "cloud-based" scripts execute, validate session
 - Validation: repeated resource names and other duplications like context names
@@ -14,7 +15,6 @@
 
 ### P1
 
-- kubectl patch x MetalLB
 - Better PowerShell scripts (likely eternal goal!).
   - Consider check behavior like that of the [GitHub actions](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions), appending to each command: `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }`
 - Check if terraform requires variable and not provide it if not needed (avoids warnings).

@@ -12,7 +12,7 @@ globalVariables:
   websiteHost:           "localhost"
   websiteTlsSecret:      "website-tls-secret"
   certManagerIssuerEmail: "certificates@cloudtalk.app"
-  _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
+  _registryLocation:     '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
   dockerServer:          "http://${env:_registryLocation}"
   dockerUsername:        "placeholder"
   dockerPassword:        "placeholder"
@@ -26,8 +26,6 @@ globalVariables:
   _frontend003:          "${env:ironPrefix}003.${env:_namespace003}"
   # Use any of the frontendIps for the patching in the localhost
   _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:runTag}-${env:_namespace001}.frontendIp\"))"
-  # RISK: This only works for IPv4
-  _addresses:            "$($(${env:_frontendIp} -Split \"\\.\")[0]).0.0.0/8"
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
   _ironServerPort001:    "42001"
   _ironServerPort002:    "42002"
@@ -46,13 +44,13 @@ globalVariables:
 
 workloads:
 
-# Cleanup and ingress
+# Cleanup
 - context: "docker-desktop"
   variables:
     namespace: "default"
   deployments:
     # Always delete everything first, so that no references are created to existing resources previously available
-    - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-nginx --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace001} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace002} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace003} --ignore-not-found=true --v=1"
@@ -61,6 +59,25 @@ workloads:
     - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
     - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
+    # Install dependencies
+    - kubectl: "create namespace ingress-nginx --v=1"
+    - kubectl: "label namespace ingress-nginx cert-manager.io/disable-validation=true --v=1"
+    - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+    # For localhost: manually create certificate
+    - shell: "mkcert -install"
+    - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
+    - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"  
+    - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
+    # Certificate: goes first so clusterIssuer is ready when deploying templates later
+    - helm: "repo add jetstack https://charts.jetstack.io"
+    - helm: "repo update"
+    - helm: >
+        install cert-manager jetstack/cert-manager
+        --namespace ingress-nginx
+        --version v1.7.1
+        --set installCRDs=true
+        --set nodeSelector."beta\.kubernetes\.io/os"=linux
+        # --debug
         
 - context: "${env:runTag}-${env:project}-${env:runId}-001"
   variables:
@@ -159,9 +176,6 @@ workloads:
     _gravapod002: '$(kubectl get pods --selector=app=${env:containerPrefix}002-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
     _gravapod003: '$(kubectl get pods --selector=app=${env:containerPrefix}003-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
   deployments:
-    # Install dependencies
-    - kubectl: "create namespace ingress-basic --v=1"
-    - kubectl: "label namespace ingress-basic cert-manager.io/disable-validation=true --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     # certs-creation
     - kubectl: "delete pod ${env:certsContainer} --now 1 --ignore-not-found=true"
@@ -183,55 +197,28 @@ workloads:
     - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod002}:/workspace/signalFile --namespace ${env:_namespace002}"
     - kubectl: "cp ../${env:certsDir}/${env:certsServiceFile} ${env:_ironpod003}:/workspace/signalFile --namespace ${env:_namespace003}"
     - shell: 'Write-Information "   Signal sent to ironrslkv pods"'
-    # For localhost: manually create certificate
-    - shell: "mkcert -install"
-    - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
-    - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"
-    - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
-    # Certificate
-    - helm: "repo add jetstack https://charts.jetstack.io"
-    - helm: "repo update"
-    - helm: >
-        install cert-manager jetstack/cert-manager
-        --namespace ingress-basic
-        --version v1.7.1
-        --set installCRDs=true
-        --set nodeSelector."beta\.kubernetes\.io/os"=linux
-        # --debug
-    # For localhost: MetalLB
-    - shell: "$($ymlConfig = $(kubectl get configmap kube-proxy -n kube-system -o yaml) -replace 'strictARP: false','strictARP: true'; $ymlConfig | kubectl apply -n kube-system -f -)"
-    - kubectl: "create secret generic metallb-memberlist -n ingress-basic --from-literal=secretkey=\"$( $algo = new-Object System.Security.Cryptography.RijndaelManaged; $algo.KeySize=128; $algo.GenerateKey(); [Convert]::ToBase64String($algo.key) )\""
-    - helm: "repo add metallb https://metallb.github.io/metallb"
-    - helm: "repo update"
-    - helm: >
-        install metallb metallb/metallb
-        --namespace ingress-basic
-        --set configInline.address-pools[0].name=default
-        --set configInline.address-pools[0].protocol=layer2
-        --set configInline.address-pools[0].addresses[0]="${env:_frontendIp}-${env:_frontendIp}"
-        # --debug    
     # Ingress
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-basic
+        --namespace ingress-nginx
         --set controller.replicaCount=1
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-        --set controller.service.externalTrafficPolicy="Local"
         --set controller.admissionWebhooks.enabled=false
         --set controller.ingressClass=${env:ingressClass}
-        --set controller.service.annotations."metallb\.universe\.tf/address-pool"="default"
+        --set controller.service.type="ClusterIP"
         --set controller.service.externalTrafficPolicy="Local"
-        --set controller.hostNetwork=true
-        --set controller.hostPort.enabled=true
         --set tcp.${env:_ironServerPort001}="${env:_namespace001}/${env:ironPrefix}001:${env:_ironServerPort001}"
         --set tcp.${env:_ironServerPort002}="${env:_namespace002}/${env:ironPrefix}002:${env:_ironServerPort002}"
         --set tcp.${env:_ironServerPort003}="${env:_namespace003}/${env:ironPrefix}003:${env:_ironServerPort003}"
-        # --set controller.service.loadBalancerIP="${env:_frontendIp}"
         # --debug
-    - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
-    - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
+    # - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
+    # - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
     - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'
     - shell: 'Write-Information "-- Check services: kubectl get svc --all-namespaces"'
+    - shell: 'Write-Information ">>    Test: curl -k -v http://${env:_frontendIp} -H ''Host: ${env:websiteHost}''"'
+    # For localhost: hack using port forward - https://kubernetes.github.io/ingress-nginx/deploy/baremetal/
+    - shell: 'Write-Information ">>    Find and kill any other processes using TCP ports :80 and :443 with netstat"'
+    - shell: 'Write-Information ">>    Localhost HACK. Manually execute: kubectl port-forward services/nginx-ingress-ingress-nginx-controller 80:80 443:443 -n ingress-nginx"'

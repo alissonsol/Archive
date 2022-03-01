@@ -10,8 +10,8 @@ globalVariables:
   websiteHost:           "www.yrn42.com"
   websiteTlsSecret:      "website-tls-secret"
   certManagerIssuerEmail: "certificates@yrn42.com"
-  _registryLocation:     "$($([Environment]::GetEnvironmentVariable(\"${env:registryName}.registryLocation\")) -replace '.azurecr.io','')"
-  dockerServer:          "http://${env:_registryLocation}.azurecr.io"
+  _registryLocation:     '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
+  dockerServer:          "${env:_registryLocation}.azurecr.io"
   dockerUsername:        "$(az acr credential show -n ${env:_registryLocation} --query username)"
   dockerPassword:        "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
   ingressClass:          "nginx"

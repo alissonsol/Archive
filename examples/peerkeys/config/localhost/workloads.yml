@@ -3,6 +3,7 @@
 # Example of escaping to the value to be parsed inside container: ``$``(MY_POD_IP``)
 # Notes: Using internal Docker addresses since etcd refuses the client or peer URLs when trying to bind to the host name or IP
 # Ingress: TCP: --set tcp.[external-port]="[namespace]/[service]:[port]"
+# For localhost, notice that the etcd type is set to NodePort
 ---
 globalVariables:
   # TO-SET: set domain below, like yrn42.com
@@ -27,8 +28,6 @@ globalVariables:
   _frontend003:          "${env:project}003.${env:_namespace003}"
   # Use any of the frontendIps for the patching in the localhost
   _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:runTag}-${env:_namespace001}.frontendIp\"))"
-  # RISK: This only works for IPv4
-  _addresses:            "$($($(kubectl get pod etcd-docker-desktop -n kube-system -o=jsonpath=\"{.status.podIP}\") -Split \"\\.\")[0]).0.0.0/8"
   etcdPassword:          "yurunaDemo"
   etcdPrefix:            "etcd"
   # https://etcd.io/docs/v3.5/op-guide/clustering/
@@ -47,21 +46,50 @@ globalVariables:
 
 workloads:
 
-# Cleanup and ingress
+# Cleanup
 - context: "docker-desktop"
   variables:
     namespace: "default"
   deployments:
     # Always delete everything first, so that no references are created to existing resources previously available
-    - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-nginx --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace001} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace002} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace003} --ignore-not-found=true --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     - kubectl: "delete secret registry-credential --ignore-not-found=true"
-    - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+    - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
     - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
+    # Install dependencies
+    - kubectl: "create namespace ingress-nginx --v=1"
+    - kubectl: "label namespace ingress-nginx cert-manager.io/disable-validation=true --v=1"
+    - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
+    # ---- LOCALHOST ---- START
+    # https://metallb.universe.tf/installation/
+    - shell: "$( $config = \"configInline:`n  address-pools:`n  - name: default`n    protocol: layer2`n    addresses:`n    - 127.0.0.1/32`n\"; $config | Out-File -FilePath ./config.yml ); $true"
+    - helm: "repo add metallb https://metallb.github.io/metallb"
+    - helm: "repo update"
+    - helm: >
+        install metallb metallb/metallb
+        --namespace ingress-nginx
+        -f config.yml
+    # For localhost: manually create certificate
+    - shell: "mkcert -install"
+    - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
+    - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"  
+    - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
+    # ---- LOCALHOST ---- END
+    # Certificate: goes first so clusterIssuer is ready when deploying templates later
+    - helm: "repo add jetstack https://charts.jetstack.io"
+    - helm: "repo update"
+    - helm: >
+        install cert-manager jetstack/cert-manager
+        --namespace ingress-nginx
+        --version v1.7.1
+        --set installCRDs=true
+        --set nodeSelector."beta\.kubernetes\.io/os"=linux
+        # --debug
         
 - context: "${env:runTag}-${env:project}-${env:runId}-001"
   variables:
@@ -95,7 +123,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -132,7 +160,7 @@ workloads:
   deployments:
     - kubectl: "create namespace ${env:namespace} --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-    - kubectl: "create secret docker-registry registry-credential --docker-server=http://${env:_registryLocation} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
+    - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - chart: "replicator-app"
       variables:
         installName: "replicator-app-${env:runId}-${env:_number}"
@@ -147,7 +175,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -199,7 +227,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -226,43 +254,12 @@ workloads:
     _gravapod002: '$(kubectl get pods --selector=app=${env:containerPrefix}002-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
     _gravapod003: '$(kubectl get pods --selector=app=${env:containerPrefix}003-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
   deployments:
-    # Install dependencies
-    - kubectl: "create namespace ingress-basic --v=1"
-    - kubectl: "label namespace ingress-basic cert-manager.io/disable-validation=true --v=1"
-    - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-    # For localhost: manually create certificate
-    - shell: "mkcert -install"
-    - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
-    - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"  
-    - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
-    # Certificate
-    - helm: "repo add jetstack https://charts.jetstack.io"
-    - helm: "repo update"
-    - helm: >
-        install cert-manager jetstack/cert-manager
-        --namespace ingress-basic
-        --version v1.7.1
-        --set installCRDs=true
-        --set nodeSelector."beta\.kubernetes\.io/os"=linux
-        # --debug
-    # For localhost: MetalLB
-    - shell: "$($ymlConfig = $(kubectl get configmap kube-proxy -n kube-system -o yaml) -replace 'strictARP: false','strictARP: true'; $ymlConfig | kubectl apply -n kube-system -f -)"
-    - kubectl: "create secret generic -n ingress-basic metallb-memberlist --from-literal=secretkey=\"$( $algo = new-Object System.Security.Cryptography.RijndaelManaged; $algo.KeySize=128; $algo.GenerateKey(); [Convert]::ToBase64String($algo.key) )\""
-    - helm: "repo add stable https://charts.helm.sh/stable"
-    - helm: "repo update"
-    - helm: >
-        install metallb stable/metallb
-        --namespace ingress-basic
-        --set configInline.address-pools[0].name=default
-        --set configInline.address-pools[0].protocol=layer2
-        --set configInline.address-pools[0].addresses[0]="${env:_frontendIp}-${env:_frontendIp}"
-        --debug         
     # Ingress
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-basic
+        --namespace ingress-nginx
         --set controller.replicaCount=1
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux

@@ -10,6 +10,7 @@ globalVariables:
   resourceGroup:         "${env:project}-${env:runId}"
   resourceTags:          "${env:project}-${env:runId}"
   registryName:          "componentsRegistry"
+  sourceContext:         "docker-desktop"
 
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
@@ -25,7 +26,6 @@ resources:
   variables:
     _number:             "001"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
-    sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
 
 # context-copy 002
@@ -34,7 +34,6 @@ resources:
   variables:
     _number:             "002"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
-    sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"
 
 # context-copy 003
@@ -43,5 +42,4 @@ resources:
   variables:
     _number:             "003"
     clusterName:         "${env:project}-${env:runId}-${env:_number}"
-    sourceContext:       "docker-desktop"
     destinationContext:  "${env:runTag}-${env:project}-${env:runId}-${env:_number}"

@@ -2,9 +2,10 @@
 ---
 globalVariables:
   DOCKER_SCAN_SUGGEST:   "false"
+  DOCKER_BUILDKIT:       "0"
   # Notice that the 'registryName' variable is used to find the name of another variable, requiring the dual indirection
-  buildCommand: docker build --rm --build-arg DEV=1 --no-cache -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
-  # buildCommand: docker build --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
+  buildCommand: docker build --progress=plain --rm --build-arg DEV=1 --no-cache -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
+  # buildCommand: docker build --progress=plain --rm -f ${env:dockerfile} -t "${env:containerPrefix}/${env:project}:latest" "${env:buildPath}"
   tagCommand: docker tag "${env:containerPrefix}/${env:project}:latest" "$([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))/${env:containerPrefix}/${env:project}:latest"
   pushCommand: docker push "$([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation"))/${env:containerPrefix}/${env:project}:latest"
 
@@ -17,3 +18,4 @@ components:
   variables:
 - project:               "ironrslkv"
   buildPath:             "api/ironrslkv"
+  variables:

@@ -48,4 +48,12 @@ Afterward, remove the `~/.kube` folder and enable Kubernetes again (this loses a
 
 This is an unexpected Azure behavior, confirmed by this post: [How to make Azure not delete Public IP when deleting service / ingress-controller?](https://www.javaer101.com/en/article/75709569.html). Following the workaround also has its side-effects. Makes is better to `clear`, and then rebuild everything (`resources`, `components`, and `workloads`).
 
+## Invoke-Expression: Cannot bind argument to parameter 'Command' because it is an empty string.
+
+Usually due to an executed `shell` expression that doesn't return anything. Add `$true` to the end of the expression.
+
+## Debug service
+
+Edit until it works using `kubectl edit svc [service-name] -n [namespace-name]`. The same is valid for other kinds of artifacts (configMaps, pods, etc.). Then try to create the sequence of `kubectl patch` statements to guarantee the artifact will get to the right state.
+
 Back to main [readme](../README.md)
