@@ -122,10 +122,8 @@ function Publish-ResourceListHelper {
                 Set-Item -Path Env:$key -Value ${value}
                 Write-Debug "$line"
             }
-            # execute terraform apply from work folder
             Push-Location $workFolder
 
-            # warn if terraform already initialized
             $terraformPath = Join-Path -Path $workFolder -ChildPath ".terraform"
             if ($isInitialization -and (Test-Path -Path $terraformPath)) {
                 Write-Information "-- WARNING: terraform already initialized: $terraformPath `n   Resource may not be created. Use 'yuruna clear' to clear terraform state.";

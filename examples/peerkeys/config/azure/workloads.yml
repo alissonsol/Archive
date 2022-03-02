@@ -30,7 +30,7 @@ globalVariables:
   etcdPrefix:            "etcd"
   # https://etcd.io/docs/v3.5/op-guide/clustering/
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-  etcdDiscovery:         "$(wget -q -O - https://discovery.etcd.io/new?size=3 2>null)"
+  etcdDiscovery:         "$(wget -q -O - https://discovery.etcd.io/new?size=3 2>$null)"
   etcdAddress001:        $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-001.frontendIp"))
   etcdHeadless001:       '${env:etcdPrefix}001-0.${env:etcdPrefix}001-headless.${env:_namespace001}.svc.cluster.local'
   etcdPortClient001:     "42001"

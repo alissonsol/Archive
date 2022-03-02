@@ -32,7 +32,7 @@ globalVariables:
   etcdPrefix:            "etcd"
   # https://etcd.io/docs/v3.5/op-guide/clustering/
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-  etcdDiscovery:         "$(curl https://discovery.etcd.io/new?size=3)"
+  etcdDiscovery:         "$(wget -q -O - https://discovery.etcd.io/new?size=3 2>$null)"
   etcdAddress001:        '${env:etcdPrefix}001-0.${env:etcdPrefix}001-headless.${env:_namespace001}.svc.cluster.local'
   etcdPortClient001:     "1379"
   etcdPortPeer001:       "1380"
@@ -67,21 +67,11 @@ workloads:
     - kubectl: "create namespace ingress-ns --v=1"
     - kubectl: "label namespace ingress-ns cert-manager.io/disable-validation=true --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-    # ---- LOCALHOST ---- START
-    # https://metallb.universe.tf/installation/
-    - shell: "$( $config = \"configInline:`n  address-pools:`n  - name: default`n    protocol: layer2`n    addresses:`n    - 127.0.0.1/32`n\"; $config | Out-File -FilePath ./config.yml ); $true"
-    - helm: "repo add metallb https://metallb.github.io/metallb"
-    - helm: "repo update"
-    - helm: >
-        install metallb metallb/metallb
-        --namespace ingress-ns
-        -f config.yml
     # For localhost: manually create certificate
     - shell: "mkcert -install"
     - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
     - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"  
     - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
-    # ---- LOCALHOST ---- END
     # Certificate: goes first so clusterIssuer is ready when deploying templates later
     - helm: "repo add jetstack https://charts.jetstack.io"
     - helm: "repo update"
@@ -125,7 +115,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -181,7 +171,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -237,7 +227,7 @@ workloads:
         --set containerPorts.peer=${env:replicatedStatePortPeer}
         --set service.port=${env:replicatedStatePortClient}
         --set service.peerPort=${env:replicatedStatePortPeer}
-        --set service.type=LoadBalancer
+        --set service.type=NodePort
         --set extraEnvVars[0].name=ALLOW_NONE_AUTHENTICATION
         --set extraEnvVars[0].value=yes
         --set extraEnvVars[1].name=ETCD_NAME
@@ -274,26 +264,35 @@ workloads:
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
         --namespace ingress-ns
-        --set controller.replicaCount=1
+        --set controller.replicaCount=2
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set controller.service.externalTrafficPolicy="Local"
+        --set controller.service.loadBalancerIP="${env:_frontendIp}"
         --set controller.admissionWebhooks.enabled=false
         --set controller.ingressClass=${env:ingressClass}
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
         --set controller.service.annotations."metallb\.universe\.tf/address-pool"="default"
-        --set controller.service.externalTrafficPolicy="Local"
-        --set controller.hostNetwork=true
-        --set controller.hostPort.enabled=true
-        # --set controller.service.loadBalancerIP="${env:_frontendIp}"
-        # --set tcp.${env:etcdPortClient001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortClient001}"
-        # --set tcp.${env:etcdPortPeer001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortPeer001}"
-        # --set tcp.${env:etcdPortClient002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortClient002}"
-        # --set tcp.${env:etcdPortPeer002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortPeer002}"
-        # --set tcp.${env:etcdPortClient003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortClient003}"
-        # --set tcp.${env:etcdPortPeer003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortPeer003}"
+        --set tcp.${env:etcdPortClient001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortClient001}"
+        --set tcp.${env:etcdPortPeer001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortPeer001}"
+        --set tcp.${env:etcdPortClient002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortClient002}"
+        --set tcp.${env:etcdPortPeer002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortPeer002}"
+        --set tcp.${env:etcdPortClient003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortClient003}"
+        --set tcp.${env:etcdPortPeer003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortPeer003}"
         # --debug
-    - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
-    - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
+    # - LOCALHOST HACK
+    - kubectl: "delete namespace metallb-system --ignore-not-found=true --v=1"
+    - kubectl: "create namespace metallb-system --v=1"
+    - helm: "repo add stable https://charts.helm.sh/stable"
+    - helm: "repo update"
+    - helm: >
+        install metallb stable/metallb
+        --namespace metallb-system
+        --set configInline.address-pools[0].name=default
+        --set configInline.address-pools[0].protocol=layer2
+        --set configInline.address-pools[0].addresses[0]="${env:_frontendIp}-${env:_frontendIp}"
+        --debug         
     - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'
     - shell: 'Write-Information "-- Check services: kubectl get svc --all-namespaces"'
-    - shell: "Write-Information \">>    Test: curl -k -v http://${env:_frontendIp} -H 'Host: ${env:websiteHost}'\""
+    - shell: 'Write-Information ">>    Test: curl -k -v http://${env:_frontendIp} -H ''Host: ${env:websiteHost}''"'
+    - shell: 'Write-Information ">>    Check usage of ports like 80 and 443 (Quit/starting Docker may resolve; not the menu item Restart!)"'

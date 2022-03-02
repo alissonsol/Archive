@@ -22,6 +22,8 @@ Include the `automation` folder in the path. Then deploy resources, build compon
 
 - Deploy the  workloads
 
+Before deploying workloads in the `localhost`, read the special note on [ingress issues in a localhost](../../../docs/ingress-localhost.md).
+
 ```shell
 ./yuruna.ps1 workloads ../examples/cloudtalk localhost
 ```

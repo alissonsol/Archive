@@ -1,6 +1,7 @@
 # Write the localhost name back for further processing
 $hostname=[System.Net.Dns]::GetHostByName($null).HostName
-$ip_address=([System.Net.DNS]::GetHostAddresses($null) | Where-Object {$_.AddressFamily -eq "InterNetwork"} | select-object IPAddressToString)[0].IPAddressToString
-# Using IP address in Windows because K8S in the Docker for Windows won't resolve the hostname from inside the container (works in macOS, Linux)
-if ($IsWindows) { $hostname = $ip_address; }
+$ip_addresses =  $([System.Net.Dns]::GetHostAddresses($hostname) | where {$_.AddressFamily -notlike "InterNetworkV6"} | where {$_.IPAddressToString -notlike "127.0.0.1"} | foreach {echo $_.IPAddressToString })
+$ip_address = $ip_addresses[0]
+# HACK: For localhost, using IP address to avoid issues in Docker resolving the hostname from inside the container
+$hostname = $ip_address;
 Write-Output "{ ""hostname"": ""$hostname"" }"

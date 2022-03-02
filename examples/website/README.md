@@ -23,7 +23,7 @@ Before deploying to the cloud environments, seek for `TO-SET` and set the requir
 
 Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
-**IMPORTANT**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](../../../docs/faq.md).
+**IMPORTANT**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](../../docs/faq.md).
 
 - Create resources
 
@@ -38,6 +38,8 @@ Below are the end-to-end steps to deploy the `website` project to `localhost` (a
 ```
 
 - Deploy the  workloads
+
+Before deploying workloads in the `localhost`, read the special note on [ingress issues in a localhost](../../docs/ingress-localhost.md).
 
 ```shell
 ./yuruna.ps1 workloads ../examples/website localhost

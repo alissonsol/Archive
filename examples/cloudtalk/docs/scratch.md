@@ -13,6 +13,71 @@ Scratch pad for commands and investigations.
 
 ## New debugging info
 
+### macOS and ingress investigation
+
+```shell
+
+    - helm: >
+        install nginx-ingress ingress-nginx/ingress-nginx
+        --namespace ingress-ns
+        --set controller.replicaCount=1
+        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set controller.admissionWebhooks.enabled=false
+        --set controller.ingressClass=${env:ingressClass}
+        --set controller.service.type="LoadBalancer"
+        --set controller.service.externalTrafficPolicy="Local"
+        --set controller.service.loadBalancerIP="${env:_frontendIp}"
+        --set tcp.${env:_ironServerPort001}="${env:_namespace001}/${env:ironPrefix}001:${env:_ironServerPort001}"
+        --set tcp.${env:_ironServerPort002}="${env:_namespace002}/${env:ironPrefix}002:${env:_ironServerPort002}"
+        --set tcp.${env:_ironServerPort003}="${env:_namespace003}/${env:ironPrefix}003:${env:_ironServerPort003}"
+        --set controller.service.annotations."metallb\.universe\.tf/address-pool"="default"
+        --debug
+    # For localhost: metallb
+    - shell: "$( $config = \"apiVersion: v1`nkind: ConfigMap`nmetadata:`n  namespace: metallb-system`n  name: config`ndata:`n  config: |`n    address-pools:`n    - name: default`n      protocol: layer2`n      addresses:`n      - ${env:_frontendIp}/32`n\"; $config | Out-File -FilePath ./config.yml ); $true"
+    - kubectl: "delete namespace metallb-system --ignore-not-found=true --v=1"
+    - kubectl: "create namespace metallb-system --v=1"
+    - kubectl: "create secret generic -n metallb-system metallb-memberlist --from-literal=secretkey=\"$( $algo = new-Object System.Security.Cryptography.RijndaelManaged; $algo.KeySize=128; $algo.GenerateKey(); [Convert]::ToBase64String($algo.key) )\""
+    - kubectl: "apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml"
+    - kubectl: "apply -f ./config.yml"
+
+    # For localhost: hack using port forward - https://kubernetes.github.io/ingress-nginx/deploy/baremetal/
+    - kubectl: "patch svc nginx-ingress-ingress-nginx-controller -n ingress-ns -p '{\\\"spec\\\": {\\\"type\\\": \\\"LoadBalancer\\\", \\\"externalIPs\\\":[\\\"${env:_frontendIp}\\\"]}}'"
+    - shell: 'Write-Information ">>    Find and kill any other processes using TCP ports :80 and :443 with netstat"'
+    - shell: 'Write-Information ">>    Localhost HACK. Manually execute: kubectl port-forward services/nginx-ingress-ingress-nginx-controller 80:80 443:443 -n ingress-nsF"'
+
+```
+
+###
+
+### ingree issues
+
+```shell
+
+kubectl patch svc nginx-ingress-ingress-nginx-controller -n ingress-ns -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.1.19"]}}'
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+
+kubectl apply -f file.yml
+
+file.yml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: | 
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.19/32
+      
+```
+
 ### 
 
 Same issue before and after starting servers. Grave log.

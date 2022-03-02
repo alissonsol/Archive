@@ -209,7 +209,6 @@ workloads:
   deployments:
     # Ingress
     - kubectl: "create namespace ingress-ns --v=1"
-    - kubectl: "label namespace ingress-ns cert-manager.io/disable-validation=true --v=1"
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >

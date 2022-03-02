@@ -56,4 +56,15 @@ Usually due to an executed `shell` expression that doesn't return anything. Add 
 
 Edit until it works using `kubectl edit svc [service-name] -n [namespace-name]`. The same is valid for other kinds of artifacts (configMaps, pods, etc.). Then try to create the sequence of `kubectl patch` statements to guarantee the artifact will get to the right state.
 
+## Debugging localhost issues
+
+A hack here after deploying resources and components is just to reset the Kubernetes cluster in Docker and reconnect the contexts. There is a PowerShell script named `context-copy` under the automation folder that can be used for that. The names of the contexts that may need to be reconnected at in the `resources.output.yml` file, and deleting those ahead of time avoids issues. Then, just use `context-copy [sourceContextName] [destinationContextName]`.
+
+GitHub issue documenting need to restart Docker: <https://github.com/docker/for-mac/issues/4903>
+
+## PodSecurityPolicy
+
+- Check with `kubectl get psp -A`
+- Delete with `kubectl delete psp [name]`
+
 Back to main [readme](../README.md)
