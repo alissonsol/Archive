@@ -12,11 +12,11 @@ RUN apt-get update && apt-get install -y python3-pip
 RUN apt-get update && apt-get install -y default-jre
 # Dafny moved to net6.0 but Ironclad is using .net5.0
 # https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian
-RUN wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-RUN dpkg -i packages-microsoft-prod.deb
-RUN rm packages-microsoft-prod.deb
-RUN apt-get update && apt-get install -y apt-transport-https
-RUN apt-get update && apt-get install -y aspnetcore-runtime-5.0
+# RUN wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+# RUN dpkg -i packages-microsoft-prod.deb
+# RUN rm packages-microsoft-prod.deb
+# RUN apt-get update && apt-get install -y apt-transport-https
+# RUN apt-get update && apt-get install -y aspnetcore-runtime-5.0
 RUN pip3 install lit OutputCheck
 RUN pip3 install scons
 RUN git config --global core.autocrlf input

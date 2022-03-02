@@ -50,7 +50,7 @@ workloads:
     namespace: "default"
   deployments:
     # Always delete everything first, so that no references are created to existing resources previously available
-    - kubectl: "delete namespace ingress-nginx --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace001} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace002} --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:_namespace003} --ignore-not-found=true --v=1"
@@ -60,8 +60,8 @@ workloads:
     - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
     - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
     # Install dependencies
-    - kubectl: "create namespace ingress-nginx --v=1"
-    - kubectl: "label namespace ingress-nginx cert-manager.io/disable-validation=true --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
+    - kubectl: "label namespace ingress-ns cert-manager.io/disable-validation=true --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     # For localhost: manually create certificate
     - shell: "mkcert -install"
@@ -73,7 +73,7 @@ workloads:
     - helm: "repo update"
     - helm: >
         install cert-manager jetstack/cert-manager
-        --namespace ingress-nginx
+        --namespace ingress-ns
         --version v1.7.1
         --set installCRDs=true
         --set nodeSelector."beta\.kubernetes\.io/os"=linux
@@ -202,13 +202,13 @@ workloads:
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-nginx
+        --namespace ingress-ns
         --set controller.replicaCount=1
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set controller.admissionWebhooks.enabled=false
         --set controller.ingressClass=${env:ingressClass}
-        --set controller.service.type="ClusterIP"
+        --set controller.service.type="LoadBalancer"
         --set controller.service.externalTrafficPolicy="Local"
         --set tcp.${env:_ironServerPort001}="${env:_namespace001}/${env:ironPrefix}001:${env:_ironServerPort001}"
         --set tcp.${env:_ironServerPort002}="${env:_namespace002}/${env:ironPrefix}002:${env:_ironServerPort002}"
@@ -221,4 +221,4 @@ workloads:
     - shell: 'Write-Information ">>    Test: curl -k -v http://${env:_frontendIp} -H ''Host: ${env:websiteHost}''"'
     # For localhost: hack using port forward - https://kubernetes.github.io/ingress-nginx/deploy/baremetal/
     - shell: 'Write-Information ">>    Find and kill any other processes using TCP ports :80 and :443 with netstat"'
-    - shell: 'Write-Information ">>    Localhost HACK. Manually execute: kubectl port-forward services/nginx-ingress-ingress-nginx-controller 80:80 443:443 -n ingress-nginx"'
+    - shell: 'Write-Information ">>    Localhost HACK. Manually execute: kubectl port-forward services/nginx-ingress-ingress-nginx-controller 80:80 443:443 -n ingress-ns"'

@@ -134,7 +134,7 @@ function Publish-ResourceListHelper {
             }
             Write-Debug "Terraform init"
             $result = $(terraform init *>&1 | Write-Verbose)
-            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }    
+            if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
             Write-Debug "Executing terraform command from $workFolder"
             $result = $($(Invoke-Expression $executionCommand) *>&1 | Write-Verbose)
             if (![string]::IsNullOrEmpty($result)) { Write-Debug "$result"; }
@@ -169,6 +169,17 @@ function Publish-ResourceList {
     # terraform plan -compact-warnings
     # terraform graph | dot -Tsvg > graph.svg
     # terraform apply -auto-approve
+
+    # copy resourcesFile to work folder under .yuruna
+    $resourcesFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.yml"
+    if (-Not (Test-Path -Path $resourcesFile)) { Write-Information "File not found: $resourcesFile"; return $false; }
+    $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/resources"
+    $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+    $workFolder = Resolve-Path -Path $workFolder
+    $dtTime = '{0}' -f ([system.string]::format('{0:yyyy-MM-dd-HH-mm-ss}',(Get-Date)))
+    $backupFile = Join-Path -Path $workFolder -ChildPath "resources.$dtTime.yml"
+    Copy-Item "$resourcesFile" -Destination $backupFile -Recurse -Container -ErrorAction SilentlyContinue
+    Write-Verbose "Backup of: $resourcesFile copied to: $backupFile"
 
     $executionCommand = "terraform plan -compact-warnings"
     $result = Publish-ResourceListHelper -project_root $project_root -config_subfolder $config_subfolder -executionCommand $executionCommand -isInitialization $true

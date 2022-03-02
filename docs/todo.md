@@ -4,7 +4,9 @@
 
 ### P0, P1
 
-- peerkeys: etcd updates (PASSWORD?)
+- peerkeys: etcd ERROR ==> Headless service domain does not have an IP per initial member in the cluster 
+- Need something like: loop: _number(001-003)
+- curl x wget?
 - cloudtalk: in ARM, `apt-get install -y aspnetcore-runtime-5.0` is not working
   - More investigation needed: <https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian>
 - Use MetalLB or other solution to replace port forward in bare metal: <https://kubernetes.github.io/ingress-nginx/deploy/baremetal/>

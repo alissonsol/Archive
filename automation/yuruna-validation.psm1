@@ -119,25 +119,27 @@ function Confirm-ResourceOutputList {
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     # If is valid for the resources output not to exist yet
     if (-Not (Test-Path -Path $resourcesOutputFile)) { Write-Verbose "Resources output file not found: $resourcesOutputFile"; return $true; }
-    $yaml = ConvertFrom-File $resourcesOutputFile
+    $resourcesOutputYaml = ConvertFrom-File $resourcesOutputFile
 
     # Validate resources output list
-    if ($null -eq $yaml) { Write-Information "resources output cannot be null or empty in file: $resourcesOutputFile"; return $false; }
-    Write-Verbose "---- Validating Resources Output"
-    foreach ($resource in $yaml.Keys) {
-        if ($resource -eq "globalVariables") {
-            foreach ($key in $yaml.$resource.Keys) {
-                $variableName = $key
-                $variableValue = $yaml.$resource[$key]
-                Write-Verbose "globalVariables[$variableName] = $variableValue"
+    if ($null -eq $resourcesOutputYaml) { Write-Information "resources output cannot be null or empty in file: $resourcesOutputFile"; return $false; }
+    if ((-Not ($null -eq $resourcesOutputYaml)) -and (-Not ($null -eq  $resourcesOutputYaml.Keys))) {
+        foreach ($resource in $resourcesOutputYaml.Keys) {
+            if ($resource -eq "globalVariables") {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$key"
+                    $value = $resourcesOutputYaml.$resource[$key]
+                    Write-Debug "globalVariables[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
+                }
             }
-        }
-        else {
-            foreach ($key in $yaml.$resource.Keys) {
-                $variableName = $key
-                $variableValue = $yaml.$resource[$key].value
-                Write-Verbose "resourcesOutput[$resource][$variableName] = $variableValue"
-                if ([string]::IsNullOrEmpty($variableValue)) { Write-Information "resourceOutput[$resource][$variableName] have null or empty value in: $resourcesOutputFile"; return $false; }
+            else {
+                foreach ($key in $resourcesOutputYaml.$resource.Keys) {
+                    $resourceKey = "$resource.$key"
+                    $value = $resourcesOutputYaml.$resource[$key].value
+                    Write-Debug "resourcesOutput[$resourceKey] = $value"
+                    Set-Item -Path Env:$resourceKey -Value ${value}
+                }
             }
         }
     }

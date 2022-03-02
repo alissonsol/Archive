@@ -40,6 +40,15 @@ function Publish-WorkloadList {
     if ($null -eq $workloadsYaml) { Write-Information "Workloads null or empty in file: $workloadsFile"; return $true; }
     if ($null -eq $workloadsYaml.workloads) { Write-Information "Workloads null or empty in file: $workloadsFile"; return $true; }
 
+    # copy workloadsFile to work folder under .yuruna
+    $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/workloads"
+    $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+    $workFolder = Resolve-Path -Path $workFolder
+    $dtTime = '{0}' -f ([system.string]::format('{0:yyyy-MM-dd-HH-mm-ss}',(Get-Date)))
+    $backupFile = Join-Path -Path $workFolder -ChildPath "workloads.$dtTime.yml"
+    Copy-Item "$workloadsFile" -Destination $backupFile -Recurse -Container -ErrorAction SilentlyContinue
+    Write-Verbose "Backup of: $workloadsFile copied to: $backupFile"
+
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {

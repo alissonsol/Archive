@@ -1,4 +1,4 @@
-# Workloads information - localhost
+# Workloads information - azure
 # Ref: https://etcd.io/docs/current/op-guide/configuration/ + https://github.com/bitnami/charts/tree/master/bitnami/etcd + https://etcd.io/docs/v3.4.0/op-guide/container/ and comments at end!
 # Example of escaping to the value to be parsed inside container: ``$``(MY_POD_IP``)
 # Notes: Using internal Docker addresses since etcd refuses the client or peer URLs when trying to bind to the host name or IP
@@ -16,83 +16,73 @@ globalVariables:
   websiteTlsSecret:      "website-tls-secret"
   certManagerIssuerEmail: "certificates@cloudtalk.app"
   _registryLocation:     '$($([Environment]::GetEnvironmentVariable("${env:registryName}.registryLocation")) -replace ''.azurecr.io'','''')'
-  dockerServer:          "http://${env:_registryLocation}"
-  dockerUsername:        "placeholder"
-  dockerPassword:        "placeholder"
+  dockerServer:          "${env:_registryLocation}.azurecr.io"
+  dockerUsername:        "$(az acr credential show -n ${env:_registryLocation} --query username)"
+  dockerPassword:        "$(az acr credential show -n ${env:_registryLocation} --query passwords[0].value)"
   ingressClass:          "nginx"
   _namespace001:         "${env:project}-${env:runId}-001"
   _namespace002:         "${env:project}-${env:runId}-002"
   _namespace003:         "${env:project}-${env:runId}-003"
-  _frontend001:          "${env:project}001.${env:_namespace001}"
-  _frontend002:          "${env:project}002.${env:_namespace002}"
-  _frontend003:          "${env:project}003.${env:_namespace003}"
-  # Use any of the frontendIps for the patching in the localhost
-  _frontendIp:           "$([Environment]::GetEnvironmentVariable(\"${env:runTag}-${env:_namespace001}.frontendIp\"))"
+  _frontend001:          $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-001.hostname"))
+  _frontend002:          $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-002.hostname"))
+  _frontend003:          $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-003.hostname"))
   etcdPassword:          "yurunaDemo"
   etcdPrefix:            "etcd"
   # https://etcd.io/docs/v3.5/op-guide/clustering/
   # Avoid collisions: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-  etcdDiscovery:         "$(curl https://discovery.etcd.io/new?size=3)"
-  etcdAddress001:        '${env:etcdPrefix}001-0.${env:etcdPrefix}001-headless.${env:_namespace001}.svc.cluster.local'
-  etcdPortClient001:     "1379"
-  etcdPortPeer001:       "1380"
-  etcdAddress002:        '${env:etcdPrefix}002-0.${env:etcdPrefix}002-headless.${env:_namespace002}.svc.cluster.local'
-  etcdPortClient002:     "2379"
-  etcdPortPeer002:       "2380"
-  etcdAddress003:        '${env:etcdPrefix}003-0.${env:etcdPrefix}003-headless.${env:_namespace003}.svc.cluster.local'
-  etcdPortClient003:     "3379"
-  etcdPortPeer003:       "3380"
+  etcdDiscovery:         "$(wget -q -O - https://discovery.etcd.io/new?size=3 2>null)"
+  etcdAddress001:        $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-001.frontendIp"))
+  etcdHeadless001:       '${env:etcdPrefix}001-0.${env:etcdPrefix}001-headless.${env:_namespace001}.svc.cluster.local'
+  etcdPortClient001:     "42001"
+  etcdPortPeer001:       "43001"
+  etcdAddress002:        $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-002.frontendIp"))
+  etcdHeadless002:       '${env:etcdPrefix}002-0.${env:etcdPrefix}002-headless.${env:_namespace002}.svc.cluster.local'
+  etcdPortClient002:     "42002"
+  etcdPortPeer002:       "43002"
+  etcdAddress003:        $([Environment]::GetEnvironmentVariable("${env:runTag}-${env:project}-${env:runId}-003.frontendIp"))
+  etcdHeadless003:       '${env:etcdPrefix}003-0.${env:etcdPrefix}003-headless.${env:_namespace003}.svc.cluster.local'
+  etcdPortClient003:     "42003"
+  etcdPortPeer003:       "43003"
   etcdCluster:           ${env:etcdPrefix}001=http://${env:etcdAddress001}:${env:etcdPortPeer001}\,${env:etcdPrefix}002=http://${env:etcdAddress002}:${env:etcdPortPeer002}\,${env:etcdPrefix}003=http://${env:etcdAddress003}:${env:etcdPortPeer003}
   etcdClusterToken:      "nossila"  
   waitTimeout:           "2m"
 
 workloads:
-
 # Cleanup
-- context: "docker-desktop"
+# Always delete everything first, so that no references are created to existing resources previously available
+- context: "${env:runTag}-${env:project}-${env:runId}-001"
   variables:
-    namespace: "default"
+    _number: "001"
+    _basename: "${env:containerPrefix}${env:_number}"
+    namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
   deployments:
-    # Always delete everything first, so that no references are created to existing resources previously available
     - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
-    - kubectl: "delete namespace ${env:_namespace001} --ignore-not-found=true --v=1"
-    - kubectl: "delete namespace ${env:_namespace002} --ignore-not-found=true --v=1"
-    - kubectl: "delete namespace ${env:_namespace003} --ignore-not-found=true --v=1"
-    - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-    - kubectl: "delete secret registry-credential --ignore-not-found=true"
-    - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
-    - shell: 'Write-Information "   Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"'
-    - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=${env:waitTimeout}"
-    # Install dependencies
-    - kubectl: "create namespace ingress-ns --v=1"
-    - kubectl: "label namespace ingress-ns cert-manager.io/disable-validation=true --v=1"
-    - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
-    # ---- LOCALHOST ---- START
-    # https://metallb.universe.tf/installation/
-    - shell: "$( $config = \"configInline:`n  address-pools:`n  - name: default`n    protocol: layer2`n    addresses:`n    - 127.0.0.1/32`n\"; $config | Out-File -FilePath ./config.yml ); $true"
-    - helm: "repo add metallb https://metallb.github.io/metallb"
-    - helm: "repo update"
-    - helm: >
-        install metallb metallb/metallb
-        --namespace ingress-ns
-        -f config.yml
-    # For localhost: manually create certificate
-    - shell: "mkcert -install"
-    - shell: "mkcert -key-file \"${env:workFolder}/website-tls.key\" -cert-file \"${env:workFolder}/website-tls.crt\" ${env:websiteDomain} \"*.${env:websiteDomain}\" localhost \"*.localhost\" 127.0.0.1 ::1 ${env:_hostname}"
-    - kubectl: "delete secret ${env:websiteTlsSecret} --namespace=${env:namespace} --ignore-not-found=true"  
-    - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"
-    # ---- LOCALHOST ---- END
-    # Certificate: goes first so clusterIssuer is ready when deploying templates later
-    - helm: "repo add jetstack https://charts.jetstack.io"
-    - helm: "repo update"
-    - helm: >
-        install cert-manager jetstack/cert-manager
-        --namespace ingress-ns
-        --version v1.7.1
-        --set installCRDs=true
-        --set nodeSelector."beta\.kubernetes\.io/os"=linux
-        # --debug
-        
+    - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
+    - shell: 'Write-Information "   Cleaned ${env:contextName}"'
+
+- context: "${env:runTag}-${env:project}-${env:runId}-002"
+  variables:
+    _number: "002"
+    _basename: "${env:containerPrefix}${env:_number}"
+    namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
+  deployments:
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
+    - shell: 'Write-Information "   Cleaned ${env:contextName}"'
+
+- context: "${env:runTag}-${env:project}-${env:runId}-003"
+  variables:
+    _number: "003"
+    _basename: "${env:containerPrefix}${env:_number}"
+    namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
+  deployments:
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
+    - shell: 'Write-Information "   Cleaned ${env:contextName}"'
+
+# Artifact creation phase
+
+# 001
 - context: "${env:runTag}-${env:project}-${env:runId}-001"
   variables:
     _number: "001"
@@ -106,9 +96,12 @@ workloads:
     replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdPortClient${env:_number}"))'
     replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdPortPeer${env:_number}"))'
     replicatedStateAppAddress: '$([Environment]::GetEnvironmentVariable("etcdAddress${env:_number}"))'
+    replicatedStateAppHeadless: '$([Environment]::GetEnvironmentVariable("etcdHeadless${env:_number}"))'
     _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+    _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     - kubectl: "create namespace ${env:namespace} --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - chart: "replicator-app"
@@ -145,10 +138,27 @@ workloads:
         --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
         --set extraEnvVars[8].value=${env:etcdClusterToken}
         --debug
+    - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+    - helm: "repo update"
+    - helm: >
+        install nginx-ingress ingress-nginx/ingress-nginx
+        --namespace ingress-ns
+        --set controller.replicaCount=2
+        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set controller.service.externalTrafficPolicy="Local"
+        --set controller.service.loadBalancerIP="${env:_frontendIp}"
+        --set controller.admissionWebhooks.enabled=false
+        --set controller.ingressClass=${env:ingressClass}
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
+        --set tcp.${env:replicatedStatePortClient}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortClient}"
+        --set tcp.${env:replicatedStatePortPeer}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortPeer}"        
+        # --debug
     - kubectl: "expose deployment/${env:frontendApp}"
     - kubectl: "expose deployment/${env:backendApp}"
-    - shell: 'Write-Information "   Enpoint: http://${env:_frontendIp}/${env:frontendPathBase}"'
+    - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
+# 002
 - context: "${env:runTag}-${env:project}-${env:runId}-002"
   variables:
     _number: "002"
@@ -162,9 +172,12 @@ workloads:
     replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdPortClient${env:_number}"))'
     replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdPortPeer${env:_number}"))'
     replicatedStateAppAddress: '$([Environment]::GetEnvironmentVariable("etcdAddress${env:_number}"))'
+    replicatedStateAppHeadless: '$([Environment]::GetEnvironmentVariable("etcdHeadless${env:_number}"))'
     _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+    _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     - kubectl: "create namespace ${env:namespace} --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - chart: "replicator-app"
@@ -201,10 +214,27 @@ workloads:
         --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
         --set extraEnvVars[8].value=${env:etcdClusterToken}
         --debug
+    - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+    - helm: "repo update"
+    - helm: >
+        install nginx-ingress ingress-nginx/ingress-nginx
+        --namespace ingress-ns
+        --set controller.replicaCount=2
+        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+        --set controller.service.externalTrafficPolicy="Local"
+        --set controller.service.loadBalancerIP="${env:_frontendIp}"
+        --set controller.admissionWebhooks.enabled=false
+        --set controller.ingressClass=${env:ingressClass}
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
+        --set tcp.${env:replicatedStatePortClient}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortClient}"
+        --set tcp.${env:replicatedStatePortPeer}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortPeer}"        
+        # --debug
     - kubectl: "expose deployment/${env:frontendApp}"
     - kubectl: "expose deployment/${env:backendApp}"
-    - shell: 'Write-Information "   Enpoint: http://${env:_frontendIp}/${env:frontendPathBase}"'
+    - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'
 
+# 003
 - context: "${env:runTag}-${env:project}-${env:runId}-003"
   variables:
     _number: "003"
@@ -218,9 +248,12 @@ workloads:
     replicatedStatePortClient: '$([Environment]::GetEnvironmentVariable("etcdPortClient${env:_number}"))'
     replicatedStatePortPeer: '$([Environment]::GetEnvironmentVariable("etcdPortPeer${env:_number}"))'
     replicatedStateAppAddress: '$([Environment]::GetEnvironmentVariable("etcdAddress${env:_number}"))'
+    replicatedStateAppHeadless: '$([Environment]::GetEnvironmentVariable("etcdHeadless${env:_number}"))'
     _endpointHost: '$([Environment]::GetEnvironmentVariable("${env:contextName}.hostname"))'
+    _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     - kubectl: "create namespace ${env:namespace} --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     - kubectl: "create secret docker-registry registry-credential --docker-server=${env:dockerServer} --docker-username=${env:dockerUsername} --docker-password=${env:dockerPassword}"
     - chart: "replicator-app"
@@ -257,43 +290,22 @@ workloads:
         --set extraEnvVars[8].name=ETCD_INITIAL_CLUSTER_TOKEN
         --set extraEnvVars[8].value=${env:etcdClusterToken}
         --debug
-    - kubectl: "expose deployment/${env:frontendApp}"
-    - kubectl: "expose deployment/${env:backendApp}"
-    - shell: 'Write-Information "   Enpoint: http://${env:_frontendIp}/${env:frontendPathBase}"'
-
-- context: "docker-desktop"
-  variables:
-    namespace: "default"
-    _gravapod001: '$(kubectl get pods --selector=app=${env:containerPrefix}001-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
-    _gravapod002: '$(kubectl get pods --selector=app=${env:containerPrefix}002-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
-    _gravapod003: '$(kubectl get pods --selector=app=${env:containerPrefix}003-grava --all-namespaces --no-headers -o custom-columns=":metadata.name")'
-  deployments:
-    # Ingress
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
         --namespace ingress-ns
-        --set controller.replicaCount=1
+        --set controller.replicaCount=2
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set controller.service.externalTrafficPolicy="Local"
+        --set controller.service.loadBalancerIP="${env:_frontendIp}"
         --set controller.admissionWebhooks.enabled=false
         --set controller.ingressClass=${env:ingressClass}
-        --set controller.service.annotations."metallb\.universe\.tf/address-pool"="default"
-        --set controller.service.externalTrafficPolicy="Local"
-        --set controller.hostNetwork=true
-        --set controller.hostPort.enabled=true
-        # --set controller.service.loadBalancerIP="${env:_frontendIp}"
-        # --set tcp.${env:etcdPortClient001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortClient001}"
-        # --set tcp.${env:etcdPortPeer001}="${env:_namespace001}/${env:etcdPrefix}001:${env:etcdPortPeer001}"
-        # --set tcp.${env:etcdPortClient002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortClient002}"
-        # --set tcp.${env:etcdPortPeer002}="${env:_namespace002}/${env:etcdPrefix}002:${env:etcdPortPeer002}"
-        # --set tcp.${env:etcdPortClient003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortClient003}"
-        # --set tcp.${env:etcdPortPeer003}="${env:_namespace003}/${env:etcdPrefix}003:${env:etcdPortPeer003}"
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${env:project}-${env:runId}-${env:_number}"
+        --set tcp.${env:replicatedStatePortClient}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortClient}"
+        --set tcp.${env:replicatedStatePortPeer}="${env:namespace}/${env:replicatedStateApp}:${env:replicatedStatePortPeer}"        
         # --debug
-    - shell: 'Write-Information "-- Waiting: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"'
-    - kubectl: "wait --for=condition=Ready pods --all --all-namespaces --timeout=120s"
-    - shell: 'Write-Information "-- Check containers started: kubectl get pods --all-namespaces"'
-    - shell: 'Write-Information "-- Check services: kubectl get svc --all-namespaces"'
-    - shell: "Write-Information \">>    Test: curl -k -v http://${env:_frontendIp} -H 'Host: ${env:websiteHost}'\""
+    - kubectl: "expose deployment/${env:frontendApp}"
+    - kubectl: "expose deployment/${env:backendApp}"
+    - shell: 'Write-Information "   Enpoint: http://${env:_endpointHost}/${env:frontendPathBase}"'

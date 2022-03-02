@@ -39,6 +39,16 @@ function Publish-ComponentList {
     if ($null -eq $componentsYaml) { Write-Information "Components null or empty in file: $componentsFile"; return $true; }
     if ($null -eq $componentsYaml.components) { Write-Information "Components null or empty in file: $componentsFile"; return $true; }
 
+    # copy componentsFile to work folder under .yuruna
+    $workFolder = Join-Path -Path $project_root -ChildPath ".yuruna/$config_subfolder/components"
+    $null = New-Item -ItemType Directory -Force -Path $workFolder -ErrorAction SilentlyContinue
+    $workFolder = Resolve-Path -Path $workFolder
+    $dtTime = '{0}' -f ([system.string]::format('{0:yyyy-MM-dd-HH-mm-ss}',(Get-Date)))
+    $backupFile = Join-Path -Path $workFolder -ChildPath "components.$dtTime.yml"
+    Copy-Item "$componentsFile" -Destination $backupFile -Recurse -Container -ErrorAction SilentlyContinue
+    Write-Verbose "Backup of: $componentsFile copied to: $backupFile"
+    # TODO: Decide on copying all code also
+
     $resourcesOutputFile = Join-Path -Path $project_root -ChildPath "config/$config_subfolder/resources.output.yml"
     $resourcesOutputYaml = $null
     if (Test-Path -Path $resourcesOutputFile) {

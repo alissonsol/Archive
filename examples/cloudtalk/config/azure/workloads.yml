@@ -50,7 +50,7 @@ workloads:
     _basename: "${env:containerPrefix}${env:_number}"
     namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
   deployments:
-    - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
     - kubectl: "config set-context --current --namespace=default --v=1"
     - kubectl: "delete secret registry-credential --ignore-not-found=true"
@@ -63,7 +63,7 @@ workloads:
     _basename: "${env:containerPrefix}${env:_number}"
     namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
   deployments:
-    - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
     - kubectl: "config set-context --current --namespace=default --v=1"
     - kubectl: "delete secret registry-credential --ignore-not-found=true"
@@ -76,7 +76,7 @@ workloads:
     _basename: "${env:containerPrefix}${env:_number}"
     namespace: '$([Environment]::GetEnvironmentVariable("_namespace${env:_number}"))'
   deployments:
-    - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+    - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
     - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
     - kubectl: "config set-context --current --namespace=default --v=1"
     - kubectl: "delete secret registry-credential --ignore-not-found=true"
@@ -208,13 +208,13 @@ workloads:
     _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     # Ingress
-    - kubectl: "create namespace ingress-basic --v=1"
-    - kubectl: "label namespace ingress-basic cert-manager.io/disable-validation=true --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
+    - kubectl: "label namespace ingress-ns cert-manager.io/disable-validation=true --v=1"
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-basic
+        --namespace ingress-ns
         --set controller.replicaCount=2
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
@@ -245,12 +245,12 @@ workloads:
     _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     # Ingress
-    - kubectl: "create namespace ingress-basic --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-basic
+        --namespace ingress-ns
         --set controller.replicaCount=2
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
@@ -281,12 +281,12 @@ workloads:
     _frontendIp: "$([Environment]::GetEnvironmentVariable(\"${env:contextName}.frontendIp\"))"
   deployments:
     # Ingress
-    - kubectl: "create namespace ingress-basic --v=1"
+    - kubectl: "create namespace ingress-ns --v=1"
     - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
     - helm: "repo update"
     - helm: >
         install nginx-ingress ingress-nginx/ingress-nginx
-        --namespace ingress-basic
+        --namespace ingress-ns
         --set controller.replicaCount=2
         --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
         --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux

@@ -27,12 +27,12 @@ workloads:
   deployments:
   # Uninstall previous workloads: idempotent
   - kubectl: "delete namespace ${env:namespace} --ignore-not-found=true --v=1"
-  - kubectl: "delete namespace ingress-basic --ignore-not-found=true --v=1"
+  - kubectl: "delete namespace ingress-ns --ignore-not-found=true --v=1"
   - kubectl: "delete clusterrole nginx-ingress-ingress-nginx --ignore-not-found=true"
   - kubectl: "delete clusterrolebinding nginx-ingress-ingress-nginx --ignore-not-found=true"
   # Install dependencies
   - kubectl: "create namespace ${env:namespace} --v=1"
-  - kubectl: "create namespace ingress-basic --v=1"
+  - kubectl: "create namespace ingress-ns --v=1"
   - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
   - helm: "repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
   - helm: "repo update"
@@ -43,7 +43,7 @@ workloads:
   - kubectl: "create secret tls ${env:websiteTlsSecret} --key \"${env:workFolder}/website-tls.key\" --cert \"${env:workFolder}/website-tls.crt\" --namespace=${env:namespace}"  
   - helm: >
       install nginx-ingress ingress-nginx/ingress-nginx
-      --namespace ingress-basic
+      --namespace ingress-ns
       --set controller.replicaCount=2
       --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux
       --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
