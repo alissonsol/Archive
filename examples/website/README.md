@@ -58,9 +58,6 @@ As output, the following values will become available for later steps:
 - Check you can navigate to the endpoint reported after publishing the workloads.
 - Check services are available with the command: `kubectl get services --all-namespaces`
 - Check cluster events with the command: `kubectl get events --all-namespaces`
-- In Azure, if the `EXTERNAL-IP` for the `nginx-ingress` is still loading after several minutes
-  - Check if there is an event starting with `Error syncing load balancer: failed to ensure load balancer: ensurePublicIPExists for service...`
-  - Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP. You can verify that in the <https://portal.azure.com>. Hint: it is the cluster name!
 
 ## Cloud deployment instructions
 
@@ -75,9 +72,11 @@ As output, the following values will become available for later steps:
 
 - Search for `TO-SET`
   - Azure requires a globally unique registry name.
-    - Ping `yourname.azurecr.io` and confirm that name is not already in use.
-    - Set the value just to the unique host name, like `yrn42website` (not `yrn42website.azurecr.io`).
+    - Ping `yourname.azurecr.io` to confirm that a name is not already in use.
 - Afterward, execute the same commands above, replacing `localhost` with `azure`.
+- In Azure, if the `EXTERNAL-IP` for the `nginx-ingress` is still loading after several minutes
+  - Check if there is an event starting with `Error syncing load balancer: failed to ensure load balancer: ensurePublicIPExists for service...`
+  - Make sure the `azure-dns-label-name` in the Helm deployment has the same label of the `frontendIp` public IP. You can verify that in the <https://portal.azure.com>. Hint: it is the cluster name!
 - In AKS, if you need to rerun the `workloads`, your IP Address may be deleted when the previous ingress controller is deleted. Check how to lock the IP resource in this [issue](https://stackoverflow.com/questions/66435282/how-to-make-azure-not-delete-public-ip-when-deleting-service-ingress-controlle).
 
 Back to main [readme](../../README.md). Back to list of [examples](../README.md).

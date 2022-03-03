@@ -1,8 +1,18 @@
 # `yuruna` syntax
 
-The connection between the Yaml configuration files and the actions taken by each command is explained in presentation available in [PowerPoint](yuruna.pptx) and [PDF](yuruna.pdf) formats.
+The connection between the Yaml configuration files and the actions taken by each command is explained in a presentation available in [PowerPoint](yuruna.pptx) and [PDF](yuruna.pdf) formats.
 
-## Parameters
+## Syntax
+
+Include the `automation` folder in the path. Then deploy resources, build components, and install workloads. The command syntax is shown below.
+
+```shell
+yuruna.ps1 resources  [project_root] [config_subfolder] [options]
+yuruna.ps1 components [project_root] [config_subfolder] [options]
+yuruna.ps1 workloads  [project_root] [config_subfolder] [options]
+```
+
+## Commands
 
 The main PowerShell script is named `yuruna` and accepts the following parameters:
 
