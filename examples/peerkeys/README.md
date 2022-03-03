@@ -2,21 +2,11 @@
 
 Key/value replication across nodes using [etcd](https://etcd.io/).
 
-Follow the instructions to create resources, build components and deploy the workloads. Connect to one of the frontends. Endpoints are exposed during the workloads deployment.
-
-## Search and replace
-
-Reuse this project by search and replacing placeholders in case-sensitive mode.
-
-- yrn42peerkeys-tags -> Resource tags. Example: yrn42
-
-Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42peerkeys-tags` first and then use this regular expression to search and replace the others:  `(yrn42peerkeys)[A-Za-z0-9\-]*`
-
-Before deploying to the cloud environments, seek for `TO-SET` and set the required values. See section "Cloud deployment instructions".
-
-## End to end deployment
+## End-to-end deployment
 
 Below are the end-to-end steps to deploy the `peerkeys` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+
+Before deploying, seek for `TO-SET` in the config files and set the required values. See section "Cloud deployment instructions".
 
 **IMPORTANT**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](../../docs/faq.md).
 
@@ -34,8 +24,6 @@ Below are the end-to-end steps to deploy the `peerkeys` project to `localhost` (
 
 - Deploy the  workloads
 
-Before deploying workloads in the `localhost`, read the special note on [ingress issues in a localhost](../../docs/ingress-localhost.md).
-
 ```shell
 ./yuruna.ps1 workloads ../examples/peerkeys localhost
 ```
@@ -51,7 +39,7 @@ Enter the key in another endpoint and press get. You should retrieve that same v
 Terraform will be used to create the following resources:
 
 - Registry: {componentsRegistry}
-- Clusters and corresponding local context: {yrn42peerkeys001}, {yrn42peerkeys002}, {yrn42peerkeys003}
+- Clusters and corresponding local context. For localhost deployments, copies of the default context will be created.
 
 As output, the following values will become available for later steps:
 
@@ -63,36 +51,37 @@ As output, the following values will become available for later steps:
 ## Components
 
 - A Docker container image for a .NET C# website.
-- A Docker container image for a key-value storage API.
+- A BFF (Backend For Frontend) component named grava.
+- A Docker container image for a key-value storage service, using `etcd`.
 - [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx)
 - Azure Kubernetes Service (AKS) [HTTP application routing](https://docs.microsoft.com/en-us/azure/aks/http-application-routing)
 
 ## Workloads
 
 - The frontend/website will be deployed to each cluster.
-- The key-value storage API will be deployed to each cluster.
+- A component named grava, implementing a BFF (Backend For Frontend) API.
+- The key-value storage service will be deployed to each cluster.
 - Ingress controller and redirect rules are deployed to each cluster (once only in localhost).
 
 ## Cloud deployment instructions
 
-These steps need be executed just once, unless you modify configurations.
+- Confirm [requirements](../../docs/requirements.md)
+- [Authenticate](../../docs/authenticate.md) with your cloud provider
 
-- Confirm [requirements](../../../docs/requirements.md)
-  - The PowerShell scripts do not verify that requirements are met.
-- [Authenticate](../../../docs/authenticate.md) with your cloud provider
-  - Instructions assume execution from a PowerShell prompt connected to the cloud account.
+### Azure
 
-After authentication, deploy to Azure using the following sequence. Make sure those values `TO-SET` are globally unique.
+After authentication, deploy to Azure using the following sequence. Make sure those values `TO-SET` are globally unique. The example automates the steps to deploy components and expose services, as explained in the MSDN article [Up and Running with Azure Kubernetes Services](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/december/containers-up-and-running-with-azure-kubernetes-services).
 
 ```shell
 ./yuruna.ps1 resources ../examples/peerkeys azure
 ./yuruna.ps1 components ../examples/peerkeys azure
 ./yuruna.ps1 workloads ../examples/peerkeys azure
 ```
+**IMPORTANT**: Remember to clean up the resources when no longer using them.
 
 ## Notes
 
-Peerkeys exemplifies frontend, backend, and K8S "composing". The example automates the steps to deploy components and expose services, as explained in the MSDN article [Up and Running with Azure Kubernetes Services](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/december/containers-up-and-running-with-azure-kubernetes-services). In a cloud deployment, each cluster gets the ingress, which will expose the frontend site and the backend API from different endpoints, mapping to the internal services (via HTTP, port 80).
+Peerkeys exemplifies frontend, backend, and K8S "composing". In a cloud deployment, each cluster gets the ingress, which will expose the frontend site and the backend API from different endpoints, mapping to the internal services (via HTTP, port 80).
 
 <img src="peerkeys-cloud.png" alt="peerkeys in the cloud" width="640"/>
 

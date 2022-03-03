@@ -9,7 +9,7 @@ It is provided "as is" without guarantees. See [license](LICENSE.md). Always che
 These steps need be executed just once, unless you modify configurations.
 
 - Confirm [requirements](docs/requirements.md)
-  - The PowerShell scripts do not verify that requirements are met.
+  - If PowerShell is installed, check versions with `yuruna.ps1 requirements`.
 - [Authenticate](docs/authenticate.md) with your cloud provider
   - Instructions assume execution from a PowerShell prompt connected to the cloud account.
   - Depending on your cloud, login mechanism and activity, the authentication may timeout and need to be repeated.

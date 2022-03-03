@@ -10,6 +10,11 @@
       - That may be hard due to issues like [HTTP services can't be stopped when the Microsoft Web Deployment Service is installed](https://docs.microsoft.com/en-us/troubleshoot/iis/http-service-fail-stopped). Try to stop that service also (`net stop msdepsvc`), reboot, and try steps again.
   - If you run `net stop http` again and still see a service `BranchCache` that keeps needing to be stopped then disable it using the PowerShell cmdlet [`Disable-BC`](https://docs.microsoft.com/en-us/powershell/module/branchcache/disable-bc).
 
+- Browsing to a container via port forward works but not via the ingress in a localhost deployment.
+
+  - Before deploying workloads, make sure that ports to be used are not held by other processes. It is also common that, in the `localhost`, the Docker Desktop process itself holds on to the ports, preventing the local load balancer from binding (see example of [issue](https://github.com/docker/for-mac/issues/4903) repeatedly reported).
+  - Solving that may require quitting and starting Docker again (suprisingly, the Restart item in the menu doesn't have the same effect).
+
 - Example doesn't work if executed twice or after another example.
 
   - If you run an example, clear it, and port 80 is still in use, try quitting Docker and starting again.

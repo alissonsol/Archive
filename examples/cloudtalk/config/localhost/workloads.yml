@@ -37,6 +37,7 @@ globalVariables:
   ironMachines:          "${env:_frontend001} ${env:_ironServerPort001} ${env:_frontend002} ${env:_ironServerPort002} ${env:_frontend003} ${env:_ironServerPort003}"
   certsName:             "certs"
   certsType:             "IronRSLKV"
+  certsContainer:        ${env:ironPrefix}-certs
   certsDir:              "certs"
   certsServiceFile:      "${env:certsName}.${env:certsType}.service.txt"
   ironCerts:             "addr1=${env:_frontend001} port1=${env:_ironServerPort001} addr2=${env:_frontend002} port2=${env:_ironServerPort002} addr3=${env:_frontend003} port3=${env:_ironServerPort003}"
@@ -152,7 +153,6 @@ workloads:
 - context: "docker-desktop"
   variables:
     namespace: "default"
-    certsContainer: ${env:ironPrefix}-certs
     _ironpod001: '$(kubectl get pods --selector=app=${env:ironPrefix}001 --all-namespaces --no-headers -o custom-columns=":metadata.name")'
     _ironpod002: '$(kubectl get pods --selector=app=${env:ironPrefix}002 --all-namespaces --no-headers -o custom-columns=":metadata.name")'
     _ironpod003: '$(kubectl get pods --selector=app=${env:ironPrefix}003 --all-namespaces --no-headers -o custom-columns=":metadata.name")'

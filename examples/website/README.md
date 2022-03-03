@@ -2,26 +2,11 @@
 
 A simple .NET C# website container deployed to a Kubernetes cluster.
 
-## Search and replace
-
-Reuse this project by search and replacing placeholders in case-sensitive mode.
-
-- yrn42website-prefix -> Common project prefix for containers. Example: yrn42
-- yrn42website-ns -> Kubernetes namespace for installing containers. Example: yrn42
-- yrn42website-dns -> DNS prefix. Example: yrn42
-- yrn42website-rg -> Name for group of resources (Azure). Example: yrn42
-- yrn42website-tags -> Resource tags. Example: yrn42
-- yrn42website-domain -> Domain for web email, site. Example: yrn42.com
-- yrn42website-cluster -> Name for the K8S cluster (or at least a common prefix). Example: yrn42
-- yrn42website-uxname -> Name for site in the UX (This will be visible to end users). Example: yrn42
-
-Despite the several placeholders enabling reuse in different configurations, it is recommended to replace as many valuables as possible to become identical, easing future maintenance. Replace `yrn42website-domain` first and then use this regular expression to search and replace the others:  `(yrn42website)[A-Za-z0-9\-]*`
-
-Before deploying to the cloud environments, seek for `TO-SET` and set the required values. See section "Cloud deployment instructions".
-
-## End to end deployment
+## End-to-end deployment
 
 Below are the end-to-end steps to deploy the `website` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
+
+Before deploying, seek for `TO-SET` in the config files and set the required values. See section "Cloud deployment instructions".
 
 **IMPORTANT**: Before proceeding, read the Connectivity section of the [Frequently Asked Questions](../../docs/faq.md).
 
@@ -39,13 +24,9 @@ Below are the end-to-end steps to deploy the `website` project to `localhost` (a
 
 - Deploy the  workloads
 
-Before deploying workloads in the `localhost`, read the special note on [ingress issues in a localhost](../../docs/ingress-localhost.md).
-
 ```shell
 ./yuruna.ps1 workloads ../examples/website localhost
 ```
-
-*NOTE*: In AKS, if you need to rerun the `workloads`, your IP Address may be deleted when the previous ingress controller is deleted. Check how to lock the IP resource in this [issue](https://stackoverflow.com/questions/66435282/how-to-make-azure-not-delete-public-ip-when-deleting-service-ingress-controlle).
 
 ## Resources
 
@@ -96,7 +77,7 @@ As output, the following values will become available for later steps:
   - Azure requires a globally unique registry name.
     - Ping `yourname.azurecr.io` and confirm that name is not already in use.
     - Set the value just to the unique host name, like `yrn42website` (not `yrn42website.azurecr.io`).
-  - The current value is intentionally left empty so that validation will point out the need to edit the files.
 - Afterward, execute the same commands above, replacing `localhost` with `azure`.
+- In AKS, if you need to rerun the `workloads`, your IP Address may be deleted when the previous ingress controller is deleted. Check how to lock the IP resource in this [issue](https://stackoverflow.com/questions/66435282/how-to-make-azure-not-delete-public-ip-when-deleting-service-ingress-controlle).
 
 Back to main [readme](../../README.md). Back to list of [examples](../README.md).

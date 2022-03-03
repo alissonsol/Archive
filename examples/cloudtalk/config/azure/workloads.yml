@@ -35,6 +35,7 @@ globalVariables:
   ironMachines:          "${env:_frontend001} ${env:_ironServerPort001} ${env:_frontend002} ${env:_ironServerPort002} ${env:_frontend003} ${env:_ironServerPort003}"
   certsName:             "certs"
   certsType:             "IronRSLKV"
+  certsContainer:        ${env:ironPrefix}-certs
   certsDir:              "certs"
   certsServiceFile:      "${env:certsName}.${env:certsType}.service.txt"
   ironCerts:             "addr1=${env:_frontend001} port1=${env:_ironServerPort001} addr2=${env:_frontend002} port2=${env:_ironServerPort002} addr3=${env:_frontend003} port3=${env:_ironServerPort003}"
@@ -93,7 +94,6 @@ workloads:
 - context: "docker-desktop"
   variables:
     namespace: "default"
-    certsContainer: ${env:ironPrefix}-certs
   deployments:
     - kubectl: "config set-context --current --namespace=${env:namespace} --v=1"
     - kubectl: "delete secret registry-credential --ignore-not-found=true"

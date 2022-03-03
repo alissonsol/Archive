@@ -1,5 +1,6 @@
 # Resources information - localhost
 ---
+# TO-SET: ensure source context has the right name
 globalVariables:
   runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
   runTag:                "localhost"
@@ -17,7 +18,6 @@ resources:
 - name:                  "componentsRegistry"
   template:              "localhost/registry"
   variables:
-    # TO-SET: registry name must be globally unique, without dashes
     uniqueName:          "${env:project}${env:runId}"
 
 # context-copy 001

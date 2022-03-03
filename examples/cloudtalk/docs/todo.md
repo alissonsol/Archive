@@ -2,11 +2,8 @@
 
 ## TODO
 
-- Config: standardization
 - AWS, CGP resource templates
-- Apple M1/Arm build for cloudtalk example
 - "peerkeys" debug
-- Saving run configuration (temp folder name standardized)
 
 ## DONE
 

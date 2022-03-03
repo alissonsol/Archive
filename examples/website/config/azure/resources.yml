@@ -1,5 +1,6 @@
 # Resources information - azure
 ---
+# TO-SET: azure registry name must be globally unique, without dashes
 globalVariables:
   runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
   runTag:                "azure"
@@ -26,7 +27,6 @@ resources:
 - name:                  "componentsRegistry"
   template:              "azure/registry"
   variables:
-    # TO-SET: registry name must be globally unique, without dashes
     uniqueName:          "${env:project}${env:runId}"
 
 # cluster reference

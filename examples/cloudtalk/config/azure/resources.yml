@@ -1,5 +1,6 @@
 # Resources information - azure
 ---
+# TO-SET: azure registry name must be globally unique, without dashes
 globalVariables:
   runId:                 "$(-join ((97..122) | Get-Random -Count 6 | %{[char]$_}))"
   runTag:                "azure"
@@ -20,7 +21,7 @@ globalVariables:
 
 # Careful: if the template needs a variable (variables.tf) and it is not defined globally or locally below then the script will be stuck waiting input
 resources:
-# Hack: create all resource groups first, so they are ready when needed (use the registry creation as the "delay")
+# HACK: create all resource groups first, so they are ready when needed (use the registry creation as a "delay")
 - name:                  "defaultResourceGroup"
   template:              "azure/resource-group"
   variables:
@@ -49,7 +50,6 @@ resources:
 - name:                  "componentsRegistry"
   template:              "azure/registry"
   variables:
-    # TO-SET: registry name must be globally unique, without dashes
     uniqueName:          "${env:project}${env:runId}"
 
 # 001 - eastus
