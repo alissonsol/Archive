@@ -86,6 +86,6 @@ After authentication, deploy to Azure using the following sequence. Make sure th
 
 In a localhost, using connected [IronRSLKVServer](https://github.com/microsoft/Ironclad/tree/main/ironfleet/src/IronRSLKVServer) nodes, all the components run in the same cluster. The collision is solved by different pathBase values for each instance. A difference is that each backend knows about all the RSL key-value servers.
 
-<img src="cloudtalk-localhost-ironrslkv.png" alt="cloudtalk in the localhost using ironrslkv" width="640"/>
+<img src="docs/cloudtalk-localhost-ironrslkv.png" alt="cloudtalk in the localhost using ironrslkv" width="640"/>
 
 Back to main [readme](../../README.md). Back to list of [examples](../README.md).
