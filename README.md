@@ -1,6 +1,6 @@
 # `yuruna`
 
-A developer toolset for cross-cloud Kubernetes-based applications.
+A developer toolset for cross-cloud Kubernetes-based applications. Check the [Yuruna YouTube channel](https://www.youtube.com/channel/UCl36lZ2MwZ0f6_QAUOmGNDw) for videos about the tools and examples.
 
 ## Requirements and cloud-specific steps
 

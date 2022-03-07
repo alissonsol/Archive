@@ -62,6 +62,6 @@ Ahead of installing certificates in the localhost, it is recommended to run `mkc
       - It will show for each tool what was the version in the test environment and version locally found.
       - Follow links above to install or update tools.
 
-See some additional guidance on how machines were setup for the [macOS](./mac-os.md) and [Ubuntu](./ubuntu.md) tests (no guarantees!).
+See some additional guidance on how machines were setup for the [macOS](./requirements-mac-os.md) and [Ubuntu](./requirements-ubuntu.md) tests (no guarantees!).
 
 Back to main [readme](../README.md)

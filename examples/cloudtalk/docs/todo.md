@@ -3,7 +3,6 @@
 ## TODO
 
 - AWS, CGP resource templates
-- "peerkeys" debug
 
 ## DONE
 

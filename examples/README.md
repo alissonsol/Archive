@@ -12,10 +12,6 @@ Read the Connectivity section of the [Frequently Asked Questions](../docs/faq.md
 
 - [cloudtalk](cloudtalk/README.md) demonstrates key/value replication across nodes using the [IronRSL - Key-Value Store](https://github.com/microsoft/Ironclad/blob/main/ironfleet/README.md#ironrsl---key-value-store).
 
-## peerkeys
-
-- [peerkeys](peerkeys/README.md) demonstrates key/value replication across nodes using [etcd](https://etcd.io/).
-
 ## Template
 
 - This is just the [folder structure](../projects/template/) to create a new project.

@@ -4,12 +4,8 @@
 
 ### P0, P1
 
-- peerkeys: etcd ERROR ==> Headless service domain does not have an IP per initial member in the cluster 
 - Need something like: loop: _number(001-003)
 - curl x wget?
-- cloudtalk: in ARM, `apt-get install -y aspnetcore-runtime-5.0` is not working
-  - More investigation needed: <https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian>
-- Use MetalLB or other solution to replace port forward in bare metal: <https://kubernetes.github.io/ingress-nginx/deploy/baremetal/>
 - How to "pack and move" to another machine
 - Before "cloud-based" scripts execute, validate session
 - Validation: repeated resource names and other duplications like context names
@@ -22,8 +18,9 @@
 - Check if terraform requires variable and not provide it if not needed (avoids warnings).
 - Documentation
   - How to start new project from the "template".
-  - Hw to use a single PowerShell script for the several commands in a repeated block.
+  - How to use a single PowerShell script for the several commands in a repeated block until someday implementing loop: _number(001-003)
 - Finish testing and publish the resources for AWS and GCP
+  - More resource templates in general
 
 ### P2
 
@@ -39,8 +36,8 @@
   - Cert-manager: workloads in Azure
     - DEBUG: helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.1.0 --set installCRDs=true --set nodeSelector."beta\.kubernetes\.io/os"=linux --debug
   - install.go:172: [debug] Original chart version: "v1.1.0"
-    - Error: read tcp dev-machine-IP:62410->130.211.96.40(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
-    - helm.go:81: [debug] read tcp dev-machine-IP:62410->130.211.96.40(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
+    - Error: read tcp dev-machine-IP:62410->IP(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
+    - helm.go:81: [debug] read tcp dev-machine-IP:62410->IP(charts.jetstack.io):443: wsarecv: An existing connection was forcibly closed by the remote host.
   - NGINX: workloads in Azure: 2nd time+: Error: cannot re-use a name that is still in use
   - Error: Internal error occurred: failed calling webhook "webhook.cert-manager.io": Post "https://cert-manager-webhook.cert-manager.svc:443/mutate?timeout=10s": dial tcp 10 x.y.z:443: connect: connection refused
 

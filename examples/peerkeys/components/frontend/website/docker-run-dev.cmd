@@ -1,2 +1,0 @@
-docker build --rm -f Dockerfile -t yrn42peerkeys/website:latest .
-docker run --rm -it -p 9000:80 -p 9001:443 --name "yrn42peerkeys-website" -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=9001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="password" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yrn42peerkeys/website:latest

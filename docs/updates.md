@@ -4,19 +4,8 @@
 
 Focused on major theme for the mid-month release.
 
-- 2022/02/15
-  - Reorg of folder with examples
-- 2021/04/21
-  - More script improvements and fixes: now can define variable based on another from the very previous line.
-- 2021/03/21
-  - Script improvements. Now the `peerkeys` example is complete for localhost.
-- 2021/02/15
-  - Add more examples, with mechanism for easy reuse.
-  - Resource templates can be placed under `global` and reused.
-  - `resources.output` created as hierarchical Yaml, allowing multiple resouces from the same template (like multiple clusters).
-- 2021/01/11
-  - Deployment to Azure works!
-- 2020/12/18
-  - All commands are parameters for `yuruna` main PowerShell script.
+- 2022/03/14
+  - PI day launch of videos explaining example and the PowerShell scripts
+  - Cleanup of repository ahead of that to reduce "entropy"
 
 Back to main [readme](../README.md)

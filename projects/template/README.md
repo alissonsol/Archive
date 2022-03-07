@@ -2,7 +2,7 @@
 
 Folder structure template project.
 
-## End to end deployment
+## End-to-end deployment
 
 Below are the end-to-end steps to deploy the `template` project to `localhost` (assuming Docker is installed and Kubernetes enabled). The execution below is from the `automation` folder. You may need to start PowerShell (`pwsh`).
 
