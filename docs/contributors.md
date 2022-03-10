@@ -8,5 +8,6 @@ Appreciate all the help from everyone developing, testing, and contributing to `
 - [Jingyan Wang](https://github.com/jingyanwangms)
 - [Markus Kuppe](https://github.com/lemmy)
 - [Paulo Haimann Pinto](https://github.com/PSergioHP)
+- [Ross Savage](https://github.com/Ross-GH)
 
 Back to main [readme](../README.md)

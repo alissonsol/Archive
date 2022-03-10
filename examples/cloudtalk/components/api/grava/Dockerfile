@@ -22,18 +22,18 @@ COPY ./grava ./grava
 WORKDIR "/src/grava"
 RUN dotnet build "grava.csproj" -c "$BUILD_FLAG" -o /app/build
 # irontest
-WORKDIR /src
-COPY ["./irontest/irontest.csproj", "irontest/"]
-RUN dotnet restore "irontest/irontest.csproj"
-COPY ./irontest ./irontest
-WORKDIR "/src/irontest"
-RUN dotnet build "irontest.csproj" -o /app/build
+# WORKDIR /src
+# COPY ["./irontest/irontest.csproj", "irontest/"]
+# RUN dotnet restore "irontest/irontest.csproj"
+# COPY ./irontest ./irontest
+# WORKDIR "/src/irontest"
+# RUN dotnet build "irontest.csproj" -o /app/build
 
 FROM build AS publish
 WORKDIR "/src/grava"
 RUN dotnet publish "grava.csproj" -c "$BUILD_FLAG" -o /app/publish
-WORKDIR "/src/irontest"
-RUN dotnet publish "irontest.csproj" -c "$BUILD_FLAG" -o /app/publish
+# WORKDIR "/src/irontest"
+# RUN dotnet publish "irontest.csproj" -c "$BUILD_FLAG" -o /app/publish
 
 FROM base AS final
 WORKDIR /app
@@ -42,6 +42,7 @@ EXPOSE 8088
 
 COPY --from=publish /app/publish .
 
-RUN apt-get update && apt-get install -y net-tools iputils-ping
+RUN apt-get update
+# RUN apt-get update && apt-get install -y net-tools iputils-ping
 
 ENTRYPOINT ["dotnet", "grava.dll"]

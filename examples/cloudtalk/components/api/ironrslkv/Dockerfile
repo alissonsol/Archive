@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /workspace
 RUN export LANG=en_US.UTF-8
 RUN apt-get update && apt-get install -y build-essential
@@ -20,13 +20,11 @@ RUN apt-get update && apt-get install -y default-jre
 RUN pip3 install lit OutputCheck
 RUN pip3 install scons
 RUN git config --global core.autocrlf input
-RUN git clone -b main https://github.com/microsoft/Ironclad.git
+RUN git clone --branch v0.3 --single-branch https://github.com/microsoft/Ironclad.git
 WORKDIR /workspace/Ironclad
-RUN git pull
 WORKDIR /workspace
-RUN git clone https://github.com/dafny-lang/dafny.git --recurse-submodules
+RUN git clone --branch v3.4.2 --single-branch https://github.com/dafny-lang/dafny.git --recurse-submodules
 WORKDIR /workspace/dafny
-RUN git checkout v3.4.0
 RUN make exe
 RUN pip3 install pre-commit
 RUN pre-commit install
@@ -34,12 +32,18 @@ RUN make -C /workspace/dafny z3-ubuntu
 WORKDIR /workspace/Ironclad/ironfleet
 RUN scons --dafny-path=/workspace/dafny/Binaries --no-verify
 
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM base AS final
 WORKDIR /workspace
+
+COPY --from=build /workspace/Ironclad/ironfleet/bin/ /workspace/Ironclad/ironfleet/bin/
+
 COPY ["launch.sh", "/workspace"]
 COPY ["certs.sh", "/workspace"]
 RUN ["chmod", "+x", "/workspace/launch.sh"]
 RUN ["chmod", "+x", "/workspace/certs.sh"]
 
-RUN apt-get update && apt-get install -y net-tools iputils-ping
+RUN apt-get update
+# RUN apt-get update && apt-get install -y net-tools iputils-ping
 
 ENTRYPOINT ["/bin/bash", "/workspace/launch.sh"]
