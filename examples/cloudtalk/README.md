@@ -2,7 +2,7 @@
 
 Key/value replication across nodes using the [IronRSL - Key-Value Store](https://github.com/microsoft/Ironclad/blob/main/ironfleet/README.md#ironrsl---key-value-store).
 
-Follow the instructions to create resources, build components and deploy the workloads. Connect to one of the frontends. Endpoints are exposed during the workloads deployment.
+Follow the instructions to create resources, build components and deploy the workloads. Connect to one of the frontends. Endpoints are exposed during the workloads deployment. Follow this playlist of videos for guidance: [2022-03 CloudTalk Deployment](https://www.youtube.com/playlist?list=PLkI9M1RY7tAu1SxfDvXhBuSjYWgx0CrfI).
 
 ## End-to-end deployment
 
